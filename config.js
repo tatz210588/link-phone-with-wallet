@@ -10,8 +10,8 @@ export const networkConfig = {
     ],
 
     "4": [
-        {       //not yet deployed
-            phoneLinkAddress: "0x15d819282A10AE7C7F1eFC4d167E52fA50fB4709",
+        {
+            phoneLinkAddress: "0x61851Aa69131E18a3f25e90B093ea40c6c2D3bB2",
             token_icon: "https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=022",
             alt: "ETH",
             networkName: "Rinkeby"
