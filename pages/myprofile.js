@@ -94,7 +94,7 @@ const myprofile = () => {
             }).catch((error) => {
                 // Error; SMS not sent
                 // ...
-                toast.error("OTP not sent due to technical issue. Please try later.");
+                //toast.error("OTP not sent due to technical issue. Please try later.");
                 console.log("error", error)
             });
 
@@ -111,7 +111,7 @@ const myprofile = () => {
             // User signed in successfully.
             const user = result.user;
             console.log(JSON.stringify(user))
-            toast.success("user is verified")
+            toast.success("OTP verified. Encoding new phone number. Please Wait...")
             savePhone()
             setOtp(false)
             // ...
@@ -157,6 +157,8 @@ const myprofile = () => {
             tx.wait(1)
             toast.success("Phone Number Changed !!")
             setLoadingState(false)
+            seteditphonenumber(false)
+            Router.push({ pathname: './' })
             setValue('')
         }
     }

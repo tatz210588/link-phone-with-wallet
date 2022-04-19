@@ -90,7 +90,7 @@ const Home = () => {
             }).catch((error) => {
                 // Error; SMS not sent
                 // ...
-                toast.error("OTP not sent due to technical issue. Please try later.");
+                //toast.error("OTP not sent due to technical issue. Please try later.");
                 console.log("error", error)
             });
 
@@ -114,7 +114,8 @@ const Home = () => {
         }).catch((error) => {
             // User couldn't sign in (bad verification code?)
             // ...
-            toast.error("Wrong otp")
+            //toast.error("Wrong otp")
+            console.log(error);
         });
     }
 

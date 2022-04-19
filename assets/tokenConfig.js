@@ -20,6 +20,21 @@ export const tokenConfig = {
             decimal: 18
         }
     ],
+    "4": [
+
+        {
+            name: "---Select Your Crypto---",
+            address: "0x000",
+            symbol: "SELECT",
+            decimal: 18
+        },
+        {
+            name: "ETH",
+            address: "null",
+            symbol: "ETH",
+            decimal: 18
+        }
+    ],
 };
 
 export const getTokenByChain = (chain) => tokenConfig[chain];
