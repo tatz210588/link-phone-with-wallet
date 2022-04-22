@@ -46,7 +46,7 @@ const Pay = () => {
     useEffect(() => {
         window.ethereum.request({ method: 'eth_requestAccounts' })
             .then(result => {
-                setDefaultAccount(result[0]);
+                setDefaultAccount(result[0]); //get existing wallet address
             })
     }, [defaultAccount])
 

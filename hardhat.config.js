@@ -1,5 +1,6 @@
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-etherscan");
+require("@openzeppelin/hardhat-upgrades");
 
 const infura_projectId = "403f2033226a44788c2638cc1c29d438"
 const fs = require("fs")
