@@ -18,6 +18,7 @@ const style = {
 export default function Home() {
   const { address } = useWeb3()
 
+
   return (
     <div className={style.wrapper}>
       <Toaster position="top-center" reverseOrder={false} />

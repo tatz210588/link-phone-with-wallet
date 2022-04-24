@@ -45,11 +45,11 @@ const Hero = () => {
                                     pathname: '/pay'
                                 })
                             }}>Pay to Phone</button>
-                            <button className={style.qrButton} >
-                                <Image className={style.qrButton} src={logo} height={50} width={60} onClick={() => { Router.push({ pathname: '/qrPay' }) }} />
 
-                            </button>
-                            <button className={style.button} onClick={() => { Router.push({ pathname: '/register' }) }}>Link phone</button>
+
+
+                            <button className={style.button} onClick={() => { Router.push({ pathname: '/register' }) }}>Sign up</button>
+                            <button className={style.button}>Send NFT</button>
                         </div>
                     </div>
                     <div className={`${style.cardContainer} `}>

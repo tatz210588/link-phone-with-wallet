@@ -2,8 +2,32 @@ import '../styles/globals.css'
 import Header from '../components/Header'
 import { ThirdwebProvider } from "@3rdweb/react";
 import Footer from '../components/Footer'
+import { useEffect, useState } from 'react';
+import Lottie from 'react-lottie'
+import * as location from '../assets/globe.json'
+import * as success from '../assets/success.json'
+
+const defaultOptions1 = {
+  loop: true,
+  autoplay: true,
+  animationData: location.default,
+  rendererSettings: {
+    preserveAspectRatio: 'xMidYMid slice'
+  }
+}
+
+const defaultOptions2 = {
+  loop: true,
+  autoplay: true,
+  animationData: success.default,
+  rendererSettings: {
+    preserveAspectRatio: 'xMidYMid slice'
+  }
+}
 
 function linkPhoneWithWallet({ Component, pageProps }) {
+  const [loading, setLoading] = useState(undefined)
+  const [completed, setCompleted] = useState(undefined)
   const supportedChainIds = [1, 4, 137, 80001, 43114];
   const connectors = {
     injected: {},
@@ -18,19 +42,41 @@ function linkPhoneWithWallet({ Component, pageProps }) {
       darkMode: false,
     },
   };
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(true)
+      setTimeout(() => {
+        setCompleted(true)
+      }, 1000)
+    }, 4000)
+  }, [])
+
   return (
-    <ThirdwebProvider
-      connectors={connectors}
-      supportedChainIds={supportedChainIds}
-    >
+    <>
+      {!completed ? (
+        <>
+          {!loading ? (
+            <Lottie options={defaultOptions1} height={200} width={200} />
+          ) : (
+            <Lottie options={defaultOptions2} height={200} width={200} />
+          )}
+        </>
 
-      <div>
-        <Header />
+      ) : (
+        <ThirdwebProvider
+          connectors={connectors}
+          supportedChainIds={supportedChainIds}
+        >
 
-        <Component {...pageProps} />
-        <Footer />
-      </div>
-    </ThirdwebProvider>
+          <div>
+            <Header />
+            <Component {...pageProps} />
+            <Footer />
+          </div>
+        </ThirdwebProvider >
+      )
+      }
+    </>
   )
 }
 
