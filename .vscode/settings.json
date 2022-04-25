@@ -1,0 +1,9 @@
+{
+  "jshint.options": {
+    "asi": true
+  },
+  "prettier.semi": false,
+  "typescript.format.semicolons": "remove",
+  "javascript.format.semicolons": "remove",
+  "jshint.packageManager": "yarn"
+}
