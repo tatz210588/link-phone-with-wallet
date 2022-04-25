@@ -3,14 +3,17 @@
 pragma solidity ^0.8.4;
 
 import './Counters.sol';
-import '../openzeppelin-contracts-master/contracts/token/ERC20/ERC20.sol';
+//import '../openzeppelin-contracts-master/contracts/token/ERC20/ERC20.sol';
+import '@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 
-contract phoneLink is ERC20 {
+contract phoneLink is Initializable, ERC20Upgradeable {
     address payable public marketowner;
     using Counters for Counters.Counter;
     Counters.Counter public _itemIds;
 
-    constructor() ERC20('', '') {
+    function initialize() public initializer {
+        __ERC20_init('', '');
         marketowner = payable(msg.sender);
     }
 
