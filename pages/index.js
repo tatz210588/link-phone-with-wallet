@@ -1,12 +1,10 @@
 import Head from 'next/head'
-import Header from "../components/Header"
+import Header from '../components/Header'
 import { useEffect } from 'react'
-import Hero from "../components/Hero"
+import Hero from '../components/Hero'
 import { useWeb3 } from '@3rdweb/hooks'
-import toast, { Toaster } from "react-hot-toast"
+import toast, { Toaster } from 'react-hot-toast'
 import { ellipseAddress } from '../components/utils'
-
-
 
 const style = {
   wrapper: ``,
@@ -17,7 +15,6 @@ const style = {
 
 export default function Home() {
   const { address } = useWeb3()
-
 
   return (
     <div className={style.wrapper}>
