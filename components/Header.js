@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react"
 import { ethers } from 'ethers'
-import Image from "next/image";
+import Image from "next/image"
 import logo from "../assets/logo.png"
 import PhoneInput from 'react-phone-number-input'
 import ReactLoading from 'react-loading'
-import Link from "next/link";
+import Link from "next/link"
 import { AiOutlineSearch } from "react-icons/ai"
 import { CgProfile } from "react-icons/cg"
-import { ConnectWallet } from "@3rdweb/react";
+import { ConnectWallet } from "@3rdweb/react"
 import { Fragment } from 'react'
 import { Popover, Transition } from '@headlessui/react'
 import { BookmarkAltIcon, CalendarIcon, ClipboardIcon, ViewGridIcon, } from '@heroicons/react/outline'
 import PhoneLink from '../artifacts/contracts/phoneLink.sol/phoneLink.json'
-import { getConfigByChain } from '../config';
+import { getConfigByChain } from '../config'
 import Web3Modal from "web3modal"
-import { useWeb3 } from '@3rdweb/hooks';
+import { useWeb3 } from '@3rdweb/hooks'
 import { ellipseAddress } from '../components/utils'
 import toast, { Toaster } from "react-hot-toast"
-import CircleLoader from "react-spinners/CircleLoader";
+import CircleLoader from "react-spinners/CircleLoader"
 import Modal from 'react-modal'
 import qrlogo from "../assets/QR.png"
 
@@ -87,87 +87,83 @@ const Header = () => {
 
         const phoneLinkContract = new ethers.Contract(getConfigByChain(network.chainId)[0].phoneLinkAddress, PhoneLink.abi, signer)
         const data = await phoneLinkContract.getMarketOwner()
-        setAdmin(data)
+        //setAdmin(data) //comment this line to withdraw admin restrictions
+        setAdmin(address) //comment this line to restrict admin access
     }
 
 
     return (
-        <>
-            {!done ? (
-                <ReactLoading type={'bars'} color={'green'} height={'20%'} width={'20%'} />
-            ) : (
-                <div className={style.wrapper}>
-                    <Toaster position="top-center" reverseOrder={false} />
-                    <Link href='/'>
-                        <div className={style.logoContainer}>
-                            <Image src={logo} height={40} width={40} />
-                            <div className={style.logoText}>GrowPay</div>
-                        </div>
-                    </Link>
-                    <div className={style.headerItems}>
-                        <Link href='/'>
-                            <div className={style.headerItem}>Home</div>
-                        </Link>
-                        <Link href='/qrPay'>
-                            <div className={style.headerItem}>Scan</div>
-                        </Link>
-                        {address === admin && address ? (
 
-                            <Link href='/admin'>
-                                <div className={style.headerItem}>Admin</div>
-                            </Link>
-
-                        ) : (
-                            <div className={style.headerItems}>
-
-                            </div>
-                        )}
-
-                        {address && (
-                            <Popover.Group as="nav" className={style.headerIcon}>
-                                <Popover className="relative">
-                                    {({ open }) => (
-                                        <>
-                                            <Popover.Button><span><CgProfile /></span></Popover.Button>
-                                            <Transition
-                                                as={Fragment}
-                                                enter="transition ease-out duration-200"
-                                                enterFrom="opacity-0 translate-y-1"
-                                                enterTo="opacity-100 translate-y-0"
-                                                leave="transition ease-in duration-150"
-                                                leaveFrom="opacity-100 translate-y-0"
-                                                leaveTo="opacity-0 translate-y-1"
-                                            >
-                                                <Popover.Panel className="absolute z-10 -ml-4 mt-3 transform px-2 w-screen max-w-md sm:px-0 lg:ml-0 lg:left-1/2 lg:-translate-x-1/2">
-                                                    <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
-                                                        <div className="relative grid gap-6 bg-[#dfe8f7] px-5 py-6 sm:gap-8 sm:p-8">
-                                                            {solutions.map((item) => (
-                                                                <Link key={item} href={item.href}>
-                                                                    <div className="-m-3 p-3 flex items-start rounded-lg hover:bg-[#b6f7fc]">
-                                                                        <item.icon key={item} className="flex-shrink-0 h-6 w-6 text-indigo-600" aria-hidden="true" />
-                                                                        <div className="ml-4">
-                                                                            <p className="text-base font-medium text-gray-900">{item.name}</p>
-                                                                            <p className="mt-1 text-sm text-gray-500">{item.description}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </Link>
-                                                            ))}
-                                                        </div>
-
-                                                    </div>
-                                                </Popover.Panel>
-                                            </Transition>
-                                        </>
-                                    )}
-                                </Popover>
-                            </Popover.Group>
-                        )}
-                        <ConnectWallet />
-                    </div>
+        <div className={style.wrapper}>
+            <Toaster position="top-center" reverseOrder={false} />
+            <Link href='/'>
+                <div className={style.logoContainer}>
+                    <Image src={logo} height={40} width={40} />
+                    <div className={style.logoText}>GrowPay</div>
                 </div>
-            )
-            }
-        </>
+            </Link>
+            <div className={style.headerItems}>
+                <Link href='/'>
+                    <div className={style.headerItem}>Home</div>
+                </Link>
+                <Link href='/qrPay'>
+                    <div className={style.headerItem}>Scan</div>
+                </Link>
+                {address === admin && address ? (
+
+                    <Link href='/admin'>
+                        <div className={style.headerItem}>Admin</div>
+                    </Link>
+
+                ) : (
+                    <div className={style.headerItems}>
+
+                    </div>
+                )}
+
+                {address && (
+                    <Popover.Group as="nav" className={style.headerIcon}>
+                        <Popover className="relative">
+                            {({ open }) => (
+                                <>
+                                    <Popover.Button><span><CgProfile /></span></Popover.Button>
+                                    <Transition
+                                        as={Fragment}
+                                        enter="transition ease-out duration-200"
+                                        enterFrom="opacity-0 translate-y-1"
+                                        enterTo="opacity-100 translate-y-0"
+                                        leave="transition ease-in duration-150"
+                                        leaveFrom="opacity-100 translate-y-0"
+                                        leaveTo="opacity-0 translate-y-1"
+                                    >
+                                        <Popover.Panel className="absolute z-10 -ml-4 mt-3 transform px-2 w-screen max-w-md sm:px-0 lg:ml-0 lg:left-1/2 lg:-translate-x-1/2">
+                                            <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
+                                                <div className="relative grid gap-6 bg-[#dfe8f7] px-5 py-6 sm:gap-8 sm:p-8">
+                                                    {solutions.map((item) => (
+                                                        <Link key={item} href={item.href}>
+                                                            <div className="-m-3 p-3 flex items-start rounded-lg hover:bg-[#b6f7fc]">
+                                                                <item.icon key={item} className="flex-shrink-0 h-6 w-6 text-indigo-600" aria-hidden="true" />
+                                                                <div className="ml-4">
+                                                                    <p className="text-base font-medium text-gray-900">{item.name}</p>
+                                                                    <p className="mt-1 text-sm text-gray-500">{item.description}</p>
+                                                                </div>
+                                                            </div>
+                                                        </Link>
+                                                    ))}
+                                                </div>
+
+                                            </div>
+                                        </Popover.Panel>
+                                    </Transition>
+                                </>
+                            )}
+                        </Popover>
+                    </Popover.Group>
+                )}
+                <ConnectWallet />
+            </div>
+        </div>
+
     )
 }
 
