@@ -13,7 +13,8 @@ module.exports = {
     },
     mumbai: {
       url: `https://polygon-mumbai.infura.io/v3/${infura_projectId}`,
-      accounts: [privateKey]
+      accounts: [privateKey],
+      chainId: 80001
     },
     polygon_mainnet: {
       url: `https://polygon-mainnet.infura.io/v3/${infura_projectId}`,

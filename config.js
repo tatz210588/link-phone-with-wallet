@@ -1,7 +1,8 @@
 export const networkConfig = {
     "80001": [
         {
-            phoneLinkAddress: "0x10d8D49EdF424E8772a36A62201b23895D0D7b9e",
+            //phoneLinkAddress: "0x10d8D49EdF424E8772a36A62201b23895D0D7b9e", //original deployment
+            phoneLinkAddress: "0x1e7Be8f97745B08ACa98d1537b46307A45cCBCAE", //proxy deployment
             token_icon: "https://cryptologos.cc/logos/polygon-matic-logo.svg?v=022",
             alt: "MATIC",
             networkName: "Mumbai"

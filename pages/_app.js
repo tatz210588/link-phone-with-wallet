@@ -56,7 +56,9 @@ function linkPhoneWithWallet({ Component, pageProps }) {
       {!completed ? (
         <>
           {!loading ? (
-            <Lottie options={defaultOptions1} height={200} width={200} />
+            <>
+              <Lottie options={defaultOptions1} height={200} width={200} />
+            </>
           ) : (
             <Lottie options={defaultOptions2} height={200} width={200} />
           )}

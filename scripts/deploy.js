@@ -1,11 +1,13 @@
-const hre = require("hardhat");
+const { ethers, upgrades } = require("hardhat");
+
 
 async function main() {
 
-  const phoneLinks = await hre.ethers.getContractFactory("phoneLink");
-  const phoneLink = await phoneLinks.deploy();
-  await phoneLink.deployed();
-  console.log("phoneLinks deployed to:", phoneLink.address);
+  const phoneLinks = await ethers.getContractFactory("phoneLink");
+  const proxy = await upgrades.deployProxy(phoneLinks);
+  //const phoneLink = await phoneLinks.deploy();
+  //await phoneLink.deployed();
+  console.log("phoneLinks deployed to:", proxy.address);
 }
 
 main()
