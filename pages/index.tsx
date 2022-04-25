@@ -1,9 +1,5 @@
-import Head from 'next/head'
-import Header from '../components/Header'
-import { useEffect } from 'react'
 import Hero from '../components/Hero'
-import { useWeb3 } from '@3rdweb/hooks'
-import toast, { Toaster } from 'react-hot-toast'
+import { Toaster } from 'react-hot-toast'
 import { ellipseAddress } from '../components/utils'
 
 const style = {
@@ -13,15 +9,13 @@ const style = {
   details: `text-lg text-center text=[#282b2f] font-semibold mt-4`,
 }
 
-export default function Home() {
-  const { address } = useWeb3()
+const Home = () => (
+  <div className={style.wrapper}>
+    <Toaster position="top-center" reverseOrder={false} />
+    <>
+      <Hero />
+    </>
+  </div>
+)
 
-  return (
-    <div className={style.wrapper}>
-      <Toaster position="top-center" reverseOrder={false} />
-      <>
-        <Hero />
-      </>
-    </div>
-  )
-}
+export default Home
