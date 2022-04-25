@@ -20,7 +20,7 @@ import PhoneLink from '../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import { getConfigByChain } from '../config'
 import Web3Modal from 'web3modal'
 import { useWeb3 } from '@3rdweb/hooks'
-import { ellipseAddress } from '../components/utils'
+import { ellipseAddress } from './utils'
 import toast, { Toaster } from 'react-hot-toast'
 import CircleLoader from 'react-spinners/CircleLoader'
 import Modal from 'react-modal'
@@ -61,8 +61,8 @@ const style = {
 
 const Header = () => {
   const { address } = useWeb3()
-  const [admin, setAdmin] = useState()
-  const [done, setDone] = useState(undefined)
+  const [admin, setAdmin] = useState<typeof address>()
+  const [done, setDone] = useState(false)
 
   useEffect(() => {
     if (!window.ethereum) {
@@ -144,11 +144,11 @@ const Header = () => {
                       <Popover.Panel className="absolute z-10 -ml-4 mt-3 w-screen max-w-md transform px-2 sm:px-0 lg:left-1/2 lg:ml-0 lg:-translate-x-1/2">
                         <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                           <div className="relative grid gap-6 bg-[#dfe8f7] px-5 py-6 sm:gap-8 sm:p-8">
-                            {solutions.map((item) => (
-                              <Link key={item} href={item.href}>
+                            {solutions.map((item, i) => (
+                              <Link key={i} href={item.href}>
                                 <div className="-m-3 flex items-start rounded-lg p-3 hover:bg-[#b6f7fc]">
                                   <item.icon
-                                    key={item}
+                                    key={i}
                                     className="h-6 w-6 flex-shrink-0 text-indigo-600"
                                     aria-hidden="true"
                                   />
