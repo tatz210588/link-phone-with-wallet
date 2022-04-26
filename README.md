@@ -1,6 +1,6 @@
-# Basic Sample Hardhat Project
+# GrowLimitLess Project for Hackathon Entry
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+This project demonstrates the use case thats related to tokenizing a phone or email to a wallet address. We are currently making this cross chain compatible and adding support for KAI network as well. This is also going as our entry for the hackathon project.
 
 Try running some of the following tasks:
 
