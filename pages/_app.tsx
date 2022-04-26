@@ -7,6 +7,7 @@ import Lottie from 'react-lottie'
 import * as globeLoaderData from '../assets/globe.json'
 import * as successLoaderData from '../assets/success.json'
 import { AppProps } from 'next/app'
+import { Toaster } from 'react-hot-toast'
 
 const globeLoader = {
   loop: true,
@@ -81,6 +82,7 @@ const linkPhoneWithWallet = ({ Component, pageProps }: AppProps) => {
           <Footer />
         </ThirdwebProvider>
       )}
+      <Toaster position="top-center" reverseOrder={false} />
     </>
   )
 }
