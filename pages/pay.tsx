@@ -30,23 +30,23 @@ const Pay = () => {
   const { chainId } = useWeb3()
   //const chainName = getNetworkMetadata(chainId).chainName;
   //const chainId = '80001'
-  const [value, setValue] = useState(null)
-  const [balanceToken, setBalanceToken] = useState(0)
+  const [value, setValue] = useState('')
+  const [balanceToken, setBalanceToken] = useState('0')
   const [formInput, updateFormInput] = useState({ amount: 0 })
-  const [selectedToken, setSelectedToken] = useState()
+  const [selectedToken, setSelectedToken] = useState<any>(null)
   const [loadingState, setLoadingState] = useState(false)
-  const [defaultAccount, setDefaultAccount] = useState(null)
+  const [defaultAccount, setDefaultAccount] = useState<any>(null)
   const [loadingBalanceState, setLoadingBalanceState] = useState(false)
 
   useEffect(() => {
     window.ethereum
       .request({ method: 'eth_requestAccounts' })
-      .then((result) => {
+      .then((result: any[]) => {
         setDefaultAccount(result[0]) //get existing wallet address
       })
   }, [defaultAccount])
 
-  async function loadBalance(selectToken) {
+  async function loadBalance(selectToken: any) {
     setSelectedToken(selectToken)
     setLoadingState(true)
     await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
@@ -65,10 +65,9 @@ const Pay = () => {
         setBalanceToken(web3BNToFloatString(data, pow, 0, BigNumber.ROUND_DOWN))
       } else {
         //if selected token is native token
-        provider.getBalance(defaultAccount).then((balance) => {
-          const balanceInEth = ethers.utils.formatEther(balance)
-          setBalanceToken(rounded(balanceInEth))
-        })
+        const balance = await provider.getBalance(defaultAccount)
+        const balanceInEth = ethers.utils.formatEther(balance)
+        setBalanceToken(rounded(balanceInEth))
       }
       setLoadingState(false)
     } else {
@@ -76,9 +75,9 @@ const Pay = () => {
     }
   }
   function web3BNToFloatString(
-    bn,
-    divideBy,
-    decimals,
+    bn: any,
+    divideBy: BigNumber,
+    decimals: number,
     roundingMode = BigNumber.ROUND_DOWN
   ) {
     const converted = new BigNumber(bn.toString())
@@ -87,8 +86,8 @@ const Pay = () => {
   }
 
   async function transfer() {
-    if (selectedToken != null && formInput.amount > 0 && value != null) {
-      if (balanceToken > formInput.amount) {
+    if (selectedToken && formInput.amount && value) {
+      if (balanceToken && Number(balanceToken) > formInput.amount) {
         setLoadingState(true)
 
         await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
@@ -102,7 +101,10 @@ const Pay = () => {
           PhoneLink.abi,
           signer
         )
-        const amount = ethers.utils.parseUnits(formInput.amount, 'ether')
+        const amount = ethers.utils.parseUnits(
+          formInput.amount.toString(),
+          'ether'
+        )
         const phoneLinkContract = new ethers.Contract(
           getConfigByChain(network.chainId)[0].phoneLinkAddress,
           PhoneLink.abi,
@@ -117,7 +119,7 @@ const Pay = () => {
           )
         } else {
           const items = await Promise.all(
-            to.map(async (i) => {
+            to.map(async (i: any) => {
               let item = {
                 phoneNumber: i.phoneNumber,
                 connectedWalletAddress: i.connectedWalletAddress,
@@ -171,7 +173,7 @@ const Pay = () => {
             <select
               className={style.dropDown}
               onChange={(e) => {
-                if (e.target.value != 0) {
+                if (e.target.value !== '0') {
                   const token = getTokenByChain(chainId)[e.target.value]
                   setSelectedToken(token)
                   loadBalance(getTokenByChain(chainId)[e.target.value])
@@ -182,7 +184,7 @@ const Pay = () => {
                 }
               }}
             >
-              {getTokenByChain(chainId).map((token, index) => (
+              {getTokenByChain(chainId).map((token: any, index: number) => (
                 <option value={index} key={token.address}>
                   {token.name}
                 </option>
@@ -201,7 +203,7 @@ const Pay = () => {
                 placeholder="Enter phone number"
                 value={value}
                 id="myNewInput"
-                onChange={setValue}
+                onChange={(ph) => setValue(ph?.toString ?? '')}
               />
             </div>
 
@@ -212,7 +214,7 @@ const Pay = () => {
                 onChange={(e) => {
                   updateFormInput({
                     ...formInput,
-                    amount: e.target.value,
+                    amount: Number(e.target.value),
                   })
                 }}
               />
@@ -223,7 +225,7 @@ const Pay = () => {
             <div className={style.midRow}>
               Connecting to blockchain. Please wait
               <BeatLoader
-                className={style.midRow}
+                // className={style.midRow}
                 color={'#ffffff'}
                 loading={loadingState}
                 size={15}

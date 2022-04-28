@@ -1,6 +1,6 @@
 import { useWeb3 } from '@3rdweb/hooks'
-import React, { useState, useEffect } from 'react'
-import toast, { Toaster } from 'react-hot-toast'
+import React, { useState, useEffect, KeyboardEvent } from 'react'
+import toast from 'react-hot-toast'
 import Router from 'next/router'
 import PhoneLink from '../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import { getConfigByChain } from '../config'
@@ -13,6 +13,7 @@ import Container from '../components/Container'
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
+  infoContainer: `h-20 bg-[#313338] p-4 rounded-b-lg flex items-center text-white`,
   searchBar: `flex flex-1 mx-[0.8rem]  items-center bg-[#363840] rounded-[0.8rem] hover:bg-[#757199]`,
   searchInput: `h-[2.6rem] w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#e6e8eb] placeholder:text-[#8a939b]`,
   copyContainer: `w-1/2`,
@@ -30,7 +31,7 @@ const style = {
 const Home = () => {
   const { address, chainId } = useWeb3()
   const [loadingState, setLoadingState] = useState(true)
-  const [details, setDetails] = useState()
+  const [details, setDetails] = useState<any[]>([])
   const [formInput, updateFormInput] = useState({ phoneNumber: '' })
   const [admins, setAdmins] = useState()
 
@@ -54,7 +55,7 @@ const Home = () => {
     )
     const data = await phoneLinkContract.getPhoneToDetails()
     const items = await Promise.all(
-      data.map(async (i) => {
+      data.map(async (i: any) => {
         let item = {
           name: i.name,
           phoneNumber: i.phoneNumber,
@@ -68,10 +69,12 @@ const Home = () => {
     setLoadingState(false)
   }
 
-  async function search(e) {
+  async function search(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') {
       setLoadingState(true)
-      if (document.getElementById('searchBar').value === '') {
+      if (
+        '' === (document.getElementById('searchBar') as HTMLInputElement)?.value
+      ) {
         loadPhoneDetails()
       } else {
         const web3Modal = new Web3Modal({
@@ -91,7 +94,7 @@ const Home = () => {
           formInput.phoneNumber
         )
         const items = await Promise.all(
-          data.map(async (i) => {
+          data.map(async (i: any) => {
             let item = {
               phoneNumber: i.phoneNumber,
               connectedWalletAddress: i.connectedWalletAddress,
@@ -112,10 +115,10 @@ const Home = () => {
 
   return (
     <Container>
-      {loadingState === true ? (
+      {loadingState ? (
         <div className={style.spinner}>
           <CircleLoader
-            className={style.spinner}
+            // className={style.spinner}
             color={'#277cc2'}
             loading={loadingState}
             size={150}

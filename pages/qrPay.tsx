@@ -26,30 +26,30 @@ const style = {
 }
 
 const qrPay = () => {
-  const [scanResultWebCam, setScanResultWebCam] = useState(null)
+  const [scanResultWebCam, setScanResultWebCam] = useState('')
   const [formInput, updateFormInput] = useState({ amount: 0 })
   const { chainId } = useWeb3()
-  const [balanceToken, setBalanceToken] = useState(0)
-  const [selectedToken, setSelectedToken] = useState()
+  const [balanceToken, setBalanceToken] = useState('0')
+  const [selectedToken, setSelectedToken] = useState<any>(null)
   const [loadingState, setLoadingState] = useState(false)
   const [loadingBalanceState, setLoadingBalanceState] = useState(false)
-  const [defaultAccount, setDefaultAccount] = useState(null)
+  const [defaultAccount, setDefaultAccount] = useState('')
   const [walletName, setWalletName] = useState('Fetching data. Please Wait...')
 
   useEffect(() => {
     window.ethereum
       .request({ method: 'eth_requestAccounts' })
-      .then((result) => {
+      .then((result: string[]) => {
         setDefaultAccount(result[0])
       })
-    console.log('default', defaultAccount)
+    console.info({ defaultAccount })
   }, [defaultAccount])
 
-  const handleErrorWebCam = (error) => {
-    console.log(error)
+  const handleErrorWebCam = (error: any) => {
+    console.error(error)
   }
 
-  async function fetchDetails(address) {
+  async function fetchDetails(address: string) {
     window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
     const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
     const signer = provider.getSigner() // get signer
@@ -63,7 +63,7 @@ const qrPay = () => {
     )
     const data = await phoneLinkContract.getWalletDetails(address)
     const items = await Promise.all(
-      data.map(async (i) => {
+      data.map(async (i: any) => {
         let item = {
           name: i.name,
           phoneNumber: i.phoneNumber,
@@ -75,21 +75,21 @@ const qrPay = () => {
     setWalletName(items[0].name)
   }
 
-  const handleScanWebCam = (result) => {
+  const handleScanWebCam = (result: any) => {
     if (result) {
       fetchDetails(result.text)
       setScanResultWebCam(result.text)
     }
   }
 
-  async function loadBalance(selectToken) {
+  async function loadBalance(selectToken: any) {
     setSelectedToken(selectToken)
     setLoadingState(true)
     await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
     const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
 
-    if (selectToken != 0) {
-      if (selectToken.address != 'null') {
+    if (selectToken) {
+      if (selectToken.address) {
         //if selected token address is non-native token
         const tokenContract = new ethers.Contract(
           selectToken.address,
@@ -98,14 +98,13 @@ const qrPay = () => {
         )
         const data = await tokenContract.balanceOf(defaultAccount)
         const pow = new BigNumber('10').pow(new BigNumber(selectToken.decimal))
-        console.log('fetching balance')
+        console.info('fetching balance')
         setBalanceToken(web3BNToFloatString(data, pow, 0, BigNumber.ROUND_DOWN))
       } else {
         //if selected token is native token
-        provider.getBalance(defaultAccount).then((balance) => {
-          const balanceInEth = ethers.utils.formatEther(balance)
-          setBalanceToken(rounded(balanceInEth))
-        })
+        const balance = await provider.getBalance(defaultAccount)
+        const balanceInEth = ethers.utils.formatEther(balance)
+        setBalanceToken(rounded(balanceInEth))
       }
       setLoadingState(false)
     } else {
@@ -114,8 +113,8 @@ const qrPay = () => {
   }
 
   async function transfer() {
-    if (selectedToken != null && formInput.amount > 0) {
-      if (balanceToken > formInput.amount) {
+    if (selectedToken !== null && formInput.amount > 0) {
+      if (Number(balanceToken) > formInput.amount) {
         setLoadingState(true)
 
         await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
@@ -130,7 +129,10 @@ const qrPay = () => {
           PhoneLink.abi,
           signer
         )
-        const amount = ethers.utils.parseUnits(formInput.amount, 'ether')
+        const amount = ethers.utils.parseUnits(
+          formInput.amount.toString(),
+          'ether'
+        )
 
         if (selectedToken.address != 'null') {
           //for non-native coin
@@ -147,7 +149,7 @@ const qrPay = () => {
         toast.success('Transfer Successful.')
         setLoadingState(false)
         await loadBalance(selectedToken)
-        console.log('balance', balanceToken)
+        console.info({ balanceToken })
       } else {
         toast.error('You need more balance to execute this transaction.')
       }
@@ -157,9 +159,9 @@ const qrPay = () => {
   }
 
   function web3BNToFloatString(
-    bn,
-    divideBy,
-    decimals,
+    bn: any,
+    divideBy: BigNumber,
+    decimals: number,
     roundingMode = BigNumber.ROUND_DOWN
   ) {
     const converted = new BigNumber(bn.toString())
@@ -194,7 +196,7 @@ const qrPay = () => {
             <select
               className={style.dropDown}
               onChange={(e) => {
-                if (e.target.value != 0) {
+                if (e.target.value != '0') {
                   const token = getTokenByChain(chainId)[e.target.value]
                   setSelectedToken(token)
                   loadBalance(getTokenByChain(chainId)[e.target.value])
@@ -205,7 +207,7 @@ const qrPay = () => {
                 }
               }}
             >
-              {getTokenByChain(chainId).map((token, index) => (
+              {getTokenByChain(chainId).map((token: any, index: number) => (
                 <option value={index} key={token.address}>
                   {token.name}
                 </option>
@@ -217,7 +219,10 @@ const qrPay = () => {
                 className={style.searchInput}
                 placeholder="Amount to transfer"
                 onChange={(e) => {
-                  updateFormInput({ ...formInput, amount: e.target.value })
+                  updateFormInput({
+                    ...formInput,
+                    amount: Number(e.target.value),
+                  })
                 }}
               />
             </div>

@@ -6,9 +6,6 @@ import logo from '../assets/QR.png'
 import Container from './Container'
 
 const style = {
-  // wrapper: `relative`,
-  // container: `before:content-[''] before:bg-red-500 before:absolute before:top-0 before:left-0 before:right-0 before:bottom-0 before:bg-[url('../assets/4.jpg')] before:bg-cover before:bg-center before:bg-fixed before:opacity-100 before:blur`,
-  // contentWrapper: `flex h-screen relative justify-center flex-wrap items-center`,
   copyContainer: `w-1/2`,
   title: `relative text-[#277cc2] text-[46px] font-semibold`,
   description: `text-[#fffbeb] container-[400px] text-xl mt-[0.8rem] mb-[2.5rem]`,

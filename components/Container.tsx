@@ -1,9 +1,9 @@
 import { NextPage } from 'next'
 
 type ContainerProps = {
-  wrapperClass: string
-  containerClass: string
-  contentWrapperClass: string
+  wrapperClass?: string
+  containerClass?: string
+  contentWrapperClass?: string
 }
 
 const Container: NextPage<ContainerProps> = ({

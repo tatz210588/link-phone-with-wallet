@@ -40,15 +40,16 @@ const style = {
 
 const Home = () => {
   const { address, chainId } = useWeb3()
-  const [signInData, setSignInData] = useState()
+  const [signInData, setSignInData] = useState('')
   const [formInput, updateFormInput] = useState({ name: '', otp: '' })
   const [loadingState, setLoadingState] = useState(false)
-  const [newPhNo, setNewPhNo] = useState()
+  const [newPhNo, setNewPhNo] = useState(false)
   const [phoneNo, setPhoneNo] = useState('')
   const [otp, setOtp] = useState(false)
 
   useEffect(() => {
-    document.getElementById('myInput').value = ''
+    const myInput = document.getElementById('myInput') as HTMLInputElement
+    myInput.value = ''
     fetchPhoneNo()
   }, [])
 
@@ -58,20 +59,19 @@ const Home = () => {
       'sign-in-button',
       {
         size: 'invisible',
-        callback: (response) => {
+        callback: (response: any) => {
           // reCAPTCHA solved, allow signInWithPhoneNumber.
           console.info('recaptcha verifying')
-          onSignInSubmit()
-          console.info('recaptcha verified')
+          onSignInSubmit(null).then((_) => console.info('recaptcha verified'))
         },
       },
       auth
     )
   }
 
-  async function onSignInSubmit(e) {
+  async function onSignInSubmit(e: any) {
     try {
-      e.preventDefault()
+      e?.preventDefault()
     } catch (error) {
       console.error(error)
     }
@@ -82,48 +82,48 @@ const Home = () => {
 
     const appVerifier = window.recaptchaVerifier
     const auth = getAuth()
-    signInWithPhoneNumber(auth, signInPhoneNumber, appVerifier)
-      .then((confirmationResult) => {
-        // SMS sent. Prompt user to type the code from the message, then sign the
-        // user in with confirmationResult.confirm(code).
-        window.confirmationResult = confirmationResult
-        toast.success('OTP sent. Please enter the OTP')
-        setOtp(true)
-        // ...
-      })
-      .catch((error) => {
-        // Error; SMS not sent
-        // ...
-        //toast.error("OTP not sent due to technical issue. Please try later.");
-        console.error(error)
-      })
+    try {
+      // SMS sent. Prompt user to type the code from the message, then sign the
+      // user in with confirmationResult.confirm(code).
+      window.confirmationResult = await signInWithPhoneNumber(
+        auth,
+        signInPhoneNumber,
+        appVerifier
+      )
+      toast.success('OTP sent. Please enter the OTP')
+      setOtp(true)
+      // ...
+    } catch (error) {
+      // Error; SMS not sent
+      // ...
+      //toast.error("OTP not sent due to technical issue. Please try later.");
+      console.error(error)
+    }
   }
 
-  async function onSubmitOTP(e) {
+  async function onSubmitOTP(e: any) {
     try {
-      e.preventDefault()
+      e?.preventDefault()
     } catch (error) {
       console.error(error)
     }
     const code = formInput.otp
     console.info({ code })
-    window.confirmationResult
-      .confirm(code)
-      .then((result) => {
-        // User signed in successfully.
-        const user = result.user
-        console.info({ user })
-        toast.success('user is verified')
-        link()
-        setOtp(false)
-        // ...
-      })
-      .catch((error) => {
-        // User couldn't sign in (bad verification code?)
-        // ...
-        //toast.error("Wrong otp")
-        console.error(error)
-      })
+    try {
+      const result = await window.confirmationResult.confirm(code)
+      // User signed in successfully.
+      const user = result.user
+      console.info({ user })
+      toast.success('user is verified')
+      await link()
+      setOtp(false)
+      // ...
+    } catch (error) {
+      // User couldn't sign in (bad verification code?)
+      // ...
+      //toast.error("Wrong otp")
+      console.error(error)
+    }
   }
 
   async function fetchPhoneNo() {
@@ -232,7 +232,7 @@ const Home = () => {
             placeholder={phoneNo}
             value={signInData}
             id="myNewInput"
-            onChange={setSignInData}
+            onChange={(ph) => setSignInData(ph?.toString() ?? '')}
           />
         </div>
         {loadingState == true ? (
@@ -291,7 +291,7 @@ const Home = () => {
                         placeholder="Enter phone number"
                         value={signInData}
                         id="myInput"
-                        onChange={setSignInData}
+                        onChange={(ph) => setSignInData(ph?.toString() ?? '')}
                       />
                     </div>
                     <button type="submit" className={style.nftButton}>
