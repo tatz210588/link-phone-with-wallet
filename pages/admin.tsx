@@ -9,7 +9,7 @@ import { ethers } from 'ethers'
 import { AiOutlineSearch } from 'react-icons/ai'
 import Container from '../components/Container'
 import BusyLoader, { LoaderType } from '../components/BusyLoader'
-//import firebase from"./firebase"
+//import getFirebaseApp from"./firebase"
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,

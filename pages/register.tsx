@@ -10,12 +10,13 @@ import { ethers } from 'ethers'
 import Modal from 'react-modal'
 import { maskPhone } from '../components/utils'
 import axios from 'axios'
+import { FirebaseApp } from 'firebase/app'
 import {
   getAuth,
   RecaptchaVerifier,
   signInWithPhoneNumber,
 } from 'firebase/auth'
-// import firebase from '../components/firebase'
+import getFirebaseApp from '../components/firebase'
 import Router from 'next/router'
 import Container from '../components/Container'
 import BusyLoader, { LoaderType } from '../components/BusyLoader'
@@ -36,6 +37,7 @@ const style = {
 }
 
 const Home = () => {
+  const [firebaseApp, setFirebaseApp] = useState<FirebaseApp | undefined>()
   const { address, chainId } = useWeb3()
   const [signInData, setSignInData] = useState('')
   const [formInput, updateFormInput] = useState({ name: '', otp: '' })
@@ -51,7 +53,7 @@ const Home = () => {
   }, [])
 
   async function configureCaptcha() {
-    const auth = getAuth()
+    const auth = getAuth(firebaseApp)
     window.recaptchaVerifier = new RecaptchaVerifier(
       'sign-in-button',
       {
@@ -78,7 +80,7 @@ const Home = () => {
     console.info({ signInPhoneNumber })
 
     const appVerifier = window.recaptchaVerifier
-    const auth = getAuth()
+    const auth = getAuth(firebaseApp)
     try {
       // SMS sent. Prompt user to type the code from the message, then sign the
       // user in with confirmationResult.confirm(code).
@@ -125,6 +127,7 @@ const Home = () => {
 
   async function fetchPhoneNo() {
     setLoadingState(true)
+    setFirebaseApp(await getFirebaseApp())
     const web3Modal = new Web3Modal({
       network: 'mainnet',
       cacheProvider: true,

@@ -7,12 +7,13 @@ import PhoneLink from '../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import Modal from 'react-modal'
 import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
+import { FirebaseApp } from 'firebase/app'
 import {
   getAuth,
   RecaptchaVerifier,
   signInWithPhoneNumber,
 } from 'firebase/auth'
-import firebase from '../components/firebase'
+import getFirebaseApp from '../components/firebase'
 import toast from 'react-hot-toast'
 import Router from 'next/router'
 import Container from '../components/Container'
@@ -36,6 +37,7 @@ const style = {
 }
 
 const MyProfile = () => {
+  const [firebaseApp, setFirebaseApp] = useState<FirebaseApp | undefined>()
   const [src, setSrc] = useState('')
   const { address, chainId } = useWeb3()
   const [phoneNumber, setPhoneNumber] = useState('')
@@ -58,7 +60,7 @@ const MyProfile = () => {
   }, [address, chainId])
 
   async function configureCaptcha() {
-    const auth = getAuth()
+    const auth = getAuth(firebaseApp)
     window.recaptchaVerifier = new RecaptchaVerifier(
       'sign-in-button',
       {
@@ -85,7 +87,7 @@ const MyProfile = () => {
     console.info({ signInPhoneNumber })
 
     const appVerifier = window.recaptchaVerifier
-    const auth = getAuth()
+    const auth = getAuth(firebaseApp)
     try {
       // SMS sent. Prompt user to type the code from the message, then sign the
       // user in with confirmationResult.confirm(code).
@@ -131,7 +133,7 @@ const MyProfile = () => {
 
   async function fetchPhone() {
     setLoadingState(true)
-
+    setFirebaseApp(await getFirebaseApp())
     await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
     const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
     const signer = provider.getSigner() // get signer
