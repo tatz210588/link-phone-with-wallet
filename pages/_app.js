@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import Lottie from 'react-lottie'
 import * as location from '../assets/globe.json'
 import * as success from '../assets/success.json'
-import { AppProps } from 'next/app'
+
 
 const defaultOptions1 = {
   loop: true,
@@ -26,10 +26,10 @@ const defaultOptions2 = {
   },
 }
 
-const linkPhoneWithWallet = ({ Component, pageProps }: AppProps) => {
+const linkPhoneWithWallet = ({ Component, pageProps }) => {
   const [loading, setLoading] = useState(false)
   const [completed, setCompleted] = useState(false)
-  const supportedChainIds = [1, 4, 137, 80001, 43114]
+  const supportedChainIds = [1, 4, 137, 80001, 43114, 24, 242]
   const connectors = {
     injected: {},
     magic: {
