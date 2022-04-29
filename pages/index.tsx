@@ -1,5 +1,4 @@
 import Hero from '../components/Hero'
-import { Toaster } from 'react-hot-toast'
 import { ellipseAddress } from '../components/utils'
 
 const style = {
@@ -11,7 +10,6 @@ const style = {
 
 const Home = () => (
   <div className={style.wrapper}>
-    <Toaster position="top-center" reverseOrder={false} />
     <>
       <Hero />
     </>

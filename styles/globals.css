@@ -53,10 +53,30 @@
   }
 
   .header-main {
-    @apply z-[100] h-24 w-screen justify-center bg-[#E6CF7C];
+    @apply z-[100] h-24 justify-center bg-[#E6CF7C];
 
     &.header-sticky {
       @apply min-h-[80px];
+    }
+  }
+
+  .wrapper {
+    @apply relative;
+  }
+
+  .container {
+    @apply m-auto before:absolute before:top-0 before:left-0 before:right-0 before:bottom-0 before:bg-red-500 before:bg-[url('../assets/4.jpg')] before:bg-cover before:bg-fixed before:bg-center before:opacity-100 before:blur before:content-[''];
+  }
+
+  .content-wrapper {
+    @apply relative flex h-screen flex-wrap items-center justify-center;
+  }
+
+  .loading-container {
+    @apply m-auto flex h-screen content-center justify-center;
+
+    & > div {
+      @apply !m-auto;
     }
   }
 }

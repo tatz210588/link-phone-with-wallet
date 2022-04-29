@@ -21,7 +21,7 @@ import { getConfigByChain } from '../config'
 import Web3Modal from 'web3modal'
 import { useWeb3 } from '@3rdweb/hooks'
 import { ellipseAddress } from './utils'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 // import CircleLoader from 'react-spinners/CircleLoader'
 // import Modal from 'react-modal'
 // import qrlogo from '../assets/QR.png'
@@ -175,7 +175,6 @@ const Header = () => {
           <ConnectWallet />
         </div>
       </header>
-      <Toaster position="top-center" reverseOrder={false} />
     </>
   )
 }

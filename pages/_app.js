@@ -4,23 +4,30 @@ import { ThirdwebProvider } from '@3rdweb/react'
 import Footer from '../components/Footer'
 import { useEffect, useState } from 'react'
 import Lottie from 'react-lottie'
+<<<<<<< HEAD:pages/_app.js
 import * as location from '../assets/globe.json'
 import * as success from '../assets/success.json'
 
+=======
+import * as globeLoaderData from '../assets/globe.json'
+import * as successLoaderData from '../assets/success.json'
+import { AppProps } from 'next/app'
+import { Toaster } from 'react-hot-toast'
+>>>>>>> e1026de27682aebfc471ca3a62eb6da0e327cef8:pages/_app.tsx
 
-const defaultOptions1 = {
+const globeLoader = {
   loop: true,
   autoplay: true,
-  animationData: location,
+  animationData: globeLoaderData,
   rendererSettings: {
     preserveAspectRatio: 'xMidYMid slice',
   },
 }
 
-const defaultOptions2 = {
+const successLoader = {
   loop: true,
   autoplay: true,
-  animationData: success,
+  animationData: successLoaderData,
   rendererSettings: {
     preserveAspectRatio: 'xMidYMid slice',
   },
@@ -29,7 +36,12 @@ const defaultOptions2 = {
 const linkPhoneWithWallet = ({ Component, pageProps }) => {
   const [loading, setLoading] = useState(false)
   const [completed, setCompleted] = useState(false)
+<<<<<<< HEAD:pages/_app.js
   const supportedChainIds = [1, 4, 137, 80001, 43114, 24, 242]
+=======
+  const [loaderSize, setLoaderSize] = useState(320)
+  const supportedChainIds = [1, 4, 137, 80001, 43114]
+>>>>>>> e1026de27682aebfc471ca3a62eb6da0e327cef8:pages/_app.tsx
   const connectors = {
     injected: {},
     magic: {
@@ -55,15 +67,21 @@ const linkPhoneWithWallet = ({ Component, pageProps }) => {
   return (
     <>
       {!completed ? (
-        <>
+        <div className="loading-container container">
           {!loading ? (
-            <>
-              <Lottie options={defaultOptions1} height={200} width={200} />
-            </>
+            <Lottie
+              options={globeLoader}
+              height={loaderSize}
+              width={loaderSize}
+            />
           ) : (
-            <Lottie options={defaultOptions2} height={200} width={200} />
+            <Lottie
+              options={successLoader}
+              height={loaderSize}
+              width={loaderSize}
+            />
           )}
-        </>
+        </div>
       ) : (
         <ThirdwebProvider
           connectors={connectors}
@@ -74,6 +92,7 @@ const linkPhoneWithWallet = ({ Component, pageProps }) => {
           <Footer />
         </ThirdwebProvider>
       )}
+      <Toaster position="top-center" reverseOrder={false} />
     </>
   )
 }
