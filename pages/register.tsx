@@ -7,7 +7,6 @@ import PhoneLink from '../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import { getConfigByChain } from '../config'
 import Web3Modal from 'web3modal'
 import { ethers } from 'ethers'
-import BeatLoader from 'react-spinners/BeatLoader'
 import Modal from 'react-modal'
 import { maskPhone } from '../components/utils'
 import axios from 'axios'
@@ -18,8 +17,8 @@ import {
 } from 'firebase/auth'
 // import firebase from '../components/firebase'
 import Router from 'next/router'
-import RingLoader from 'react-spinners/RingLoader'
 import Container from '../components/Container'
+import BusyLoader, { LoaderType } from '../components/BusyLoader'
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
@@ -29,10 +28,8 @@ const style = {
   copyContainer: `w-1/2`,
   modalListWrapper: `bg-[#303339]  w-1/3 h-1/3 mr-auto ml-auto my-28 rounded-2xl p-2 overflow-hidden  relative overflow-auto`,
   title: `relative text-white text-[32px] font-semibold`,
-  midRow: `text-white`,
   description: `text-[#fff] container-[400px] text-2xl mt-[0.8rem] mb-[2.5rem]`,
   ctaContainer: `flex`,
-  spinner: `w-full h-screen flex justify-center text-white mt-20 p-100 object-center`,
   accentedButton: ` relative text-lg font-semibold px-12 py-4 bg-[#2181e2] rounded-lg mr-5 text-white hover:bg-[#42a0ff] cursor-pointer`,
   button: `font-bold w-full mt-2 bg-[#eb77f2] text-white text-lg rounded shadow-lg hover:bg-[#e134eb] cursor-pointer`,
   nftButton: `font-bold w-full mt-4 bg-[#eb77f2] text-white text-lg rounded p-4 shadow-lg hover:bg-[#e134eb] cursor-pointer`,
@@ -236,15 +233,15 @@ const Home = () => {
           />
         </div>
         {loadingState == true ? (
-          <div className={`${style.midRow} m-8`}>
-            <BeatLoader
-              className={style.midRow}
-              color={'#ffffff'}
-              loading={loadingState}
-              size={15}
-            />
+          <BusyLoader
+            loaderType={LoaderType.Beat}
+            wrapperClass="white-busy-container m-8"
+            className="white-busy-container"
+            color={'#ffffff'}
+            size={15}
+          >
             Saving data to blockchain. Please wait✋🏻...
-          </div>
+          </BusyLoader>
         ) : (
           <button className={style.nftButton} onClick={() => savePhone()}>
             Link
@@ -254,16 +251,13 @@ const Home = () => {
       <Container>
         <div className={style.copyContainer}>
           {loadingState == true ? (
-            <div className={style.spinner}>
-              <RingLoader
-                className={style.spinner}
-                color={'#ffffff'}
-                size={50}
-              />
-              <p>
-                <b>Fetching data from blockchain...</b>
-              </p>
-            </div>
+            <BusyLoader
+              loaderType={LoaderType.Ring}
+              color={'#ffffff'}
+              size={50}
+            >
+              <b>Fetching data from blockchain...</b>
+            </BusyLoader>
           ) : (
             <div>
               <div className={`${style.title} mt-1 p-1`}>

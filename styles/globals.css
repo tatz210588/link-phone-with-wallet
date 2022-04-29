@@ -79,4 +79,12 @@
       @apply !m-auto;
     }
   }
+
+  .busy-container {
+    @apply mt-20 flex h-screen w-full justify-center object-center p-[100px] text-white;
+  }
+
+  .white-busy-container {
+    @apply text-white;
+  }
 }

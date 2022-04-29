@@ -7,10 +7,9 @@ import { ethers } from 'ethers'
 import BigNumber from 'bignumber.js'
 import toast from 'react-hot-toast'
 import PhoneLink from '../artifacts/contracts/phoneLink.sol/phoneLink.json'
-import BeatLoader from 'react-spinners/BeatLoader'
-import RingLoader from 'react-spinners/RingLoader'
 import { getConfigByChain } from '../config'
 import Container from '../components/Container'
+import BusyLoader, { LoaderType } from '../components/BusyLoader'
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
@@ -18,7 +17,6 @@ const style = {
   searchInput: `h-[2.6rem] w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#e6e8eb] placeholder:text-[#8a939b]`,
   copyContainer: `w-1/2`,
   title: `relative text-white text-[46px] font-semibold`,
-  midRow: `text-white`,
   description: `text-[#fff] container-[400px] text-md mb-[2.5rem]`,
   spinner: `w-full h-screen flex justify-center text-white mt-20 p-100 object-center`,
   nftButton: `font-bold w-full mt-4 bg-pink-500 text-white text-lg rounded p-4 shadow-lg hover:bg-[#19a857] cursor-pointer`,
@@ -171,12 +169,9 @@ const qrPay = () => {
   return (
     <Container>
       {!chainId ? (
-        <div className={style.spinner}>
-          <RingLoader className={style.spinner} color={'#ffffff'} size={50} />
-          <p>
-            <b>Click on the Connect Wallet button !!</b>
-          </p>
-        </div>
+        <BusyLoader loaderType={LoaderType.Ring} color={'#ffffff'} size={50}>
+          <b>Click on the Connect Wallet button !!</b>
+        </BusyLoader>
       ) : scanResultWebCam == null ? (
         <QrReader
           delay={300}
@@ -233,15 +228,15 @@ const qrPay = () => {
             )}
           </div>
           {loadingState === true ? (
-            <div className={style.midRow}>
+            <BusyLoader
+              loaderType={LoaderType.Beat}
+              wrapperClass="white-busy-container"
+              className="white-busy-container"
+              color={'#ffffff'}
+              size={15}
+            >
               Connecting to blockchain. Please wait
-              <BeatLoader
-                className={style.midRow}
-                color={'#ffffff'}
-                loading={loadingState}
-                size={15}
-              />
-            </div>
+            </BusyLoader>
           ) : (
             <div>
               {

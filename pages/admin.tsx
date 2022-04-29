@@ -6,9 +6,9 @@ import PhoneLink from '../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import { getConfigByChain } from '../config'
 import Web3Modal from 'web3modal'
 import { ethers } from 'ethers'
-import CircleLoader from 'react-spinners/CircleLoader'
 import { AiOutlineSearch } from 'react-icons/ai'
 import Container from '../components/Container'
+import BusyLoader, { LoaderType } from '../components/BusyLoader'
 //import firebase from"./firebase"
 
 const style = {
@@ -116,15 +116,9 @@ const Home = () => {
   return (
     <Container>
       {loadingState ? (
-        <div className={style.spinner}>
-          <CircleLoader
-            // className={style.spinner}
-            color={'#277cc2'}
-            loading={loadingState}
-            size={150}
-          />
+        <BusyLoader loaderType={LoaderType.Circle} color={'#277cc2'} size={150}>
           Fetching Data From BlockChain... Please Wait...✋🏻
-        </div>
+        </BusyLoader>
       ) : !details.length ? (
         <div className={`${style.spinner} mb-4 text-5xl font-bold`}>
           DATABASE IS EMPTY !!
