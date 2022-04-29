@@ -11,14 +11,16 @@ const Container: NextPage<ContainerProps> = ({
   wrapperClass = 'wrapper',
   containerClass = 'container',
   contentWrapperClass = 'content-wrapper',
-}) => (
-  <>
-    <div className={wrapperClass}>
-      <div className={containerClass}>
-        <div className={contentWrapperClass}>{children}</div>
+}) => {
+  return (
+    <>
+      <div className={wrapperClass}>
+        <div className={containerClass}>
+          <div className={contentWrapperClass}>{children}</div>
+        </div>
       </div>
-    </div>
-  </>
-)
+    </>
+  )
+}
 
 export default Container
