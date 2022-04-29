@@ -19,6 +19,15 @@ export const networkConfig = {
 
         },
     ],
-};
 
-export const getConfigByChain = (chain) => networkConfig[chain];
+    "242": [
+        {
+            phoneLinkAddress: "0x90179ba681708dC36C38828153130D5B7836b7D5", //proxy address
+            token_icon: "https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=022",
+            alt: "KAI",
+            networkName: "kardiachain_test"
+        }
+    ]
+}
+
+export const getConfigByChain = (chain) => networkConfig[chain]
