@@ -16,15 +16,7 @@
     "incremental": true,
     "typeRoots": ["@types", "node_modules/@types"]
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.js",
-    "**/*.jsx",
-    "pages/_app.tsx",
-    "pages/index.tsx"
-  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
   "exclude": [
     "node_modules",
     "openzeppelin-contracts-master",
