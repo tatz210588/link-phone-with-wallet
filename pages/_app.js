@@ -36,12 +36,8 @@ const successLoader = {
 const linkPhoneWithWallet = ({ Component, pageProps }) => {
   const [loading, setLoading] = useState(false)
   const [completed, setCompleted] = useState(false)
-<<<<<<< HEAD:pages/_app.js
   const supportedChainIds = [1, 4, 137, 80001, 43114, 24, 242]
-=======
   const [loaderSize, setLoaderSize] = useState(320)
-  const supportedChainIds = [1, 4, 137, 80001, 43114]
->>>>>>> e1026de27682aebfc471ca3a62eb6da0e327cef8:pages/_app.tsx
   const connectors = {
     injected: {},
     magic: {
