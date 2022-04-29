@@ -4,6 +4,7 @@ import { ThirdwebProvider } from '@3rdweb/react'
 import Footer from '../components/Footer'
 import { useEffect, useState } from 'react'
 import Lottie from 'react-lottie'
+
 import * as globeLoaderData from '../assets/globe.json'
 import * as successLoaderData from '../assets/success.json'
 import { AppProps } from 'next/app'
@@ -27,11 +28,11 @@ const successLoader = {
   },
 }
 
-const linkPhoneWithWallet = ({ Component, pageProps }: AppProps) => {
+const linkPhoneWithWallet = ({ Component, pageProps }) => {
   const [loading, setLoading] = useState(false)
   const [completed, setCompleted] = useState(false)
+  const supportedChainIds = [1, 4, 137, 80001, 43114, 24, 242]
   const [loaderSize, setLoaderSize] = useState(320)
-  const supportedChainIds = [1, 4, 137, 80001, 43114]
   const connectors = {
     injected: {},
     magic: {

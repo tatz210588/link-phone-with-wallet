@@ -1,10 +1,10 @@
-require("@nomiclabs/hardhat-waffle");
-require("@nomiclabs/hardhat-etherscan");
-require("@openzeppelin/hardhat-upgrades");
+require("@nomiclabs/hardhat-waffle")
+require("@nomiclabs/hardhat-etherscan")
+require("@openzeppelin/hardhat-upgrades")
 
 const infura_projectId = "403f2033226a44788c2638cc1c29d438"
 const fs = require("fs")
-const privateKey = fs.readFileSync(".secret").toString();
+const privateKey = fs.readFileSync(".secret").toString()
 
 module.exports = {
   networks: {
@@ -27,10 +27,18 @@ module.exports = {
     kovan: {
       url: `https://kovan.infura.io/v3/${infura_projectId}`,
       accounts: [privateKey]
+    },
+    kardiachain_main: {
+      url: "https://rpc.kardiachain.io",
+      accounts: [privateKey]
+    },
+    kardiachain_test: {
+      url: "https://dev.kardiachain.io/",
+      accounts: [privateKey]
     }
   },
   etherscan: {
     apiKey: "7BVQVNCAAB8GWGBW2JMJ9HYVE2AT8M296S" //polygonscan api is added here
   },
   solidity: "0.8.4",
-};
+}
