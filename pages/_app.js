@@ -4,16 +4,11 @@ import { ThirdwebProvider } from '@3rdweb/react'
 import Footer from '../components/Footer'
 import { useEffect, useState } from 'react'
 import Lottie from 'react-lottie'
-<<<<<<< HEAD:pages/_app.js
-import * as location from '../assets/globe.json'
-import * as success from '../assets/success.json'
 
-=======
 import * as globeLoaderData from '../assets/globe.json'
 import * as successLoaderData from '../assets/success.json'
 import { AppProps } from 'next/app'
 import { Toaster } from 'react-hot-toast'
->>>>>>> e1026de27682aebfc471ca3a62eb6da0e327cef8:pages/_app.tsx
 
 const globeLoader = {
   loop: true,
