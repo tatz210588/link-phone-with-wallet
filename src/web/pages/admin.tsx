@@ -125,7 +125,7 @@ const Home = () => {
         </div>
       ) : (
         <div className={`${style.infoContainer} mt-8`}>
-          <div className={style.midRow}>
+          <div className={`${style.midRow} flex flex-row`}>
             <div className={style.title}>Database</div>
             <div className={style.searchBar}>
               <div className={style.searchIcon}>
@@ -170,7 +170,7 @@ const Home = () => {
                         </thead>
                         <tbody className="rounded-2xl">
                           {details.map((detail, id) => (
-                            <tr className="rounded-3xl">
+                            <tr key={id} className="rounded-3xl">
                               <td className="text-dark border-b border-l border-[#E8E8E8] bg-[#F3F6FF] py-5 px-2 text-center text-base font-medium">
                                 {id + 1}
                               </td>
