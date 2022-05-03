@@ -13,7 +13,6 @@ import BusyLoader, { LoaderType } from '../components/BusyLoader'
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
-  infoContainer: `h-20 bg-[#313338] p-4 rounded-b-lg flex items-center text-white`,
   searchBar: `flex flex-1 mx-[0.8rem]  items-center bg-[#363840] rounded-[0.8rem] hover:bg-[#757199]`,
   searchInput: `h-[2.6rem] w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#e6e8eb] placeholder:text-[#8a939b]`,
   copyContainer: `w-1/2`,
@@ -124,8 +123,8 @@ const Home = () => {
           DATABASE IS EMPTY !!
         </div>
       ) : (
-        <div className={`${style.infoContainer} mt-8`}>
-          <div className={`${style.midRow} flex flex-row`}>
+        <div className={`mt-8`}>
+          <div className={style.midRow}>
             <div className={style.title}>Database</div>
             <div className={style.searchBar}>
               <div className={style.searchIcon}>
