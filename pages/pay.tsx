@@ -96,36 +96,22 @@ const Pay = () => {
         ethers.utils.getAddress(defaultAccount) //checks if an address is valid one
         const network = await provider.getNetwork()
 
-        const tokenContract = new ethers.Contract(
-          selectedToken.address,
-          PhoneLink.abi,
-          signer
-        )
-        const amount = ethers.utils.parseUnits(
-          formInput.amount.toString(),
-          'ether'
-        )
-        const phoneLinkContract = new ethers.Contract(
-          getConfigByChain(network.chainId)[0].phoneLinkAddress,
-          PhoneLink.abi,
-          signer
-        )
+        const tokenContract = new ethers.Contract(selectedToken.address, PhoneLink.abi, signer)
+        const amount = ethers.utils.parseUnits(formInput.amount.toString(), 'ether')
+        const phoneLinkContract = new ethers.Contract(getConfigByChain(network.chainId)[0].phoneLinkAddress, PhoneLink.abi, signer)
         const to = await phoneLinkContract.fetchWalletAddress(value) //gets the addresses linked to the phone number
 
         if (to.length == 0) {
           //means your friend has not yet linked his/her wallet
-          toast.error(
-            'The given phone number is not linked any wallet. Ask your friend to link his Phone'
-          )
+          toast.error('The given phone number is not linked any wallet. Ask your friend to link his Phone')
         } else {
-          const items = await Promise.all(
-            to.map(async (i: any) => {
-              let item = {
-                phoneNumber: i.phoneNumber,
-                connectedWalletAddress: i.connectedWalletAddress,
-              }
-              return item
-            })
+          const items = await Promise.all(to.map(async (i: any) => {
+            let item = {
+              phoneNumber: i.phoneNumber,
+              connectedWalletAddress: i.connectedWalletAddress,
+            }
+            return item
+          })
           )
 
           if (selectedToken.address != 'null') {
