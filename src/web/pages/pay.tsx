@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js'
 import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import toast from 'react-hot-toast'
-import PhoneLink from '../artifacts/contracts/phoneLink.sol/phoneLink.json'
+import PhoneLink from '../../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import Container from '../components/Container'
 import BusyLoader, { LoaderType } from '../components/BusyLoader'
 

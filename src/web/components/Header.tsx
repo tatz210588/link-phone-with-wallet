@@ -16,7 +16,7 @@ import {
   ClipboardIcon,
   ViewGridIcon,
 } from '@heroicons/react/outline'
-import PhoneLink from '../artifacts/contracts/phoneLink.sol/phoneLink.json'
+import PhoneLink from '../../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import { getConfigByChain } from '../config'
 import Web3Modal from 'web3modal'
 import { useWeb3 } from '@3rdweb/hooks'

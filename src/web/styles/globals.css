@@ -39,7 +39,7 @@
 @layer components {
   html,
   body {
-    @apply block !font-poppins;
+    @apply !font-poppins block;
   }
 
   header,
@@ -65,7 +65,11 @@
   }
 
   .container {
-    @apply m-auto before:absolute before:top-0 before:left-0 before:right-0 before:bottom-0 before:bg-red-500 before:bg-[url('../assets/4.jpg')] before:bg-cover before:bg-fixed before:bg-center before:opacity-100 before:blur before:content-[''];
+    @apply m-auto;
+
+    &::before {
+      @apply absolute top-0 left-0 right-0 bottom-0 -z-50 bg-red-500 bg-[url('../assets/4.jpg')] bg-cover bg-fixed bg-center opacity-100 blur content-[''];
+    }
   }
 
   .content-wrapper {
