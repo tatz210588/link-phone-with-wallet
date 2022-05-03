@@ -10,12 +10,6 @@ import { CgProfile } from 'react-icons/cg'
 import { ConnectWallet } from '@3rdweb/react'
 import { Fragment } from 'react'
 import { Popover, Transition } from '@headlessui/react'
-import {
-  BookmarkAltIcon,
-  CalendarIcon,
-  ClipboardIcon,
-  ViewGridIcon,
-} from '@heroicons/react/outline'
 import PhoneLink from '../../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import { getConfigByChain } from '../config'
 import Web3Modal from 'web3modal'
@@ -32,7 +26,7 @@ const solutions = [
     description: 'Anyone can scan your QR code and send money instantly.',
     href: '/myprofile',
     modalName: 'myqrcode',
-    icon: ViewGridIcon,
+    icon: CgProfile,
   },
 ]
 
