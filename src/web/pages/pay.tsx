@@ -33,7 +33,7 @@ const Pay = () => {
   const { chainId } = useWeb3()
   //const chainName = getNetworkMetadata(chainId).chainName;
   //const chainId = '80001'
-  const paymentHelper = PaymentHelper()
+  const [paymentHelper, setPaymentHelper] = useState(PaymentHelper())
   const [value, setValue] = useState('')
   const [balanceToken, setBalanceToken] = useState(defaults.balanceToken)
   const [formInput, updateFormInput] = useState({ amount: 0 })

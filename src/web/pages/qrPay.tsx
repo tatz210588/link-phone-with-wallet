@@ -33,7 +33,7 @@ const qrPay = () => {
   const [scanResultWebCam, setScanResultWebCam] = useState('')
   const [formInput, updateFormInput] = useState({ amount: 0 })
   const { chainId } = useWeb3()
-  const paymentHelper = PaymentHelper()
+  const [paymentHelper, setPaymentHelper] = useState(PaymentHelper())
   const [balanceToken, setBalanceToken] = useState(defaults.balanceToken)
   // const [selectedToken, setSelectedToken] = useState<TokenInfo | undefined>()
   const [loadingState, setLoadingState] = useState(false)
