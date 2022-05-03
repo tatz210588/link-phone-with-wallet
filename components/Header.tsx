@@ -50,7 +50,6 @@ const style = {
 
   modalListWrapper: `bg-[#303339]  w-1/3 h-1/3 mr-auto ml-auto my-28 rounded-2xl p-2 overflow-hidden  relative overflow-auto`,
   title: `relative text-white text-[32px] font-semibold`,
-  midRow: `text-white`,
   description: `text-[#fff] container-[400px] text-2xl mt-[0.8rem] mb-[2.5rem]`,
   ctaContainer: `flex`,
   spinner: `w-full h-screen flex justify-center text-white mt-20 p-100 object-center`,
