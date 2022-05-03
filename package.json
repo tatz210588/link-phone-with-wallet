@@ -1,4 +1,6 @@
 {
+  "name": "link-phone-with-wallet-web",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "refresh": "yarn run clean && yarn install",
