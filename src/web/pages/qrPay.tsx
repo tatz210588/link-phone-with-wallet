@@ -200,7 +200,7 @@ const qrPay = () => {
         <BusyLoader loaderType={LoaderType.Ring} color={'#ffffff'} size={50}>
           <b>Click on the Connect Wallet button !!</b>
         </BusyLoader>
-      ) : scanResultWebCam == null ? (
+      ) : !scanResultWebCam ? (
         <QrReader
           delay={300}
           style={{ width: '100%' }}
