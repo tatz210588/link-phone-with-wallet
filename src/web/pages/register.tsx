@@ -20,6 +20,7 @@ import getFirebaseApp from '../components/firebase'
 import Router from 'next/router'
 import Container from '../components/Container'
 import BusyLoader, { LoaderType } from '../components/BusyLoader'
+import IdInput from '../components/IdInput'
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
@@ -48,11 +49,14 @@ const Home = () => {
   const [email, setEmail] = useState('flex')
   const [isPhone, setIsPhone] = useState('hidden')
 
+  // useEffect(() => {
+  //   const myInput = document.getElementById('myInput') as HTMLInputElement
+  //   myInput.value = ''
+  //   fetchPhoneNo()
+  // }, [])
   useEffect(() => {
-    const myInput = document.getElementById('myInput') as HTMLInputElement
-    myInput.value = ''
-    fetchPhoneNo()
-  }, [])
+    getFirebaseApp().then((app) => setFirebaseApp(app))
+  }, [firebaseApp])
 
   async function configureCaptcha() {
     const auth = getAuth(firebaseApp)
@@ -76,7 +80,7 @@ const Home = () => {
     } catch (error) {
       console.error(error)
     }
-    console.info('step1')
+    console.info({ signInData })
     configureCaptcha()
     const signInPhoneNumber = signInData
     console.info({ signInPhoneNumber })
@@ -129,7 +133,6 @@ const Home = () => {
 
   async function fetchPhoneNo() {
     setLoadingState(true)
-    setFirebaseApp(await getFirebaseApp())
     const web3Modal = new Web3Modal({
       network: 'mainnet',
       cacheProvider: true,
@@ -284,41 +287,13 @@ const Home = () => {
                         }
                       />
                     </div>
-                    <div className={`${style.searchBar} mt-2 p-1 ${email}`}>
-                      <input className={style.searchInput}
-                        placeholder="Phone / Email"
-                        value={signInData}
-                        id="myInput"
-                        onChange={(ph) => {
-                          if (ph.target.value === '1' || '2') {
-                            setEmail('hidden')
-                            setIsPhone('flex')
-                            document.getElementById('phoneInput')?.focus()
-                          }
-                          setSignInData(ph.target.value)
-
-                        }}
-                      />
-                    </div>
-                    <div className={`${style.searchBar} mt-2 p-1 ${isPhone}`}>
-                      <PhoneInput
-                        //className={`${style.searchInput}`}
-                        placeholder="Enter phone number"
-                        value={signInData}
-                        id="phoneInput"
-                        onChange={(ph) => {
-                          //console.log("ph", ph)
-                          if (!ph) {
-                            setEmail('flex')
-                            setIsPhone('hidden')
-                            setSignInData('')
-                          } else {
-                            setSignInData(ph?.toString() ?? '')
-                          }
-                        }
-                        }
-                      />
-                    </div>
+                    <IdInput
+                      className={style.searchInput}
+                      id="myInput"
+                      wrapperClass={`${style.searchBar} mt-2 p-1`}
+                      placeholder="Phone / Email"
+                      onChange={setSignInData}
+                    />
                     <button type="submit" className={style.nftButton}>
                       Get OTP
                     </button>
@@ -348,7 +323,7 @@ const Home = () => {
             </div>
           )}
         </div>
-      </Container >
+      </Container>
     </>
   )
 }
