@@ -290,7 +290,7 @@ const Home = () => {
                         value={signInData}
                         id="myInput"
                         onChange={(ph) => {
-                          if (ph.target.value === '9') {
+                          if (ph.target.value === '1' || '2') {
                             setEmail('hidden')
                             setIsPhone('flex')
                             document.getElementById('phoneInput')?.focus()
