@@ -23,9 +23,9 @@ import BusyLoader, { LoaderType } from '../components/BusyLoader'
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
-  searchBar: `flex flex-1 w-max-[520px] items-center bg-[#d5e1f7] rounded-[0.8rem] hover:bg-[#757199]`,
+  searchBar: `flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#363840] rounded-[0.8rem] hover:bg-[#757199]`,
+  searchInput: `h-[2.6rem] w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#e6e8eb] placeholder:text-[#8a939b]`,
   searchBarVerify: `flex flex-1 w-max-[520px] items-center rounded-[0.8rem]`,
-  searchInput: `h-full w-full border-0 bg-transparent outline-0 ring-0 px-2 rounded-3xl pl-0 text-[#000000] placeholder:text-[#8a939b]`,
   copyContainer: `w-1/2`,
   modalListWrapper: `bg-[#303339]  w-1/3 h-1/3 mr-auto ml-auto my-28 rounded-2xl p-2 overflow-hidden  relative overflow-auto`,
   title: `relative text-white text-[32px] font-semibold`,
@@ -45,6 +45,8 @@ const Home = () => {
   const [newPhNo, setNewPhNo] = useState(false)
   const [phoneNo, setPhoneNo] = useState('')
   const [otp, setOtp] = useState(false)
+  const [email, setEmail] = useState('flex')
+  const [isPhone, setIsPhone] = useState('hidden')
 
   useEffect(() => {
     const myInput = document.getElementById('myInput') as HTMLInputElement
@@ -282,13 +284,39 @@ const Home = () => {
                         }
                       />
                     </div>
-                    <div className={`${style.searchBar} mt-2 p-1`}>
-                      <PhoneInput
-                        className={`${style.searchInput}`}
-                        placeholder="Enter phone number"
+                    <div className={`${style.searchBar} mt-2 p-1 ${email}`}>
+                      <input className={style.searchInput}
+                        placeholder="Phone / Email"
                         value={signInData}
                         id="myInput"
-                        onChange={(ph) => setSignInData(ph?.toString() ?? '')}
+                        onChange={(ph) => {
+                          if (ph.target.value === '9') {
+                            setEmail('hidden')
+                            setIsPhone('flex')
+                            document.getElementById('phoneInput')?.focus()
+                          }
+                          setSignInData(ph.target.value)
+
+                        }}
+                      />
+                    </div>
+                    <div className={`${style.searchBar} mt-2 p-1 ${isPhone}`}>
+                      <PhoneInput
+                        //className={`${style.searchInput}`}
+                        placeholder="Enter phone number"
+                        value={signInData}
+                        id="phoneInput"
+                        onChange={(ph) => {
+                          //console.log("ph", ph)
+                          if (!ph) {
+                            setEmail('flex')
+                            setIsPhone('hidden')
+                            setSignInData('')
+                          } else {
+                            setSignInData(ph?.toString() ?? '')
+                          }
+                        }
+                        }
                       />
                     </div>
                     <button type="submit" className={style.nftButton}>
@@ -320,7 +348,7 @@ const Home = () => {
             </div>
           )}
         </div>
-      </Container>
+      </Container >
     </>
   )
 }

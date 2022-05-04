@@ -25,14 +25,14 @@ const tokenConfig: Record<number, TokenInfo[]> = {
       symbol: 'LOLO',
       decimal: 18,
     },
-    /*
-        {
-            name: "USD Tether",
-            address: "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
-            symbol: "USDT",
-            decimal: 6
-        }
-        */
+
+    {
+      name: "USD Tether",
+      address: "0xA02f6adc7926efeBBd59Fd43A84f4E0c0c91e832",
+      symbol: "USDT",
+      decimal: 6
+    }
+
   ],
   '4': [
     {
