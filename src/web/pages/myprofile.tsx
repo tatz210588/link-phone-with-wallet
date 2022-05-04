@@ -59,6 +59,10 @@ const MyProfile = () => {
     fetchPhone()
   }, [address, chainId])
 
+  useEffect(() => {
+    getFirebaseApp().then((app) => setFirebaseApp(app))
+  }, [firebaseApp])
+
   async function configureCaptcha() {
     const auth = getAuth(firebaseApp)
     window.recaptchaVerifier = new RecaptchaVerifier(
@@ -133,7 +137,6 @@ const MyProfile = () => {
 
   async function fetchPhone() {
     setLoadingState(true)
-    setFirebaseApp(await getFirebaseApp())
     await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
     const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
     const signer = provider.getSigner() // get signer
