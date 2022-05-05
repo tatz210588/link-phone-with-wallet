@@ -1,4 +1,5 @@
 import path from 'path'
+import crypto from 'crypto'
 
 export const ellipseAddress = (address: string, width = 5) =>
   address && address.length > 2 * width
@@ -32,3 +33,13 @@ export const createUrlToken = (address = '', chainId?: number) =>
 
 export const createUrlAddress = (address = '', chainId?: number) =>
   path.join(_baseUrl(chainId), 'address', address)
+
+export const isNumeric = (str?: string) => !isNaN(Number(str))
+
+export const emptyString = (str?: string) => !str?.trim()
+
+export const randomString = (length = 16) =>
+  crypto
+    .randomBytes(length * 3)
+    .toString('hex')
+    .substring(0, length)

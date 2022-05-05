@@ -1,15 +1,14 @@
-import { useWeb3 } from '@3rdweb/hooks'
+// import { useWeb3 } from '@3rdweb/hooks'
 import React, { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import 'react-phone-number-input/style.css'
-import PhoneInput from 'react-phone-number-input'
 import PhoneLink from '../../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import { getConfigByChain } from '../config'
 import Web3Modal from 'web3modal'
 import { ethers } from 'ethers'
 import Modal from 'react-modal'
 import { maskPhone } from '../components/utils'
-import axios from 'axios'
+// import axios from 'axios'
 import { FirebaseApp } from 'firebase/app'
 import {
   getAuth,
@@ -37,17 +36,19 @@ const style = {
   nftButton: `font-bold w-full mt-4 bg-[#eb77f2] text-white text-lg rounded p-4 shadow-lg hover:bg-[#e134eb] cursor-pointer`,
 }
 
+const idPlaceholder = 'Phone / Email'
+
 const Home = () => {
   const [firebaseApp, setFirebaseApp] = useState<FirebaseApp | undefined>()
-  const { address, chainId } = useWeb3()
+  // const { address, chainId } = useWeb3()
   const [signInData, setSignInData] = useState('')
   const [formInput, updateFormInput] = useState({ name: '', otp: '' })
   const [loadingState, setLoadingState] = useState(false)
   const [newPhNo, setNewPhNo] = useState(false)
   const [phoneNo, setPhoneNo] = useState('')
   const [otp, setOtp] = useState(false)
-  const [email, setEmail] = useState('flex')
-  const [isPhone, setIsPhone] = useState('hidden')
+  // const [email, setEmail] = useState('flex')
+  // const [isPhone, setIsPhone] = useState('hidden')
 
   // useEffect(() => {
   //   const myInput = document.getElementById('myInput') as HTMLInputElement
@@ -231,7 +232,7 @@ const Home = () => {
           Enter New Phone Number:
         </div>
 
-        <div className={`${style.searchBar} mt-2 p-1`}>
+        {/* <div className={`${style.searchBar} mt-2 p-1`}>
           <PhoneInput
             className={style.searchInput}
             placeholder={phoneNo}
@@ -239,7 +240,15 @@ const Home = () => {
             id="myNewInput"
             onChange={(ph) => setSignInData(ph?.toString() ?? '')}
           />
-        </div>
+        </div> */}
+        <IdInput
+          className={style.searchInput}
+          id="myNewInput"
+          wrapperClass={`${style.searchBar} mt-2 p-1`}
+          value={signInData}
+          placeholder={idPlaceholder}
+          onChange={setSignInData}
+        />
         {loadingState == true ? (
           <BusyLoader
             loaderType={LoaderType.Beat}
@@ -291,7 +300,7 @@ const Home = () => {
                       className={style.searchInput}
                       id="myInput"
                       wrapperClass={`${style.searchBar} mt-2 p-1`}
-                      placeholder="Phone / Email"
+                      placeholder={idPlaceholder}
                       onChange={setSignInData}
                     />
                     <button type="submit" className={style.nftButton}>

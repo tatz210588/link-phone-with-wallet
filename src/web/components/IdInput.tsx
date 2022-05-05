@@ -1,12 +1,14 @@
-import PhoneInput from 'react-phone-number-input'
 import { NextPage } from 'next'
 import { ChangeEvent, useEffect, useState } from 'react'
+import PhoneInput from 'react-phone-number-input'
+import { emptyString, isNumeric, randomString } from './utils'
 
 type IdInputProps = {
   wrapperClass?: string
   className?: string
-  id: string
-  onChange?: (value: string) => void
+  id?: string
+  value?: string
+  onChange?: (value: string, inputType?: IdType) => void
   placeholder?: string
 }
 
@@ -15,34 +17,50 @@ enum IdType {
   email,
 }
 
+const defaultIdType = IdType.email
+const isPhone = (str?: string) => str && !emptyString(str) && isNumeric(str)
+
 const IdInput: NextPage<IdInputProps> = ({
   children,
   className,
   id,
+  value,
   wrapperClass,
   onChange,
   placeholder,
   ...rest
 }) => {
-  const [idType, setIdType] = useState(IdType.email)
-  const [idValue, setIdValue] = useState('')
+  const [elId, setElId] = useState(id)
+  const [idValue, setIdValue] = useState(value ?? '')
+  const [idType, setIdType] = useState(
+    isPhone(idValue) ? IdType.phone : defaultIdType
+  )
 
   useEffect(() => {
-    document.getElementById(id)?.focus()
+    if (emptyString(elId)) {
+      let _id = ''
+      do {
+        _id = randomString()
+      } while (document.getElementById(_id))
+      setElId(_id)
+    }
+  }, [elId])
+
+  useEffect(() => {
+    elId && document.getElementById(elId)?.focus()
   }, [idType])
 
-  useEffect(() => onChange && onChange(idValue), [idValue])
-
-  const isNumeric = (str: string) => !isNaN(Number(str))
+  useEffect(() => onChange && onChange(idValue, idType), [idValue])
 
   const onTextChange = (e?: string) => {
     const value = e ? e.toString() : ''
     switch (idType) {
-      case IdType.email:
-        if (value && isNumeric(value)) setIdType(IdType.phone)
-        break
       case IdType.phone:
-        if (value === '') setIdType(IdType.email)
+        if (emptyString(value)) setIdType(defaultIdType)
+        break
+      case IdType.email:
+      default:
+        if (isPhone(value)) setIdType(IdType.phone)
         break
     }
     setIdValue(value)
@@ -57,7 +75,7 @@ const IdInput: NextPage<IdInputProps> = ({
       <div className={wrapperClass}>
         {idType === IdType.email && (
           <input
-            id={id}
+            id={elId}
             className={className}
             value={idValue}
             onChange={onInputChange}
@@ -66,7 +84,7 @@ const IdInput: NextPage<IdInputProps> = ({
         )}
         {idType === IdType.phone && (
           <PhoneInput
-            id={id}
+            id={elId}
             className={className}
             value={idValue}
             onChange={onTextChange}
