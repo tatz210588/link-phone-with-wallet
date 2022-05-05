@@ -19,7 +19,7 @@ import getFirebaseApp from '../components/firebase'
 import Router from 'next/router'
 import Container from '../components/Container'
 import BusyLoader, { LoaderType } from '../components/BusyLoader'
-import IdInput from '../components/IdInput'
+import IdInput, { IdType } from '../components/IdInput'
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
@@ -231,16 +231,6 @@ const Home = () => {
         >
           Enter New Phone Number:
         </div>
-
-        {/* <div className={`${style.searchBar} mt-2 p-1`}>
-          <PhoneInput
-            className={style.searchInput}
-            placeholder={phoneNo}
-            value={signInData}
-            id="myNewInput"
-            onChange={(ph) => setSignInData(ph?.toString() ?? '')}
-          />
-        </div> */}
         <IdInput
           className={style.searchInput}
           id="myNewInput"
@@ -248,6 +238,7 @@ const Home = () => {
           value={signInData}
           placeholder={idPlaceholder}
           onChange={setSignInData}
+          excludeIdTypes={[IdType.wallet]}
         />
         {loadingState == true ? (
           <BusyLoader
@@ -302,6 +293,7 @@ const Home = () => {
                       wrapperClass={`${style.searchBar} mt-2 p-1`}
                       placeholder={idPlaceholder}
                       onChange={setSignInData}
+                      excludeIdTypes={[IdType.wallet]}
                     />
                     <button type="submit" className={style.nftButton}>
                       Get OTP

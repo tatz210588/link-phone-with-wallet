@@ -34,7 +34,18 @@ export const createUrlToken = (address = '', chainId?: number) =>
 export const createUrlAddress = (address = '', chainId?: number) =>
   path.join(_baseUrl(chainId), 'address', address)
 
+export class NRegex extends RegExp {
+  nonStickyTest = (str: string) => {
+    this.lastIndex = 0
+    let result = this.test(str)
+    this.lastIndex = 0
+    return result
+  }
+}
+export const phoneRegex = new NRegex(/^[\+]?\d+$/g)
 export const isNumeric = (str?: string) => !isNaN(Number(str))
+export const isHexString = (str?: string) =>
+  !emptyString(str) && str?.startsWith('0x') && isNumeric(str)
 
 export const emptyString = (str?: string) => !str?.trim()
 

@@ -5,7 +5,7 @@ import { getConfigByChain } from '../config'
 import { ethers } from 'ethers'
 import PhoneLink from '../../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import Modal from 'react-modal'
-import PhoneInput from 'react-phone-number-input'
+// import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import { FirebaseApp } from 'firebase/app'
 import {
@@ -18,6 +18,7 @@ import toast from 'react-hot-toast'
 import Router from 'next/router'
 import Container from '../components/Container'
 import BusyLoader, { LoaderType } from '../components/BusyLoader'
+import IdInput, { IdType } from '../components/IdInput'
 
 const style = {
   modalListWrapper: `bg-[#303339]  w-1/3 h-1/2 mr-auto ml-auto my-28 rounded-2xl p-2 overflow-hidden  relative overflow-auto`,
@@ -204,15 +205,15 @@ const MyProfile = () => {
               </div>
               <form onSubmit={onSignInSubmit}>
                 <div id="sign-in-button"></div>
-                <div>
-                  <PhoneInput
-                    placeholder="Enter phone number"
-                    value={signInData}
-                    id="myInput"
-                    onChange={(ph) => setSignInData(ph?.toString() ?? '')}
-                  />
-                </div>
-
+                <IdInput
+                  className={style.searchInput}
+                  wrapperClass={`${style.searchBar} mt-2 p-1`}
+                  placeholder="Enter phone / email"
+                  value={signInData}
+                  id="myInput"
+                  onChange={setSignInData}
+                  excludeIdTypes={[IdType.wallet]}
+                />
                 <button type="submit" className={style.nftButton}>
                   Get OTP
                 </button>

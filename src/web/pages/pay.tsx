@@ -5,13 +5,14 @@ import { useWeb3 } from '@3rdweb/hooks'
 // import { rounded } from '../components/utils'
 // import { ethers } from 'ethers'
 // import BigNumber from 'bignumber.js'
-import PhoneInput from 'react-phone-number-input'
+// import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import toast from 'react-hot-toast'
 // import PhoneLink from '../../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import Container from '../components/Container'
 import BusyLoader, { LoaderType } from '../components/BusyLoader'
 import PaymentHelper from '../components/PaymentHelper'
+import IdInput from '../components/IdInput'
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
@@ -209,15 +210,14 @@ const Pay = () => {
             </div>
           </div>
           <div className=" mt-4 grid grid-cols-2 gap-1">
-            <div className={`${style.searchBar} mt-2 p-1`}>
-              <PhoneInput
-                placeholder="Enter phone number"
-                value={value}
-                id="myNewInput"
-                onChange={(ph) => setValue(ph?.toString ?? '')}
-              />
-            </div>
-
+            <IdInput
+              className={style.searchInput}
+              wrapperClass={`${style.searchBar} mt-2 p-1`}
+              placeholder="Enter phone / email / wallet"
+              value={value}
+              id="myNewInput"
+              onChange={setValue}
+            />
             <div className={`${style.searchBar} mt-2 p-1`}>
               <input
                 className={style.searchInput}
