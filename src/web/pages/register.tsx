@@ -10,20 +10,22 @@ import { ethers } from 'ethers'
 import Modal from 'react-modal'
 import { maskPhone } from '../components/utils'
 import axios from 'axios'
+import emailjs from '@emailjs/browser'
 import { FirebaseApp } from 'firebase/app'
 import {
   getAuth,
   RecaptchaVerifier,
-  signInWithPhoneNumber,
+  signInWithPhoneNumber, sendSignInLinkToEmail
 } from 'firebase/auth'
 import getFirebaseApp from '../components/firebase'
 import Router from 'next/router'
 import Container from '../components/Container'
 import BusyLoader, { LoaderType } from '../components/BusyLoader'
+import { FaPhp } from 'react-icons/fa'
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
-  searchBar: `flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#363840] rounded-[0.8rem] hover:bg-[#757199]`,
+  searchBar: `flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#363840] rounded-[0.8rem] `,
   searchInput: `h-[2.6rem] w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#e6e8eb] placeholder:text-[#8a939b]`,
   searchBarVerify: `flex flex-1 w-max-[520px] items-center rounded-[0.8rem]`,
   copyContainer: `w-1/2`,
@@ -40,13 +42,16 @@ const Home = () => {
   const [firebaseApp, setFirebaseApp] = useState<FirebaseApp | undefined>()
   const { address, chainId } = useWeb3()
   const [signInData, setSignInData] = useState('')
-  const [formInput, updateFormInput] = useState({ name: '', otp: '' })
+  const [formInput, updateFormInput] = useState({ name: '', otp: '', identifier: '', type: '' })
   const [loadingState, setLoadingState] = useState(false)
   const [newPhNo, setNewPhNo] = useState(false)
   const [phoneNo, setPhoneNo] = useState('')
   const [otp, setOtp] = useState(false)
   const [email, setEmail] = useState('flex')
+  const [emailLink, setEmailLink] = useState(false)
   const [isPhone, setIsPhone] = useState('hidden')
+  const [emailOTP, setEmailOTP] = useState(0)
+  const [checked, setChecked] = useState(true)
 
   useEffect(() => {
     const myInput = document.getElementById('myInput') as HTMLInputElement
@@ -78,28 +83,41 @@ const Home = () => {
     }
     console.info('step1')
     configureCaptcha()
-    const signInPhoneNumber = signInData
-    console.info({ signInPhoneNumber })
-
-    const appVerifier = window.recaptchaVerifier
-    const auth = getAuth(firebaseApp)
-    try {
-      // SMS sent. Prompt user to type the code from the message, then sign the
-      // user in with confirmationResult.confirm(code).
-      window.confirmationResult = await signInWithPhoneNumber(
-        auth,
-        signInPhoneNumber,
-        appVerifier
-      )
-      toast.success('OTP sent. Please enter the OTP')
+    if (formInput.type === 'email') {
+      var OTP = Math.floor(Math.random() * 100000)
+      setEmailOTP(OTP)
+      var templateParams = { user: formInput.name, email: formInput.identifier, message: OTP }
+      emailjs.send('service_t2xue7p', 'template_dnzci4u', templateParams, 'Z8B2Ufr9spWJFx4js')
+        .then(function (response) {
+          console.log('SUCCESS!', response.status, response.text)
+          toast.success("Check email for OTP")
+        }, function (error) {
+          console.log('FAILED...', error)
+        })
       setOtp(true)
-      // ...
-    } catch (error) {
-      // Error; SMS not sent
-      // ...
-      //toast.error("OTP not sent due to technical issue. Please try later.");
-      console.error(error)
+
     }
+    else if (formInput.type === 'phone') {
+      console.log("phone otp")
+      const signInPhoneNumber = signInData
+      console.info({ signInPhoneNumber })
+
+      const appVerifier = window.recaptchaVerifier
+      const auth = getAuth(firebaseApp)
+      try {
+        // SMS sent. Prompt user to type the code from the message, then sign the
+        // user in with confirmationResult.confirm(code).
+        window.confirmationResult = await signInWithPhoneNumber(auth, signInPhoneNumber, appVerifier)
+        toast.success('OTP sent. Please enter the OTP')
+        setOtp(true)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    else {
+      toast.error("Please enter phone/email to proceed.")
+    }
+
   }
 
   async function onSubmitOTP(e: any) {
@@ -108,22 +126,32 @@ const Home = () => {
     } catch (error) {
       console.error(error)
     }
-    const code = formInput.otp
-    console.info({ code })
-    try {
-      const result = await window.confirmationResult.confirm(code)
-      // User signed in successfully.
-      const user = result.user
-      console.info({ user })
-      toast.success('user is verified')
-      await link()
-      setOtp(false)
-      // ...
-    } catch (error) {
-      // User couldn't sign in (bad verification code?)
-      // ...
-      //toast.error("Wrong otp")
-      console.error(error)
+    if (formInput.type === 'email') {
+      if (emailOTP.toString() == formInput.otp) {
+        toast.success("Email Authenticated")
+        //await link()
+        setOtp(false)
+      } else {
+        toast.error("Wrong OTP entered.")
+      }
+    } else {
+      const code = formInput.otp
+      console.info({ code })
+      try {
+        const result = await window.confirmationResult.confirm(code)
+        // User signed in successfully.
+        const user = result.user
+        console.info({ user })
+        toast.success('user is verified')
+        await link()
+        setOtp(false)
+        // ...
+      } catch (error) {
+        // User couldn't sign in (bad verification code?)
+        // ...
+        //toast.error("Wrong otp")
+        console.error(error)
+      }
     }
   }
 
@@ -153,7 +181,10 @@ const Home = () => {
 
     setLoadingState(false)
     if (data != '') {
-      Router.push({ pathname: './myprofile' })
+      //Router.push({ pathname: './myprofile' })
+      console.log("already linked")
+      setChecked(false)
+      console.log(checked)
     }
   }
   async function link() {
@@ -171,9 +202,9 @@ const Home = () => {
       PhoneLink.abi,
       signer
     )
-    const tx = await phoneLinkContract.enterDetails(formInput.name, signInData)
+    const tx = await phoneLinkContract.enterDetails(formInput.name, formInput.identifier, formInput.type)
     tx.wait(1)
-    toast.success('Wallet succesfully linked to your phone number')
+    toast.success(`Wallet succesfully linked to your ${formInput.type}`)
     setLoadingState(false)
     Router.push({ pathname: '/' })
   }
@@ -290,10 +321,12 @@ const Home = () => {
                         value={signInData}
                         id="myInput"
                         onChange={(ph) => {
-                          if (ph.target.value === '1' || '2') {
+                          if (ph.target.value == '9') { //check needed
                             setEmail('hidden')
                             setIsPhone('flex')
-                            document.getElementById('phoneInput')?.focus()
+                            document.getElementById('phoneInput')?.focus() //check needed
+                          } else {
+                            updateFormInput({ ...formInput, identifier: ph.target.value, type: 'email' })
                           }
                           setSignInData(ph.target.value)
 
@@ -313,14 +346,23 @@ const Home = () => {
                             setIsPhone('hidden')
                             setSignInData('')
                           } else {
+                            updateFormInput({ ...formInput, identifier: ph, type: 'phone' })
                             setSignInData(ph?.toString() ?? '')
                           }
                         }
                         }
                       />
                     </div>
+                    <div  >
+                      <input className={`w-7 h-7 mt-2 p-1 ml-4 mr-4 rounded-lg`} type="checkbox" defaultChecked={checked}
+                        onChange={() => setChecked(!checked)} />
+
+                      <b className={style.description}>Mark this wallet as your primary wallet</b>
+
+                    </div>
+
                     <button type="submit" className={style.nftButton}>
-                      Get OTP
+                      Submit
                     </button>
                   </form>
                 </div>
@@ -330,15 +372,7 @@ const Home = () => {
                     onSubmit={onSubmitOTP}
                     className=" mt-4 grid grid-cols-2 gap-6"
                   >
-                    <input
-                      placeholder="OTP"
-                      onChange={(e) =>
-                        updateFormInput({
-                          ...formInput,
-                          otp: e.target.value,
-                        })
-                      }
-                    />
+                    <input placeholder="OTP" onChange={(e) => updateFormInput({ ...formInput, otp: e.target.value })} />
                     <button type="submit" className={`${style.button} p-2`}>
                       Verify OTP
                     </button>
