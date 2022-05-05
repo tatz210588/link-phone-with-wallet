@@ -53,7 +53,7 @@ const IdInput: NextPage<IdInputProps> = ({
   useEffect(() => onChange && onChange(idValue, idType), [idValue])
 
   const onTextChange = (e?: string) => {
-    const value = e ? e.toString() : ''
+    const value = e?.toString() ?? ''
     switch (idType) {
       case IdType.phone:
         if (emptyString(value)) setIdType(defaultIdType)
