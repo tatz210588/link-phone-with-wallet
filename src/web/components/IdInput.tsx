@@ -15,7 +15,7 @@ type IdInputProps = {
   className?: string
   id?: string
   value?: string
-  onChange?: (value: string, inputType?: IdType) => void
+  onChange?: (value: string, inputType: IdType) => void
   placeholder?: string
   excludeIdTypes?: IdType[]
 }

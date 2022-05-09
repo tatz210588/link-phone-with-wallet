@@ -14,7 +14,7 @@ import { FirebaseApp } from 'firebase/app'
 import {
   getAuth,
   RecaptchaVerifier,
-  signInWithPhoneNumber
+  signInWithPhoneNumber,
 } from 'firebase/auth'
 import getFirebaseApp from '../components/firebase'
 import Router from 'next/router'
@@ -43,7 +43,12 @@ const idPlaceholder = 'Phone / Email'
 const Home = () => {
   const [firebaseApp, setFirebaseApp] = useState<FirebaseApp | undefined>()
   const [signInData, setSignInData] = useState('')
-  const [formInput, updateFormInput] = useState({ name: '', otp: '', identifier: '', type: '' })
+  const [formInput, updateFormInput] = useState({
+    name: '',
+    otp: '',
+    identifier: '',
+    type: '',
+  })
   const [loadingState, setLoadingState] = useState(false)
   const { address } = useWeb3()
   const [phoneNo, setPhoneNo] = useState(null)
@@ -91,18 +96,29 @@ const Home = () => {
     if (formInput.type === 'email') {
       var OTP = Math.floor(Math.random() * 100000)
       setEmailOTP(OTP)
-      var templateParams = { user: formInput.name, email: formInput.identifier, message: OTP }
-      emailjs.send('service_t2xue7p', 'template_dnzci4u', templateParams, 'Z8B2Ufr9spWJFx4js')
-        .then(function (response) {
-          toast.success("Check email for OTP")
-        }, function (error) {
-          console.log('FAILED...', error)
-        })
+      var templateParams = {
+        user: formInput.name,
+        email: formInput.identifier,
+        message: OTP,
+      }
+      emailjs
+        .send(
+          'service_t2xue7p',
+          'template_dnzci4u',
+          templateParams,
+          'Z8B2Ufr9spWJFx4js'
+        )
+        .then(
+          function (response) {
+            toast.success('Check email for OTP')
+          },
+          function (error) {
+            console.log('FAILED...', error)
+          }
+        )
       setOtp(true)
-
-    }
-    else if (formInput.type === 'phone') {
-      console.log("phone otp")
+    } else if (formInput.type === 'phone') {
+      console.log('phone otp')
       const signInPhoneNumber = signInData
       console.info({ signInPhoneNumber })
 
@@ -111,17 +127,19 @@ const Home = () => {
       try {
         // SMS sent. Prompt user to type the code from the message, then sign the
         // user in with confirmationResult.confirm(code).
-        window.confirmationResult = await signInWithPhoneNumber(auth, signInPhoneNumber, appVerifier)
+        window.confirmationResult = await signInWithPhoneNumber(
+          auth,
+          signInPhoneNumber,
+          appVerifier
+        )
         toast.success('OTP sent. Please enter the OTP')
         setOtp(true)
       } catch (error) {
         console.error(error)
       }
+    } else {
+      toast.error('Please enter phone/email to proceed.')
     }
-    else {
-      toast.error("Please enter phone/email to proceed.")
-    }
-
   }
 
   async function onSubmitOTP(e: any) {
@@ -132,11 +150,11 @@ const Home = () => {
     }
     if (formInput.type === 'email') {
       if (emailOTP.toString() == formInput.otp) {
-        toast.success("Email Authenticated")
+        toast.success('Email Authenticated')
         await link()
         setOtp(false)
       } else {
-        toast.error("Wrong OTP entered.")
+        toast.error('Wrong OTP entered.')
       }
     } else {
       const code = formInput.otp
@@ -169,28 +187,32 @@ const Home = () => {
     const provider = new ethers.providers.Web3Provider(connection)
     const signer = provider.getSigner()
     const network = await provider.getNetwork()
-    const phoneLinkContract = new ethers.Contract(getConfigByChain(network.chainId)[0].phoneLinkAddress, PhoneLink.abi, signer)
+    const phoneLinkContract = new ethers.Contract(
+      getConfigByChain(network.chainId)[0].phoneLinkAddress,
+      PhoneLink.abi,
+      signer
+    )
     //const data = await phoneLinkContract.fetchPhoneNumber()
     const data = await phoneLinkContract.getWalletDetails(address)
-    const items = await Promise.all(data.map(async (i: any) => {
-      let item = {
-        name: i.name,
-        identifier: i.identifier,
-        typeOfIdentifier: i.typeOfIdentifier,
-        connectedWalletAddress: i.connectedWalletAddress,
-        isPrimaryWallet: i.isPrimaryWallet
-      }
-      if (item.isPrimaryWallet == true) {
-        setIsPrimary(true)
-      }
-      return item
-    })
+    const items = await Promise.all(
+      data.map(async (i: any) => {
+        let item = {
+          name: i.name,
+          identifier: i.identifier,
+          typeOfIdentifier: i.typeOfIdentifier,
+          connectedWalletAddress: i.connectedWalletAddress,
+          isPrimaryWallet: i.isPrimaryWallet,
+        }
+        if (item.isPrimaryWallet == true) {
+          setIsPrimary(true)
+        }
+        return item
+      })
     )
     setPhoneNo(items[0].typeOfIdentifier)
     //setChecked(items[0].isPrimaryWallet ? items[0].isPrimaryWallet : false)
 
     setLoadingState(false)
-
   }
 
   async function link() {
@@ -203,17 +225,30 @@ const Home = () => {
     const provider = new ethers.providers.Web3Provider(connection)
     const signer = provider.getSigner()
     const network = await provider.getNetwork()
-    const phoneLinkContract = new ethers.Contract(getConfigByChain(network.chainId)[0].phoneLinkAddress, PhoneLink.abi, signer)
-    console.log("checked", checked)
-    const tx = await phoneLinkContract.enterDetails(formInput.name, formInput.identifier, formInput.type, checked)
+    const phoneLinkContract = new ethers.Contract(
+      getConfigByChain(network.chainId)[0].phoneLinkAddress,
+      PhoneLink.abi,
+      signer
+    )
+    console.log('checked', checked)
+    const tx = await phoneLinkContract.enterDetails(
+      formInput.name,
+      formInput.identifier,
+      formInput.type,
+      checked
+    )
     tx.wait(1)
     toast.success(`Wallet succesfully linked to your ${formInput.type}`)
     setLoadingState(false)
     Router.push({ pathname: '/' })
   }
 
-  function setIdValue(value: string, inputType?: IdType) {
-    updateFormInput({ ...formInput, identifier: value, type: inputType?.toString() ?? '' })
+  function setIdValue(value: string, inputType: IdType) {
+    updateFormInput({
+      ...formInput,
+      identifier: value,
+      type: inputType.toString(),
+    })
     setSignInData(value)
   }
 
@@ -259,22 +294,25 @@ const Home = () => {
                       excludeIdTypes={[IdType.wallet]}
                     />
 
-                    {phoneNo && (
-                      isPrimary == false ?
-                        <div  >
-
-                          <input className={`w-7 h-7 mt-2 p-1 ml-4 mr-4 rounded-lg`} type="checkbox" defaultChecked={checked}
+                    {phoneNo &&
+                      (isPrimary == false ? (
+                        <div>
+                          <input
+                            className={`mt-2 ml-4 mr-4 h-7 w-7 rounded-lg p-1`}
+                            type="checkbox"
+                            defaultChecked={checked}
                             onChange={() => {
-                              console.log("checked", checked)
+                              console.log('checked', checked)
                               setChecked(!checked)
-                              console.log("checked", checked)
-                            }} />
+                              console.log('checked', checked)
+                            }}
+                          />
 
-                          <b className={style.description}>Set this wallet as your primary wallet</b>
-
+                          <b className={style.description}>
+                            Set this wallet as your primary wallet
+                          </b>
                         </div>
-                        : null
-                    )}
+                      ) : null)}
                     <button type="submit" className={style.nftButton}>
                       Submit
                     </button>
@@ -286,7 +324,12 @@ const Home = () => {
                     onSubmit={onSubmitOTP}
                     className=" mt-4 grid grid-cols-2 gap-6"
                   >
-                    <input placeholder="OTP" onChange={(e) => updateFormInput({ ...formInput, otp: e.target.value })} />
+                    <input
+                      placeholder="OTP"
+                      onChange={(e) =>
+                        updateFormInput({ ...formInput, otp: e.target.value })
+                      }
+                    />
                     <button type="submit" className={`${style.button} p-2`}>
                       Verify OTP
                     </button>
