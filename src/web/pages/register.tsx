@@ -15,7 +15,7 @@ import { FirebaseApp } from 'firebase/app'
 import {
   getAuth,
   RecaptchaVerifier,
-  signInWithPhoneNumber, sendSignInLinkToEmail
+  signInWithPhoneNumber
 } from 'firebase/auth'
 import getFirebaseApp from '../components/firebase'
 import Router from 'next/router'
@@ -25,8 +25,8 @@ import { FaPhp } from 'react-icons/fa'
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
-  searchBar: `flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#363840] rounded-[0.8rem] `,
-  searchInput: `h-[2.6rem] w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#e6e8eb] placeholder:text-[#8a939b]`,
+  searchBar: `flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#ffffff] rounded-[0.8rem] `,
+  searchInput: `h-[2.6rem] w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#000000] placeholder:text-[#fffffff]`,
   searchBarVerify: `flex flex-1 w-max-[520px] items-center rounded-[0.8rem]`,
   copyContainer: `w-1/2`,
   modalListWrapper: `bg-[#303339]  w-1/3 h-1/3 mr-auto ml-auto my-28 rounded-2xl p-2 overflow-hidden  relative overflow-auto`,
@@ -40,24 +40,23 @@ const style = {
 
 const Home = () => {
   const [firebaseApp, setFirebaseApp] = useState<FirebaseApp | undefined>()
-  const { address, chainId } = useWeb3()
   const [signInData, setSignInData] = useState('')
   const [formInput, updateFormInput] = useState({ name: '', otp: '', identifier: '', type: '' })
   const [loadingState, setLoadingState] = useState(false)
-  const [newPhNo, setNewPhNo] = useState(false)
-  const [phoneNo, setPhoneNo] = useState('')
+  const { address } = useWeb3()
+  const [phoneNo, setPhoneNo] = useState(null)
   const [otp, setOtp] = useState(false)
   const [email, setEmail] = useState('flex')
-  const [emailLink, setEmailLink] = useState(false)
   const [isPhone, setIsPhone] = useState('hidden')
   const [emailOTP, setEmailOTP] = useState(0)
   const [checked, setChecked] = useState(true)
+  const [isPrimary, setIsPrimary] = useState(false)
 
   useEffect(() => {
-    const myInput = document.getElementById('myInput') as HTMLInputElement
-    myInput.value = ''
-    fetchPhoneNo()
-  }, [])
+    //const myInput = document.getElementById('myInput') as HTMLInputElement
+    //myInput.value = ''
+    getWalletDetails()
+  }, [address])
 
   async function configureCaptcha() {
     const auth = getAuth(firebaseApp)
@@ -89,7 +88,6 @@ const Home = () => {
       var templateParams = { user: formInput.name, email: formInput.identifier, message: OTP }
       emailjs.send('service_t2xue7p', 'template_dnzci4u', templateParams, 'Z8B2Ufr9spWJFx4js')
         .then(function (response) {
-          console.log('SUCCESS!', response.status, response.text)
           toast.success("Check email for OTP")
         }, function (error) {
           console.log('FAILED...', error)
@@ -129,7 +127,7 @@ const Home = () => {
     if (formInput.type === 'email') {
       if (emailOTP.toString() == formInput.otp) {
         toast.success("Email Authenticated")
-        //await link()
+        await link()
         setOtp(false)
       } else {
         toast.error("Wrong OTP entered.")
@@ -155,7 +153,7 @@ const Home = () => {
     }
   }
 
-  async function fetchPhoneNo() {
+  async function getWalletDetails() {
     setLoadingState(true)
     setFirebaseApp(await getFirebaseApp())
     const web3Modal = new Web3Modal({
@@ -166,27 +164,30 @@ const Home = () => {
     const provider = new ethers.providers.Web3Provider(connection)
     const signer = provider.getSigner()
     const network = await provider.getNetwork()
-    const phoneLinkContract = new ethers.Contract(
-      getConfigByChain(network.chainId)[0].phoneLinkAddress,
-      PhoneLink.abi,
-      signer
+    const phoneLinkContract = new ethers.Contract(getConfigByChain(network.chainId)[0].phoneLinkAddress, PhoneLink.abi, signer)
+    //const data = await phoneLinkContract.fetchPhoneNumber()
+    const data = await phoneLinkContract.getWalletDetails(address)
+    const items = await Promise.all(data.map(async (i: any) => {
+      let item = {
+        name: i.name,
+        identifier: i.identifier,
+        typeOfIdentifier: i.typeOfIdentifier,
+        connectedWalletAddress: i.connectedWalletAddress,
+        isPrimaryWallet: i.isPrimaryWallet
+      }
+      if (item.isPrimaryWallet == true) {
+        setIsPrimary(true)
+      }
+      return item
+    })
     )
-    const data = await phoneLinkContract.fetchPhoneNumber()
-    console.info({ phoneLinkContract })
-    console.info({ data })
-    setPhoneNo(data)
-    data === ''
-      ? toast.error('Wallet not linked to any phone. Link Now !!')
-      : toast.success(`Your wallet is already linked with ${maskPhone(data)}`)
+    setPhoneNo(items[0].typeOfIdentifier)
+    //setChecked(items[0].isPrimaryWallet ? items[0].isPrimaryWallet : false)
 
     setLoadingState(false)
-    if (data != '') {
-      //Router.push({ pathname: './myprofile' })
-      console.log("already linked")
-      setChecked(false)
-      console.log(checked)
-    }
+
   }
+
   async function link() {
     setLoadingState(true)
     const web3Modal = new Web3Modal({
@@ -197,93 +198,17 @@ const Home = () => {
     const provider = new ethers.providers.Web3Provider(connection)
     const signer = provider.getSigner()
     const network = await provider.getNetwork()
-    const phoneLinkContract = new ethers.Contract(
-      getConfigByChain(network.chainId)[0].phoneLinkAddress,
-      PhoneLink.abi,
-      signer
-    )
-    const tx = await phoneLinkContract.enterDetails(formInput.name, formInput.identifier, formInput.type)
+    const phoneLinkContract = new ethers.Contract(getConfigByChain(network.chainId)[0].phoneLinkAddress, PhoneLink.abi, signer)
+    console.log("checked", checked)
+    const tx = await phoneLinkContract.enterDetails(formInput.name, formInput.identifier, formInput.type, checked)
     tx.wait(1)
     toast.success(`Wallet succesfully linked to your ${formInput.type}`)
     setLoadingState(false)
     Router.push({ pathname: '/' })
   }
 
-  async function savePhone() {
-    if (signInData == phoneNo) {
-      toast.error('This number is already linked with your Wallet !!')
-    } else {
-      setLoadingState(true)
-      const web3Modal = new Web3Modal({
-        network: 'mainnet',
-        cacheProvider: true,
-      })
-      const connection = await web3Modal.connect()
-      const provider = new ethers.providers.Web3Provider(connection)
-      const signer = provider.getSigner()
-      const network = await provider.getNetwork()
-      console.info({ network })
-      const phoneLinkContract = new ethers.Contract(
-        getConfigByChain(network.chainId)[0].phoneLinkAddress,
-        PhoneLink.abi,
-        signer
-      )
-      console.info('phoneLinkContract')
-      const tx = await phoneLinkContract.editPhoneNumber(signInData)
-      console.info('edit')
-      tx.wait(1)
-      toast.success('Phone Number Changed !!')
-      setNewPhNo(false)
-      setLoadingState(false)
-      setSignInData('')
-    }
-  }
-
   return (
     <>
-      <Modal isOpen={newPhNo} className={style.modalListWrapper}>
-        <button
-          className={` flex w-full justify-end text-white hover:text-[#fc1303]`}
-          onClick={() => {
-            setNewPhNo(false)
-            setLoadingState(false)
-            setSignInData('')
-          }}
-        >
-          Close ❌
-        </button>
-
-        <div
-          className={`${style.title} mt-8 flex w-full justify-center font-bold text-white`}
-        >
-          Enter New Phone Number:
-        </div>
-
-        <div className={`${style.searchBar} mt-2 p-1`}>
-          <PhoneInput
-            className={style.searchInput}
-            placeholder={phoneNo}
-            value={signInData}
-            id="myNewInput"
-            onChange={(ph) => setSignInData(ph?.toString() ?? '')}
-          />
-        </div>
-        {loadingState == true ? (
-          <BusyLoader
-            loaderType={LoaderType.Beat}
-            wrapperClass="white-busy-container m-8"
-            className="white-busy-container"
-            color={'#ffffff'}
-            size={15}
-          >
-            Saving data to blockchain. Please wait✋🏻...
-          </BusyLoader>
-        ) : (
-          <button className={style.nftButton} onClick={() => savePhone()}>
-            Link
-          </button>
-        )}
-      </Modal>
       <Container>
         <div className={style.copyContainer}>
           {loadingState == true ? (
@@ -321,7 +246,7 @@ const Home = () => {
                         value={signInData}
                         id="myInput"
                         onChange={(ph) => {
-                          if (ph.target.value == '9') { //check needed
+                          if (!isNaN(Number(ph.target.value)) && ph.target.value) { //check needed
                             setEmail('hidden')
                             setIsPhone('flex')
                             document.getElementById('phoneInput')?.focus() //check needed
@@ -335,7 +260,7 @@ const Home = () => {
                     </div>
                     <div className={`${style.searchBar} mt-2 p-1 ${isPhone}`}>
                       <PhoneInput
-                        //className={`${style.searchInput}`}
+                        className={`${style.searchInput}`}
                         placeholder="Enter phone number"
                         value={signInData}
                         id="phoneInput"
@@ -353,13 +278,22 @@ const Home = () => {
                         }
                       />
                     </div>
-                    <div  >
-                      <input className={`w-7 h-7 mt-2 p-1 ml-4 mr-4 rounded-lg`} type="checkbox" defaultChecked={checked}
-                        onChange={() => setChecked(!checked)} />
+                    {phoneNo && (
+                      isPrimary == false ?
+                        <div  >
 
-                      <b className={style.description}>Mark this wallet as your primary wallet</b>
+                          <input className={`w-7 h-7 mt-2 p-1 ml-4 mr-4 rounded-lg`} type="checkbox" defaultChecked={checked}
+                            onChange={() => {
+                              console.log("checked", checked)
+                              setChecked(!checked)
+                              console.log("checked", checked)
+                            }} />
 
-                    </div>
+                          <b className={style.description}>Set this wallet as your primary wallet</b>
+
+                        </div>
+                        : null
+                    )}
 
                     <button type="submit" className={style.nftButton}>
                       Submit
