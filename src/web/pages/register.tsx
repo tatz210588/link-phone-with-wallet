@@ -2,14 +2,13 @@ import { useWeb3 } from '@3rdweb/hooks'
 import React, { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import 'react-phone-number-input/style.css'
-import PhoneInput from 'react-phone-number-input'
 import PhoneLink from '../../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import { getConfigByChain } from '../config'
 import Web3Modal from 'web3modal'
 import { ethers } from 'ethers'
 import Modal from 'react-modal'
 import { maskPhone } from '../components/utils'
-import axios from 'axios'
+//import axios from 'axios'
 import emailjs from '@emailjs/browser'
 import { FirebaseApp } from 'firebase/app'
 import {
@@ -22,6 +21,7 @@ import Router from 'next/router'
 import Container from '../components/Container'
 import BusyLoader, { LoaderType } from '../components/BusyLoader'
 import { FaPhp } from 'react-icons/fa'
+import IdInput, { IdType } from '../components/IdInput'
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
@@ -37,6 +37,8 @@ const style = {
   button: `font-bold w-full mt-2 bg-[#eb77f2] text-white text-lg rounded shadow-lg hover:bg-[#e134eb] cursor-pointer`,
   nftButton: `font-bold w-full mt-4 bg-[#eb77f2] text-white text-lg rounded p-4 shadow-lg hover:bg-[#e134eb] cursor-pointer`,
 }
+
+const idPlaceholder = 'Phone / Email'
 
 const Home = () => {
   const [firebaseApp, setFirebaseApp] = useState<FirebaseApp | undefined>()
@@ -57,6 +59,10 @@ const Home = () => {
     //myInput.value = ''
     getWalletDetails()
   }, [address])
+
+  useEffect(() => {
+    getFirebaseApp().then((app) => setFirebaseApp(app))
+  }, [firebaseApp])
 
   async function configureCaptcha() {
     const auth = getAuth(firebaseApp)
@@ -80,7 +86,7 @@ const Home = () => {
     } catch (error) {
       console.error(error)
     }
-    console.info('step1')
+    console.info({ signInData })
     configureCaptcha()
     if (formInput.type === 'email') {
       var OTP = Math.floor(Math.random() * 100000)
@@ -155,7 +161,6 @@ const Home = () => {
 
   async function getWalletDetails() {
     setLoadingState(true)
-    setFirebaseApp(await getFirebaseApp())
     const web3Modal = new Web3Modal({
       network: 'mainnet',
       cacheProvider: true,
@@ -207,6 +212,11 @@ const Home = () => {
     Router.push({ pathname: '/' })
   }
 
+  function setIdValue(value: string, inputType?: IdType) {
+    updateFormInput({ ...formInput, identifier: value, type: inputType?.toString() ?? '' })
+    setSignInData(value)
+  }
+
   return (
     <>
       <Container>
@@ -240,44 +250,15 @@ const Home = () => {
                         }
                       />
                     </div>
-                    <div className={`${style.searchBar} mt-2 p-1 ${email}`}>
-                      <input className={style.searchInput}
-                        placeholder="Phone / Email"
-                        value={signInData}
-                        id="myInput"
-                        onChange={(ph) => {
-                          if (!isNaN(Number(ph.target.value)) && ph.target.value) { //check needed
-                            setEmail('hidden')
-                            setIsPhone('flex')
-                            document.getElementById('phoneInput')?.focus() //check needed
-                          } else {
-                            updateFormInput({ ...formInput, identifier: ph.target.value, type: 'email' })
-                          }
-                          setSignInData(ph.target.value)
+                    <IdInput
+                      className={style.searchInput}
+                      id="myInput"
+                      wrapperClass={`${style.searchBar} mt-2 p-1`}
+                      placeholder={idPlaceholder}
+                      onChange={setIdValue}
+                      excludeIdTypes={[IdType.wallet]}
+                    />
 
-                        }}
-                      />
-                    </div>
-                    <div className={`${style.searchBar} mt-2 p-1 ${isPhone}`}>
-                      <PhoneInput
-                        className={`${style.searchInput}`}
-                        placeholder="Enter phone number"
-                        value={signInData}
-                        id="phoneInput"
-                        onChange={(ph) => {
-                          //console.log("ph", ph)
-                          if (!ph) {
-                            setEmail('flex')
-                            setIsPhone('hidden')
-                            setSignInData('')
-                          } else {
-                            updateFormInput({ ...formInput, identifier: ph, type: 'phone' })
-                            setSignInData(ph?.toString() ?? '')
-                          }
-                        }
-                        }
-                      />
-                    </div>
                     {phoneNo && (
                       isPrimary == false ?
                         <div  >
@@ -294,7 +275,6 @@ const Home = () => {
                         </div>
                         : null
                     )}
-
                     <button type="submit" className={style.nftButton}>
                       Submit
                     </button>
@@ -316,7 +296,7 @@ const Home = () => {
             </div>
           )}
         </div>
-      </Container >
+      </Container>
     </>
   )
 }

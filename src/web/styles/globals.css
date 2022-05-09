@@ -91,4 +91,8 @@
   .white-busy-container {
     @apply text-white;
   }
+
+  .PhoneInput .PhoneInputInput {
+    background: transparent;
+  }
 }
