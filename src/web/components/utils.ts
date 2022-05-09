@@ -49,8 +49,8 @@ export const isHexString = (str?: string) =>
 
 export const emptyString = (str?: string) => !str?.trim()
 
-export const randomString = (length = 16) =>
+export const randomString = (length = 16, format: BufferEncoding = 'hex') =>
   crypto
     .randomBytes(length * 3)
-    .toString('hex')
+    .toString(format)
     .substring(0, length)

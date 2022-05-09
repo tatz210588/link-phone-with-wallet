@@ -21,9 +21,9 @@ type IdInputProps = {
 }
 
 export enum IdType {
-  email,
-  phone,
-  wallet,
+  email = 'email',
+  phone = 'phone',
+  wallet = 'wallet',
 }
 
 const defaultIdType = IdType.email
