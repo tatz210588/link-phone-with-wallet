@@ -31,7 +31,7 @@ const Home = () => {
   const { address, chainId } = useWeb3()
   const [loadingState, setLoadingState] = useState(true)
   const [details, setDetails] = useState<any[]>([])
-  const [formInput, updateFormInput] = useState({ phoneNumber: '' })
+  const [formInput, updateFormInput] = useState({ identifier: '' })
   const [admins, setAdmins] = useState()
 
   useEffect(() => {
@@ -57,8 +57,10 @@ const Home = () => {
       data.map(async (i: any) => {
         let item = {
           name: i.name,
-          phoneNumber: i.phoneNumber,
+          identifier: i.identifier,
           connectedWalletAddress: i.connectedWalletAddress,
+          typeOfIdentifier: i.typeOfIdentifier,
+          isPrimaryWallet: i.isPrimaryWallet
         }
         return item
       })
@@ -85,18 +87,18 @@ const Home = () => {
         const signer = provider.getSigner()
         const network = await provider.getNetwork()
         const phoneLinkContract = new ethers.Contract(
-          getConfigByChain(network.chainId)[0].phoneLinkAddress,
-          PhoneLink.abi,
-          signer
-        )
-        const data = await phoneLinkContract.fetchWalletAddress(
-          formInput.phoneNumber
+          getConfigByChain(network.chainId)[0].phoneLinkAddress, PhoneLink.abi, signer)
+        const data = await phoneLinkContract.fetchAllWalletAddress(
+          formInput.identifier
         )
         const items = await Promise.all(
           data.map(async (i: any) => {
             let item = {
-              phoneNumber: i.phoneNumber,
+              name: i.name,
+              identifier: i.identifier,
               connectedWalletAddress: i.connectedWalletAddress,
+              typeOfIdentifier: i.typeOfIdentifier,
+              isPrimaryWallet: i.isPrimaryWallet
             }
             return item
           })
@@ -137,7 +139,7 @@ const Home = () => {
                 onChange={(e) =>
                   updateFormInput({
                     ...formInput,
-                    phoneNumber: e.target.value,
+                    identifier: e.target.value,
                   })
                 }
                 onKeyDown={(e) => search(e)}
@@ -149,38 +151,50 @@ const Home = () => {
               <div className="container">
                 <div className="-mx-4 flex flex-wrap">
                   <div className="w-full px-4">
-                    <div className="max-w-full overflow-x-auto">
+                    <div className="max-w-full overflow-x-auto rounded">
                       <table className="w-full table-auto rounded-md rounded-3xl">
                         <thead>
                           <tr className="bg-primary text-center">
                             <th className="w-1/6 min-w-[160px] border-l border-transparent py-4 px-3 text-lg font-semibold text-white lg:py-7 lg:px-4">
                               Sl. No.
                             </th>
-                            <th className=" w-1/6 min-w-[160px] py-4 px-3 text-lg font-semibold text-white lg:py-7 lg:px-4">
-                              Ph No.
-                            </th>
                             <th className="w-1/6 min-w-[160px] py-4 px-3 text-lg font-semibold text-white lg:py-7 lg:px-4">
                               Name.
                             </th>
+                            <th className=" w-1/6 min-w-[160px] py-4 px-3 text-lg font-semibold text-white lg:py-7 lg:px-4">
+                              Phone/Email.
+                            </th>
+                            <th className=" w-1/6 min-w-[160px] py-4 px-3 text-lg font-semibold text-white lg:py-7 lg:px-4">
+                              Ph no/EmailID.
+                            </th>
                             <th className="w-1/6 min-w-[160px] py-4 px-3 text-lg font-semibold text-white lg:py-7 lg:px-4">
                               Wallet Address
+                            </th>
+                            <th className="w-1/6 min-w-[160px] py-4 px-3 text-lg font-semibold text-white lg:py-7 lg:px-4">
+                              Is Primary?
                             </th>
                           </tr>
                         </thead>
                         <tbody className="rounded-2xl">
                           {details.map((detail, id) => (
                             <tr key={id} className="rounded-3xl">
-                              <td className="text-dark border-b border-l border-[#E8E8E8] bg-[#F3F6FF] py-5 px-2 text-center text-base font-medium">
+                              <td className="text-dark border-b border-l border-[#E8E8E8] bg-[#ebecf2] py-5 px-2 text-center text-base font-medium">
                                 {id + 1}
                               </td>
-                              <td className="text-dark border-b border-[#E8E8E8] bg-white py-5 px-2 text-center text-base font-medium">
-                                {detail.phoneNumber}
-                              </td>
-                              <td className="text-dark border-b border-[#E8E8E8] bg-white py-5 px-2 text-center text-base font-medium">
+                              <td className="text-dark border-b border-[#E8E8E8] bg-[#eadaeb] py-5 px-2 text-center text-base font-medium">
                                 {detail.name}
                               </td>
-                              <td className="text-dark border-b border-[#E8E8E8] bg-[#F3F6FF] py-5 px-2 text-center text-base font-medium">
+                              <td className="text-dark border-b border-[#E8E8E8] bg-[#ebeada] py-5 px-2 text-center text-base font-medium">
+                                {detail.typeOfIdentifier}
+                              </td>
+                              <td className="text-dark border-b border-[#E8E8E8] bg-[#fffbc2] py-5 px-2 text-center text-base font-medium">
+                                {detail.identifier}
+                              </td>
+                              <td className="text-dark border-b border-[#E8E8E8] bg-[#83eff2] py-5 px-2 text-center text-base font-medium">
                                 {detail.connectedWalletAddress}
+                              </td>
+                              <td className="text-dark border-b border-[#E8E8E8] bg-[#adffb7] py-5 px-2 text-center text-base font-medium">
+                                {detail.isPrimaryWallet == true ? 'Y' : 'N'}
                               </td>
                             </tr>
                           ))}
