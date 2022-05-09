@@ -44,11 +44,10 @@ const Footer = () => {
           <div className="grid-1 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <div className="">
               <h6 className="mb-4 flex items-center justify-center font-semibold uppercase md:justify-start">
-                LoloNFT
+                GrowPay
               </h6>
               <p>
-                Here you can purchase original NFTs of all the gems in the rural
-                Bengal..
+                Send or receive Crypto to friends on their phone number or email Ids.
               </p>
             </div>
             <div className="">
@@ -57,22 +56,22 @@ const Footer = () => {
               </h6>
               <p className="mb-4">
                 <a href="#!" className="text-gray-600">
-                  Explore
+                  Home
                 </a>
               </p>
               <p className="mb-4">
                 <a href="#!" className="text-gray-600">
-                  Create Item
+                  Pay to Phone
                 </a>
               </p>
               <p className="mb-4">
                 <a href="#!" className="text-gray-600">
-                  My Collections
+                  Scan QR code
                 </a>
               </p>
               <p>
                 <a href="#!" className="text-gray-600">
-                  My Creations
+                  My Profile
                 </a>
               </p>
             </div>
