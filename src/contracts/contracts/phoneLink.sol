@@ -35,12 +35,11 @@ contract phoneLink is Initializable, ERC20Upgradeable {
   function getWalletDetails(address walletAddress) public view returns (Details[] memory)
   {
     uint256 totalItemCount = _itemIds.current();
-    Details[] memory items = new Details[](1);
+    Details[] memory items = new Details[](totalItemCount);
     for (uint256 i = 0; i < totalItemCount; i++) {
       if (phoneToDetails[i + 1].connectedWalletAddress == walletAddress) {
         Details storage currentItem = phoneToDetails[i + 1];
         items[i] = currentItem;
-        break;
       }
     }
     return items;

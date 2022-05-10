@@ -261,11 +261,7 @@ const Home = () => {
   }
 
   function setIdValue(value: string, inputType: IdType) {
-    updateFormInput({
-      ...formInput,
-      identifier: value,
-      type: inputType.toString(),
-    })
+    updateFormInput({ ...formInput, identifier: value, type: inputType.toString(), })
     setSignInData(value)
   }
 
@@ -311,7 +307,7 @@ const Home = () => {
                       excludeIdTypes={[IdType.wallet]}
                     />
 
-                    {phoneNo &&
+                    {
                       (isPrimary == false ? (
                         <div>
                           <input
