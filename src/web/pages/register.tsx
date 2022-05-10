@@ -48,15 +48,12 @@ const Home = () => {
   })
   const [loadingState, setLoadingState] = useState(false)
   const { address } = useWeb3()
-  const [phoneNo, setPhoneNo] = useState(null)
   const [otp, setOtp] = useState(false)
   const [emailOTP, setEmailOTP] = useState('')
   const [checked, setChecked] = useState(true)
   const [isPrimary, setIsPrimary] = useState(false)
 
   useEffect(() => {
-    //const myInput = document.getElementById('myInput') as HTMLInputElement
-    //myInput.value = ''
     getWalletDetails()
   }, [address])
 
@@ -73,7 +70,7 @@ const Home = () => {
         callback: (response: any) => {
           // reCAPTCHA solved, allow signInWithPhoneNumber.
           console.info('recaptcha verifying')
-          challengeIdentity().then((_) => console.info('recaptcha verified'))
+          onSignInSubmit().then((_) => console.info('recaptcha verified'))
         },
       },
       auth
@@ -88,7 +85,40 @@ const Home = () => {
     }
     console.info({ signInData })
     configureCaptcha()
-    challengeIdentity()
+    if (formInput.type === 'email') {
+      var OTP = randomString(10, 'base64')
+      setEmailOTP(OTP)
+      var templateParams = { user: formInput.name, email: formInput.identifier, message: OTP }
+      emailjs.send('service_t2xue7p', 'template_dnzci4u', templateParams, 'Z8B2Ufr9spWJFx4js')
+        .then(function (response) {
+          console.log('SUCCESS!', response.status, response.text)
+          toast.success("Check email for OTP")
+        }, function (error) {
+          console.log('FAILED...', error)
+        })
+      setOtp(true)
+
+    }
+    else if (formInput.type === 'phone') {
+      console.log("phone otp")
+      const signInPhoneNumber = signInData
+      console.info({ signInPhoneNumber })
+
+      const appVerifier = window.recaptchaVerifier
+      const auth = getAuth(firebaseApp)
+      try {
+        // SMS sent. Prompt user to type the code from the message, then sign the
+        // user in with confirmationResult.confirm(code).
+        window.confirmationResult = await signInWithPhoneNumber(auth, signInPhoneNumber, appVerifier)
+        toast.success('OTP sent. Please enter the OTP')
+        setOtp(true)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    else {
+      toast.error("Please enter phone/email to proceed.")
+    }
   }
 
   async function challengeIdentity() {
@@ -159,38 +189,32 @@ const Home = () => {
     } catch (error) {
       console.error(error)
     }
-    switch (formInput.type) {
-      case IdType.email:
-        if (emailOTP === formInput.otp) {
-          toast.success('Email Authenticated')
-          await link()
-        } else {
-          toast.error('Wrong OTP entered.')
-        }
+    if (formInput.type === 'email') {
+      if (emailOTP.toString() == formInput.otp) {
+        toast.success("Email Authenticated")
+        //await link()
         setOtp(false)
-        break
-      case IdType.phone:
-        const code = formInput.otp
-        console.info({ code })
-        try {
-          const result = await window.confirmationResult.confirm(code)
-          // User signed in successfully.
-          const user = result.user
-          console.info({ user })
-          toast.success('user is verified')
-          await link()
-          // ...
-        } catch (error) {
-          // User couldn't sign in (bad verification code?)
-          // ...
-          //toast.error("Wrong otp")
-          console.error(error)
-        }
+      } else {
+        toast.error("Wrong OTP entered.")
+      }
+    } else {
+      const code = formInput.otp
+      console.info({ code })
+      try {
+        const result = await window.confirmationResult.confirm(code)
+        // User signed in successfully.
+        const user = result.user
+        console.info({ user })
+        toast.success('user is verified')
+        await link()
         setOtp(false)
-        break
-      default:
-        toast.error('Unsupported OTP entered.')
-        break
+        // ...
+      } catch (error) {
+        // User couldn't sign in (bad verification code?)
+        // ...
+        //toast.error("Wrong otp")
+        console.error(error)
+      }
     }
   }
 
@@ -210,7 +234,9 @@ const Home = () => {
       signer
     )
     //const data = await phoneLinkContract.fetchPhoneNumber()
+
     const data = await phoneLinkContract.getWalletDetails(address)
+    console.log("sdsdsa", data)
     const items = await Promise.all(
       data.map(async (i: any) => {
         let item = {
@@ -226,8 +252,6 @@ const Home = () => {
         return item
       })
     )
-    setPhoneNo(items[0].typeOfIdentifier)
-    //setChecked(items[0].isPrimaryWallet ? items[0].isPrimaryWallet : false)
 
     setLoadingState(false)
   }

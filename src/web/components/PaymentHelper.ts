@@ -139,27 +139,18 @@ const PaymentHelper = () => {
 
           let targetAddress = target
           if (!directAddress) {
-            //gets the addresses linked to the phone number
-            const to = await phoneLinkContract.fetchWalletAddress(target)
+            //gets the addresses linked to the identifier = target
+            const to = await phoneLinkContract.fetchPrimaryWalletAddress(target)
 
             if (to.length === 0) {
               //means your friend has not yet linked his/her wallet
               toast.error(
                 'The given phone number is not linked to any wallet.' +
-                  ' Ask your friend to link his Phone'
+                ' Ask your friend to link his Phone'
               )
               return false
             } else {
-              const items = await Promise.all(
-                to.map(async (i: any) => {
-                  let item = {
-                    phoneNumber: i.phoneNumber,
-                    connectedWalletAddress: i.connectedWalletAddress,
-                  }
-                  return item
-                })
-              )
-              targetAddress = items[0].connectedWalletAddress
+              targetAddress = to
             }
           }
 

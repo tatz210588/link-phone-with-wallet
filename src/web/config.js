@@ -1,7 +1,7 @@
 export const networkConfig = {
     "80001": [
         {
-            phoneLinkAddress: "0x0221c5432fE9732b973F3282bE599fC1cB997cd6", //proxy deployment
+            phoneLinkAddress: "0xc577F566D73851F945acbA2Def79884ea0B29818", //proxy deployment
             token_icon: "https://cryptologos.cc/logos/polygon-matic-logo.svg?v=022",
             alt: "MATIC",
             networkName: "Mumbai"
@@ -11,7 +11,7 @@ export const networkConfig = {
 
     "4": [
         {
-            phoneLinkAddress: "0x61851Aa69131E18a3f25e90B093ea40c6c2D3bB2",
+            phoneLinkAddress: "0xc62773E07ab521DB2366Ea441D47ccFA6F15c005", //proxy deployment
             token_icon: "https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=022",
             alt: "ETH",
             networkName: "Rinkeby"
