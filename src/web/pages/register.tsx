@@ -121,68 +121,6 @@ const Home = () => {
     }
   }
 
-  async function challengeIdentity() {
-    switch (formInput.type) {
-      case IdType.email:
-        var emailOtp = randomString(10, 'base64')
-        setEmailOTP(emailOtp)
-        var templateParams = {
-          user: formInput.name,
-          email: formInput.identifier,
-          message: emailOtp,
-        }
-
-        setOtp(true)
-        try {
-          await emailjs.send(
-            'service_t2xue7p',
-            'template_dnzci4u',
-            templateParams,
-            'Z8B2Ufr9spWJFx4js'
-          )
-          toast.success(
-            <>
-              OTP has been sent successfully to{' '}
-              {ellipseAddress(formInput.identifier, 4)}
-              <br />
-              Please check your email.
-            </>
-          )
-        } catch (error) {
-          console.error(error)
-          toast.error('Unable to send OTP to the given email...')
-          setOtp(false)
-        }
-        break
-      case IdType.phone:
-        console.log('phone otp')
-        const signInPhoneNumber = signInData
-        console.info({ signInPhoneNumber })
-
-        const appVerifier = window.recaptchaVerifier
-        const auth = getAuth(firebaseApp)
-        try {
-          setOtp(true)
-          // SMS sent. Prompt user to type the code from the message, then sign the
-          // user in with confirmationResult.confirm(code).
-          window.confirmationResult = await signInWithPhoneNumber(
-            auth,
-            signInPhoneNumber,
-            appVerifier
-          )
-          toast.success('OTP sent. Please enter the OTP')
-        } catch (error) {
-          console.error(error)
-          toast.error('Unable to send OTP to the given phone no...')
-          setOtp(false)
-        }
-        break
-      default:
-        toast.error('Please enter phone/email to proceed.')
-        break
-    }
-  }
-
   async function onSubmitOTP(e: any) {
     try {
       e?.preventDefault()
@@ -236,22 +174,19 @@ const Home = () => {
     //const data = await phoneLinkContract.fetchPhoneNumber()
 
     const data = await phoneLinkContract.getWalletDetails(address)
-    console.log("sdsdsa", data)
-    const items = await Promise.all(
-      data.map(async (i: any) => {
-        let item = {
-          name: i.name,
-          identifier: i.identifier,
-          typeOfIdentifier: i.typeOfIdentifier,
-          connectedWalletAddress: i.connectedWalletAddress,
-          isPrimaryWallet: i.isPrimaryWallet,
-        }
-        if (item.isPrimaryWallet == true) {
-          setIsPrimary(true)
-        }
-        return item
-      })
-    )
+    const items = await Promise.all(data.map(async (i: any) => {
+      let item = {
+        name: i.name,
+        identifier: i.identifier,
+        typeOfIdentifier: i.typeOfIdentifier,
+        connectedWalletAddress: i.connectedWalletAddress,
+        isPrimaryWallet: i.isPrimaryWallet,
+      }
+      if (item.isPrimaryWallet == true) {
+        setIsPrimary(true)
+      }
+      return item
+    }))
 
     setLoadingState(false)
   }

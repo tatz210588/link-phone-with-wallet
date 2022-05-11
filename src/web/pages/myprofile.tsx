@@ -8,6 +8,7 @@ import Modal from 'react-modal'
 // import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import { FirebaseApp } from 'firebase/app'
+import { ellipseAddress } from '../components/utils'
 import {
   getAuth,
   RecaptchaVerifier,
@@ -47,6 +48,7 @@ const MyProfile = () => {
   const [signInData, setSignInData] = useState('')
   const [otp, setOtp] = useState(false)
   const [formInput, updateFormInput] = useState({ otp: '' })
+  const [details, setDetails] = useState<any[]>([])
 
   useEffect(() => {
     window.ethereum
@@ -57,7 +59,7 @@ const MyProfile = () => {
           setSrc(data)
         })
       })
-    fetchPhone()
+    fetchWalletDetails()
   }, [address, chainId])
 
   useEffect(() => {
@@ -136,23 +138,38 @@ const MyProfile = () => {
     }
   }
 
-  async function fetchPhone() {
+  async function fetchWalletDetails() {
     setLoadingState(true)
     await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
     const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
     const signer = provider.getSigner() // get signer
     const network = await provider.getNetwork()
-    let data = null
     const phoneLinkContract = new ethers.Contract(
       getConfigByChain(network.chainId)[0].phoneLinkAddress,
       PhoneLink.abi,
       signer
     )
-    data = await phoneLinkContract.fetchPhoneNumber()
+    const data = await phoneLinkContract.getWalletDetails(address)
+    const items = await Promise.all(data.filter(async (i: any) => {
+      console.log("abcd1")
+      if (i.typeOfIdentifier) {
+        console.log("abcd")
+        let item = {
+          name: i.name,
+          identifier: i.identifier,
+          typeOfIdentifier: i.typeOfIdentifier,
+          connectedWalletAddress: i.connectedWalletAddress,
+          isPrimaryWallet: i.isPrimaryWallet,
+        }
+        return item
+      }
+    }))
+    console.log("items/details", items)
+    console.log("data", data)
     if (data === '') {
       Router.push({ pathname: '/register' })
     } else {
-      setPhoneNumber(data)
+      setDetails(items)
     }
     setLoadingState(false)
   }
@@ -246,23 +263,69 @@ const MyProfile = () => {
             <b>Fetching data from blockchain...</b>
           </BusyLoader>
         ) : (
-          <div className=" mt-4 grid w-1/2 grid-cols-3 gap-1">
+          <div className=" mt-4 grid w-1/2 grid-cols-1 gap-1">
             <a href={src} download>
-              <img src={src} />
+              <img src={src} />{ellipseAddress(address)}
             </a>
-            <div className={style.description}>
-              My Phone: {phoneNumber}
-              &nbsp;
-              <u>
-                <i
-                  className={style.editItem}
-                  onClick={() => {
-                    setEditPhone(true)
-                  }}
-                >
-                  edit
-                </i>
-              </u>
+            <div className="flex flex-wrap">
+              <section className="my-10 mx-5 rounded-3xl bg-[#3699eb]">
+                <div className="container">
+                  <div className="-mx-4 flex flex-wrap">
+                    <div className="w-full px-4">
+                      <div className="max-w-full overflow-x-auto rounded">
+                        <table className="w-full table-auto rounded-md rounded-3xl">
+                          <thead>
+                            <tr className="bg-primary text-center">
+                              <th className="w-1/6 min-w-[160px] border-l border-transparent py-4 px-3 text-lg font-semibold text-white lg:py-7 lg:px-4">
+                                Sl. No.
+                              </th>
+                              <th className="w-1/6 min-w-[160px] py-4 px-3 text-lg font-semibold text-white lg:py-7 lg:px-4">
+                                Name.
+                              </th>
+                              <th className=" w-1/6 min-w-[160px] py-4 px-3 text-lg font-semibold text-white lg:py-7 lg:px-4">
+                                Phone/Email.
+                              </th>
+                              <th className=" w-1/6 min-w-[160px] py-4 px-3 text-lg font-semibold text-white lg:py-7 lg:px-4">
+                                Ph no/EmailID.
+                              </th>
+                              <th className="w-1/6 min-w-[160px] py-4 px-3 text-lg font-semibold text-white lg:py-7 lg:px-4">
+                                Is Primary?
+                              </th>
+                              <th className="w-1/6 min-w-[160px] py-4 px-3 text-lg font-semibold text-white lg:py-7 lg:px-4">
+                                Edit details
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="rounded-2xl">
+                            {details.map((detail, id) => (
+                              <tr key={id} className="rounded-3xl">
+                                <td className="text-dark border-b border-l border-[#E8E8E8] bg-[#ebecf2] py-5 px-2 text-center text-base font-medium">
+                                  {detail.typeOfIdentifier ? id + 1 : null}
+                                </td>
+                                <td className="text-dark border-b border-[#E8E8E8] bg-[#eadaeb] py-5 px-2 text-center text-base font-medium">
+                                  {detail.typeOfIdentifier ? detail.name : null}
+                                </td>
+                                <td className="text-dark border-b border-[#E8E8E8] bg-[#ebeada] py-5 px-2 text-center text-base font-medium">
+                                  {detail.typeOfIdentifier ? detail.typeOfIdentifier : null}
+                                </td>
+                                <td className="text-dark border-b border-[#E8E8E8] bg-[#fffbc2] py-5 px-2 text-center text-base font-medium">
+                                  {detail.typeOfIdentifier ? detail.identifier : null}
+                                </td>
+                                <td className="text-dark border-b border-[#E8E8E8] bg-[#adffb7] py-5 px-2 text-center text-base font-medium">
+                                  {detail.typeOfIdentifier ? detail.isPrimaryWallet == true ? 'Y' : 'N' : null}
+                                </td>
+                                <td className="text-dark border-b border-[#E8E8E8] bg-[#adffb7] py-5 px-2 text-center text-base font-medium">
+                                  <u>{detail.typeOfIdentifier ? 'edit' : null}</u>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
             </div>
           </div>
         )}

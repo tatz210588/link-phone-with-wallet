@@ -38,11 +38,14 @@ contract phoneLink is Initializable, ERC20Upgradeable {
     returns (Details[] memory)
   {
     uint256 totalItemCount = _itemIds.current();
+    uint256 currentIndex = 0;
+
     Details[] memory items = new Details[](totalItemCount);
     for (uint256 i = 0; i < totalItemCount; i++) {
       if (phoneToDetails[i + 1].connectedWalletAddress == walletAddress) {
         Details storage currentItem = phoneToDetails[i + 1];
-        items[i] = currentItem;
+        items[currentIndex] = currentItem;
+        currentIndex += 1;
       }
     }
     return items;
@@ -51,11 +54,14 @@ contract phoneLink is Initializable, ERC20Upgradeable {
   //Gets all user details
   function getPhoneToDetails() public view returns (Details[] memory) {
     uint256 totalItemCount = _itemIds.current();
+    uint256 currentIndex = 0;
+
     Details[] memory items = new Details[](totalItemCount);
     for (uint256 i = 0; i < totalItemCount; i++) {
       uint256 currentId = i + 1;
       Details storage currentItem = phoneToDetails[currentId];
-      items[i] = currentItem;
+      items[currentIndex] = currentItem;
+      currentIndex += 1;
     }
     return items;
   }
@@ -136,13 +142,28 @@ contract phoneLink is Initializable, ERC20Upgradeable {
   }
 
   //my profile
-  // function myWallets() public view returns (Details[] memory){
-  //   Details[] memory detailIdentifier = getWalletDetails(msg.sender);
-  //   for(uint256 i = 0; i<detailIdentifier.length; i++){
-  //       Details[] memory mylinkedWallets = fetchAllWalletAddress(detailIdentifier[i].identifier);
-  //       return mylinkedWallets;
-  //   }
-  // }
+  function myWallets() public view returns (Details[] memory) {
+    uint256 totalItemCount = _itemIds.current();
+    uint256 currentIndex = 0;
+
+    Details[] memory items = new Details[](totalItemCount);
+    for (uint256 i = 0; i < totalItemCount; i++) {
+      if (phoneToDetails[i + 1].connectedWalletAddress == msg.sender) {
+        for (uint256 j = 0; j < totalItemCount; j++) {
+          if (
+            keccak256(abi.encodePacked((phoneToDetails[j + 1].identifier))) ==
+            keccak256(abi.encodePacked((phoneToDetails[i + 1].identifier)))
+          ) {
+            Details storage currentItem = phoneToDetails[j + 1];
+            items[currentIndex] = currentItem;
+            currentIndex += 1;
+          }
+        }
+      }
+    }
+
+    return items;
+  }
 
   //Gets the identifier linked to my connected wallet
   // function fetchPhoneNumber() public view returns (string memory) {
