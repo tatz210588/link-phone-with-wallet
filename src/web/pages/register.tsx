@@ -192,7 +192,7 @@ const Home = () => {
     if (formInput.type === 'email') {
       if (emailOTP.toString() == formInput.otp) {
         toast.success("Email Authenticated")
-        //await link()
+        await link()
         setOtp(false)
       } else {
         toast.error("Wrong OTP entered.")
