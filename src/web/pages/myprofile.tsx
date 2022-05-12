@@ -10,6 +10,7 @@ import Modal from 'react-modal'
 import 'react-phone-number-input/style.css'
 import { FirebaseApp } from 'firebase/app'
 import { ellipseAddress } from '../components/utils'
+import WalletCard from '../components/WalletCard'
 import {
   getAuth,
   RecaptchaVerifier,
@@ -23,26 +24,28 @@ import BusyLoader, { LoaderType } from '../components/BusyLoader'
 import IdInput, { IdType } from '../components/IdInput'
 
 const style = {
-  wrapper: `w-full mt-4 border border-[#151b22] rounded-xl bg-[#ffffff]] overflow-hidden`,
-  titleLeft: `flex-1 flex items-center text-xl font-bold`,
+  wrapper: `w-full mt-4 border border-[#151b22] rounded-xl bg-[#ffffff]] overflow-hidden justify-center `,
+  titleLeft: `flex-1 flex items-center text-xl font-bold justify-center text-black cursor-pointer`,
   titlle: `bg-[#ffffff] px-6 py-4 flex iems-center`,
-  titleIcon: `text-3xl mr-2`,
-  titleRight: `text-xl`,
-  tableHeader: `flex w-full bg-[#262b2f] border-y border-[#151b22] mt-8 px-4 py-1`,
+  titleIcon: `text-3xl`,
+  titleRight: `text-xl text-black`,
   modalListWrapper: `bg-[#303339]  w-1/3 h-1/2 mr-auto ml-auto my-28 rounded-2xl p-2 overflow-hidden  relative overflow-auto`,
   center: ` h-screen relative justify-center flex-wrap items-center `,
   searchBar: `flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#363840] rounded-[0.8rem] hover:bg-[#757199]`,
   searchInput: `h-[2.6rem] w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#e6e8eb] placeholder:text-[#8a939b]`,
   searchBarVerify: `flex flex-1 w-max-[520px] items-center rounded-[0.8rem]`,
   copyContainer: `w-1/2 mt-8`,
-  title: `relative text-white text-[46px] font-semibold`,
+  title: `relative text-[##6b03fc] text-[46px] font-semibold`,
   button: `font-bold w-full mt-2 bg-[#eb77f2] text-white text-lg rounded shadow-lg hover:bg-[#e134eb] cursor-pointer`,
   description: `text-[#8a939b] container-[400px] text-2xl mt-[0.8rem] mb-[2.5rem]`,
-  // description: `text-[#fff] container-[400px] text-2xl mt-[0.8rem] mb-[2.5rem]`,
   spinner: `w-full h-screen flex justify-center text-white mt-20 p-100 object-center`,
   nftButton: `font-bold w-full mt-4 bg-pink-500 text-white text-lg rounded p-4 shadow-lg hover:bg-[#19a857] cursor-pointer`,
   dropDown: `font-bold w-full mt-4 bg-[#2181e2] text-white text-lg rounded p-4 shadow-lg cursor-pointer`,
   editItem: `text-[#000000] hover:text-[#81817c] cursor-pointer`,
+  details: `p-3`,
+  info: `flex justify-between text-[#e4e8eb] drop-shadow-xl`,
+  infoLeft: `flex-0.6 flex-wrap`,
+  infoRight: `flex-0.4 text-right ml-5`,
 }
 
 const MyProfile = () => {
@@ -57,6 +60,9 @@ const MyProfile = () => {
   const [formInput, updateFormInput] = useState({ otp: '' })
   const [details, setDetails] = useState<any[]>([])
   const [toggle, setToggle] = useState(true)
+  const [toggleRight, setToggleRight] = useState(true)
+  const [toggleWallet, setToggleWallet] = useState(false)
+  const [myAddedWallets, setMyAddedWallets] = useState<any[]>([])
 
   useEffect(() => {
     window.ethereum
@@ -68,6 +74,7 @@ const MyProfile = () => {
         })
       })
     fetchWalletDetails()
+    myWallets()
   }, [address, chainId])
 
   useEffect(() => {
@@ -146,6 +153,29 @@ const MyProfile = () => {
     }
   }
 
+  async function myWallets() {
+    setLoadingState(true)
+    await window.ethereum.send('eth_requestAccounts')
+    const provider = new ethers.providers.Web3Provider(window.ethereum)
+    const signer = provider.getSigner()
+    const network = provider.getNetwork()
+
+    const phoneLinkContract = new ethers.Contract(getConfigByChain((await network).chainId)[0].phoneLinkAddress, PhoneLink.abi, signer)
+    const data: any[] = await phoneLinkContract.myWallets()
+    const items = data.map((i) => {
+      return {
+        name: i.name,
+        identifier: i.identifier,
+        typeOfIdentifier: i.typeOfIdentifier,
+        connectedWalletAddress: i.connectedWalletAddress,
+        isPrimaryWallet: i.isPrimaryWallet == true ? 'Primary Wallet' : 'Secondary Wallet',
+      }
+    })
+    setMyAddedWallets(items)
+    console.log("wallets", items)
+    setLoadingState(false)
+  }
+
   async function fetchWalletDetails() {
     setLoadingState(true)
     await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
@@ -164,7 +194,7 @@ const MyProfile = () => {
         identifier: i.identifier,
         typeOfIdentifier: i.typeOfIdentifier,
         connectedWalletAddress: i.connectedWalletAddress,
-        isPrimaryWallet: i.isPrimaryWallet,
+        isPrimaryWallet: i.isPrimaryWallet == true ? 'Primary Wallet' : 'Secondary Wallet',
       }
 
     })
@@ -268,87 +298,76 @@ const MyProfile = () => {
           </BusyLoader>
         ) : (
           <>
-            <div className=" mt-4 grid w-1/2 grid-cols-1 gap-1">
-              <a href={src} download>
-                <img src={src} />{ellipseAddress(address)}
-              </a>
-              <div className="flex flex-wrap">
-                <section className="my-10 mx-5 rounded-3xl bg-[#3699eb]">
-                  <div className="container">
-                    <div className="-mx-4 flex flex-wrap">
-                      <div className="w-full px-4">
-                        <div className="max-w-full overflow-x-auto rounded">
-                          <table className="w-full table-auto rounded-md rounded-3xl">
-                            <thead>
-                              <tr className="bg-primary text-center">
-                                <th className="w-1/6 min-w-[160px] border-l border-transparent py-4 px-3 text-lg font-semibold text-white lg:py-7 lg:px-4">
-                                  Sl. No.
-                                </th>
-                                <th className="w-1/6 min-w-[160px] py-4 px-3 text-lg font-semibold text-white lg:py-7 lg:px-4">
-                                  Name.
-                                </th>
-                                <th className=" w-1/6 min-w-[160px] py-4 px-3 text-lg font-semibold text-white lg:py-7 lg:px-4">
-                                  Phone/Email.
-                                </th>
-                                <th className=" w-1/6 min-w-[160px] py-4 px-3 text-lg font-semibold text-white lg:py-7 lg:px-4">
-                                  Ph no/EmailID.
-                                </th>
-                                <th className="w-1/6 min-w-[160px] py-4 px-3 text-lg font-semibold text-white lg:py-7 lg:px-4">
-                                  Is Primary?
-                                </th>
-                                <th className="w-1/6 min-w-[160px] py-4 px-3 text-lg font-semibold text-white lg:py-7 lg:px-4">
-                                  Edit details
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody className="rounded-2xl">
-                              {details.map((detail, id) => (
-                                <tr key={id} className="rounded-3xl">
-                                  <td className="text-dark border-b border-l border-[#E8E8E8] bg-[#ebecf2] py-5 px-2 text-center text-base font-medium">
-                                    {detail.typeOfIdentifier ? id + 1 : null}
-                                  </td>
-                                  <td className="text-dark border-b border-[#E8E8E8] bg-[#eadaeb] py-5 px-2 text-center text-base font-medium">
-                                    {detail.typeOfIdentifier ? detail.name : null}
-                                  </td>
-                                  <td className="text-dark border-b border-[#E8E8E8] bg-[#ebeada] py-5 px-2 text-center text-base font-medium">
-                                    {detail.typeOfIdentifier ? detail.typeOfIdentifier : null}
-                                  </td>
-                                  <td className="text-dark border-b border-[#E8E8E8] bg-[#fffbc2] py-5 px-2 text-center text-base font-medium">
-                                    {detail.typeOfIdentifier ? detail.identifier : null}
-                                  </td>
-                                  <td className="text-dark border-b border-[#E8E8E8] bg-[#adffb7] py-5 px-2 text-center text-base font-medium">
-                                    {detail.typeOfIdentifier ? detail.isPrimaryWallet == true ? 'Y' : 'N' : null}
-                                  </td>
-                                  <td className="text-dark border-b border-[#E8E8E8] bg-[#adffb7] py-5 px-2 text-center text-base font-medium">
-                                    <u>{detail.typeOfIdentifier ? 'edit' : null}</u>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
+
+            <div className={style.details}>
+              <div className={style.info}>
+                <div className={style.infoLeft}>
+                  <div className={style.wrapper}>
+                    <div className={style.titlle} onClick={() => setToggle(!toggle)}>
+                      <div className={style.titleLeft}>
+                        <span className={style.titleIcon}>
+                          <CgArrowsExchangeV />
+                        </span>
+                        My QR CODE
+                      </div>
+                      <div className={style.titleRight}>
+                        {toggle ? <AiOutlineUp /> : <AiOutlineDown />}
                       </div>
                     </div>
+                    {toggle && (
+                      <div className="flex flex-wrap justify-center w-[24rem] h-[23rem] my-3 mx-1 rounded-2xl overflow-hidden `,">
+                        <a href={src} download><img src={src} height={400} width={400} /></a>
+                      </div>
+                    )}
                   </div>
-                </section>
+                </div>
+                <div className={`ml-5 justify-center`}>
+                  <div className={style.wrapper}>
+                    <div className={style.titlle} onClick={() => setToggleRight(!toggleRight)}>
+                      <div className={style.titleLeft}>
+                        <span className={style.titleIcon}>
+                          <CgArrowsExchangeV />
+                        </span>
+                        My Linked Details
+                      </div>
+                      <div className={style.titleRight}>
+                        {toggleRight ? <AiOutlineUp /> : <AiOutlineDown />}
+                      </div>
+                    </div>
+                    {toggleRight && (
+                      <div className={`flex flex-wrap justify-center`}>
+                        {details.map((detail, id) => (
+                          <WalletCard key={id} detail={detail} type="details" />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className={`ml-5 justify-center`}>
+                  <div className={style.wrapper}>
+                    <div className={style.titlle} onClick={() => setToggleWallet(!toggleWallet)}>
+                      <div className={style.titleLeft}>
+                        <span className={style.titleIcon}>
+                          <CgArrowsExchangeV />
+                        </span>
+                        My Wallets
+                      </div>
+                      <div className={style.titleRight}>
+                        {toggleWallet ? <AiOutlineUp /> : <AiOutlineDown />}
+                      </div>
+                    </div>
+                    {toggleWallet && (
+                      <div className={`flex flex-wrap justify-center`}>
+                        {myAddedWallets.map((detail, id) => (
+                          <WalletCard key={id} detail={detail} type="wallets" />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-            <div className={style.wrapper}>
-              <div className={style.titlle} onClick={() => setToggle(!toggle)}>
-                <div className={style.titleLeft}>
-                  <span className={style.titleIcon}>
-                    <CgArrowsExchangeV />
-                  </span>
-                  My Wallets
-                </div>
-                <div className={style.titleRight}>
-                  {toggle ? <AiOutlineUp /> : <AiOutlineDown />}
-                </div>
-              </div>
-              {toggle && (
-                <p>test</p>
-              )}
-            </div>
+
           </>
 
         )}
