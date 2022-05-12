@@ -74,7 +74,6 @@ const MyProfile = () => {
         })
       })
     fetchWalletDetails()
-    myWallets()
   }, [address, chainId])
 
   useEffect(() => {
@@ -153,29 +152,6 @@ const MyProfile = () => {
     }
   }
 
-  async function myWallets() {
-    setLoadingState(true)
-    await window.ethereum.send('eth_requestAccounts')
-    const provider = new ethers.providers.Web3Provider(window.ethereum)
-    const signer = provider.getSigner()
-    const network = provider.getNetwork()
-
-    const phoneLinkContract = new ethers.Contract(getConfigByChain((await network).chainId)[0].phoneLinkAddress, PhoneLink.abi, signer)
-    const data: any[] = await phoneLinkContract.myWallets()
-    const items = data.map((i) => {
-      return {
-        name: i.name,
-        identifier: i.identifier,
-        typeOfIdentifier: i.typeOfIdentifier,
-        connectedWalletAddress: i.connectedWalletAddress,
-        isPrimaryWallet: i.isPrimaryWallet == true ? 'Primary Wallet' : 'Secondary Wallet',
-      }
-    })
-    setMyAddedWallets(items)
-    console.log("wallets", items)
-    setLoadingState(false)
-  }
-
   async function fetchWalletDetails() {
     setLoadingState(true)
     await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
@@ -188,6 +164,7 @@ const MyProfile = () => {
       signer
     )
     const data: any[] = await phoneLinkContract.getWalletDetails(address)
+    const myWallet: any[] = await phoneLinkContract.myWallets()
     const items = data.filter(i => !!i.typeOfIdentifier).map((i) => {
       return {
         name: i.name,
@@ -196,7 +173,15 @@ const MyProfile = () => {
         connectedWalletAddress: i.connectedWalletAddress,
         isPrimaryWallet: i.isPrimaryWallet == true ? 'Primary Wallet' : 'Secondary Wallet',
       }
-
+    })
+    const myWalletItems = myWallet.map((i) => {
+      return {
+        name: i.name,
+        identifier: i.identifier,
+        typeOfIdentifier: i.typeOfIdentifier,
+        connectedWalletAddress: i.connectedWalletAddress,
+        isPrimaryWallet: i.isPrimaryWallet == true ? 'Primary Wallet' : 'Secondary Wallet',
+      }
     })
     console.log("items/details", items)
     console.log("data", data)
@@ -204,6 +189,7 @@ const MyProfile = () => {
       Router.push({ pathname: '/register' })
     } else {
       setDetails(items)
+      setMyAddedWallets(myWalletItems)
     }
     setLoadingState(false)
   }
