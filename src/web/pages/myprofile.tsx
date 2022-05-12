@@ -23,7 +23,7 @@ import BusyLoader, { LoaderType } from '../components/BusyLoader'
 import IdInput, { IdType } from '../components/IdInput'
 
 const style = {
-  wrapper: `w-full mt-8 border border-[#151b22] rounded-xl bg-[#ffffff]] overflow-hidden`,
+  wrapper: `w-full mt-4 border border-[#151b22] rounded-xl bg-[#ffffff]] overflow-hidden`,
   titleLeft: `flex-1 flex items-center text-xl font-bold`,
   titlle: `bg-[#ffffff] px-6 py-4 flex iems-center`,
   titleIcon: `text-3xl mr-2`,
@@ -157,24 +157,20 @@ const MyProfile = () => {
       PhoneLink.abi,
       signer
     )
-    const data = await phoneLinkContract.getWalletDetails(address)
-    const items = await Promise.all(data.filter(async (i: any) => {
-      console.log("abcd1")
-      if (i.typeOfIdentifier) {
-        console.log("abcd")
-        let item = {
-          name: i.name,
-          identifier: i.identifier,
-          typeOfIdentifier: i.typeOfIdentifier,
-          connectedWalletAddress: i.connectedWalletAddress,
-          isPrimaryWallet: i.isPrimaryWallet,
-        }
-        return item
+    const data: any[] = await phoneLinkContract.getWalletDetails(address)
+    const items = data.filter(i => !!i.typeOfIdentifier).map((i) => {
+      return {
+        name: i.name,
+        identifier: i.identifier,
+        typeOfIdentifier: i.typeOfIdentifier,
+        connectedWalletAddress: i.connectedWalletAddress,
+        isPrimaryWallet: i.isPrimaryWallet,
       }
-    }))
+
+    })
     console.log("items/details", items)
     console.log("data", data)
-    if (data === '') {
+    if (!data?.length) {
       Router.push({ pathname: '/register' })
     } else {
       setDetails(items)
