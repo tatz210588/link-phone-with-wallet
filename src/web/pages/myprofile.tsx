@@ -6,7 +6,6 @@ import { useWeb3 } from '@3rdweb/hooks'
 import { getConfigByChain } from '../config'
 import { ethers } from 'ethers'
 import PhoneLink from '../../artifacts/contracts/phoneLink.sol/phoneLink.json'
-import Modal from 'react-modal'
 import 'react-phone-number-input/style.css'
 import { FirebaseApp } from 'firebase/app'
 import { ellipseAddress } from '../components/utils'
@@ -29,7 +28,7 @@ const style = {
   titlle: `bg-[#ffffff] px-6 py-4 flex iems-center`,
   titleIcon: `text-3xl`,
   titleRight: `text-xl text-black`,
-  modalListWrapper: `bg-[#303339]  w-1/3 h-1/2 mr-auto ml-auto my-28 rounded-2xl p-2 overflow-hidden  relative overflow-auto`,
+
   center: ` h-screen relative justify-center flex-wrap items-center `,
   searchBar: `flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#363840] rounded-[0.8rem] hover:bg-[#757199]`,
   searchInput: `h-[2.6rem] w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#e6e8eb] placeholder:text-[#8a939b]`,
@@ -69,8 +68,7 @@ const MyProfile = () => {
       .request({ method: 'eth_requestAccounts' }) // get the connected wallet address
       .then((result: string[]) => {
         QRCode.toDataURL(result[0]).then((data) => {
-          //Generate QR code for the connected wallet address
-          setSrc(data)
+          setSrc(data) //Generate QR code for the connected wallet address
         })
       })
     fetchWalletDetails()
@@ -165,7 +163,7 @@ const MyProfile = () => {
     )
     const data: any[] = await phoneLinkContract.getWalletDetails(address)
     const myWallet: any[] = await phoneLinkContract.myWallets()
-    const items = data.filter(i => !!i.typeOfIdentifier).map((i) => {
+    const items = data.filter(i => i.typeOfIdentifier).map((i) => {
       return {
         name: i.name,
         identifier: i.identifier,
@@ -174,7 +172,7 @@ const MyProfile = () => {
         isPrimaryWallet: i.isPrimaryWallet == true ? 'Primary Wallet' : 'Secondary Wallet',
       }
     })
-    const myWalletItems = myWallet.map((i) => {
+    const myWalletItems = myWallet.filter(i => i.typeOfIdentifier).map((i) => {
       return {
         name: i.name,
         identifier: i.identifier,
@@ -222,61 +220,6 @@ const MyProfile = () => {
 
   return (
     <>
-      <Modal isOpen={editPhone} className={style.modalListWrapper}>
-        <button
-          className={` flex w-full justify-end text-white hover:text-[#fc1303]`}
-          onClick={() => {
-            setEditPhone(false)
-            setLoadingState(false)
-            setSignInData('')
-          }}
-        >
-          Close ❌
-        </button>
-
-        <div>
-          {Boolean(otp) == false ? (
-            <div>
-              <div className={`${style.title} mt-1 p-1`}>
-                Enter your Phone Number
-              </div>
-              <form onSubmit={onSignInSubmit}>
-                <div id="sign-in-button"></div>
-                <IdInput
-                  className={style.searchInput}
-                  wrapperClass={`${style.searchBar} mt-2 p-1`}
-                  placeholder="Enter phone / email"
-                  value={signInData}
-                  id="myInput"
-                  onChange={setSignInData}
-                  excludeIdTypes={[IdType.wallet]}
-                />
-                <button type="submit" className={style.nftButton}>
-                  Get OTP
-                </button>
-              </form>
-            </div>
-          ) : (
-            <div className={`${style.searchBarVerify} mt-2`}>
-              <div className={`${style.title} mt-1 p-1`}>Enter OTP</div>
-              <form
-                onSubmit={onSubmitOTP}
-                className=" mt-4 grid grid-cols-2 gap-6"
-              >
-                <input
-                  placeholder="OTP"
-                  onChange={(e) =>
-                    updateFormInput({ ...formInput, otp: e.target.value })
-                  }
-                />
-                <button type="submit" className={`${style.button} p-2`}>
-                  Verify OTP
-                </button>
-              </form>
-            </div>
-          )}
-        </div>
-      </Modal>
       <Container>
         {loadingState == true ? (
           <BusyLoader loaderType={LoaderType.Ring} color={'#ffffff'} size={50}>

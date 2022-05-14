@@ -141,6 +141,39 @@ contract phoneLink is Initializable, ERC20Upgradeable {
     );
   }
 
+  function makePrimary(address wallet) public {
+    //MAKE THE SENT WALLET AS PRIMARY
+    uint256 slNo = _itemIds.current();
+    for (uint256 i = 0; i < slNo; i++) {
+      if (phoneToDetails[i + 1].connectedWalletAddress == wallet) {
+        phoneToDetails[i + 1].isPrimaryWallet = true;
+      }
+    }
+
+    //SET REMAINING OTHER WALLETS AS SECONDARY
+    Details[] memory MyWallets = myWallets();
+    for (uint256 i = 0; i < MyWallets.length; i++) {
+      if (MyWallets[i].connectedWalletAddress != wallet) {
+        for (uint256 j = 0; j < slNo; j++) {
+          if (
+            keccak256(abi.encodePacked((phoneToDetails[j + 1].name))) ==
+            keccak256(abi.encodePacked((MyWallets[i].name))) &&
+            keccak256(
+              abi.encodePacked((phoneToDetails[j + 1].typeOfIdentifier))
+            ) ==
+            keccak256(abi.encodePacked((MyWallets[i].typeOfIdentifier))) &&
+            keccak256(abi.encodePacked((phoneToDetails[j + 1].identifier))) ==
+            keccak256(abi.encodePacked((MyWallets[i].identifier))) &&
+            phoneToDetails[j + 1].connectedWalletAddress ==
+            MyWallets[i].connectedWalletAddress
+          ) {
+            phoneToDetails[j + 1].isPrimaryWallet = false;
+          }
+        }
+      }
+    }
+  }
+
   //my profile
   function myWallets() public view returns (Details[] memory) {
     uint256 totalItemCount = _itemIds.current();
