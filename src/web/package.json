@@ -5,8 +5,8 @@
   "scripts": {
     "refresh": "yarn run clean && yarn install",
     "refresh-all": "yarn run clean-all && yarn install",
-    "clean": "rm -rf node_modules build",
-    "clean-all": "rm -rf yarn.lock node_modules build",
+    "clean": "rm -rf node_modules build .next",
+    "clean-all": "rm -rf yarn.lock node_modules build .next",
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
