@@ -46,7 +46,10 @@ const Home = () => {
     const connection = await web3Modal.connect()
     const provider = new ethers.providers.Web3Provider(connection)
     const signer = provider.getSigner()
+    console.info({ signer })
     const network = await provider.getNetwork()
+    console.info({ network })
+    console.log("chain", network.chainId)
     const phoneLinkContract = new ethers.Contract(
       getConfigByChain(network.chainId)[0].phoneLinkAddress,
       PhoneLink.abi,

@@ -47,7 +47,7 @@ const Hero = () => {
               Router.push({ pathname: '/register' })
             }}
           >
-            Sign up
+            Register
           </button>
           <button className={style.button}>Send NFT</button>
         </div>

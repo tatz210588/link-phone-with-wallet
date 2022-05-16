@@ -50,11 +50,9 @@ const Home = () => {
   const { address } = useWeb3()
   const [otp, setOtp] = useState(false)
   const [emailOTP, setEmailOTP] = useState('')
-  const [checked, setChecked] = useState(true)
-  const [isPrimary, setIsPrimary] = useState(false)
 
   useEffect(() => {
-    getWalletDetails()
+    //getWalletDetails()
   }, [address])
 
   useEffect(() => {
@@ -156,41 +154,6 @@ const Home = () => {
     }
   }
 
-  async function getWalletDetails() {
-    setLoadingState(true)
-    const web3Modal = new Web3Modal({
-      network: 'mainnet',
-      cacheProvider: true,
-    })
-    const connection = await web3Modal.connect()
-    const provider = new ethers.providers.Web3Provider(connection)
-    const signer = provider.getSigner()
-    const network = await provider.getNetwork()
-    const phoneLinkContract = new ethers.Contract(
-      getConfigByChain(network.chainId)[0].phoneLinkAddress,
-      PhoneLink.abi,
-      signer
-    )
-    //const data = await phoneLinkContract.fetchPhoneNumber()
-
-    const data = await phoneLinkContract.getWalletDetails(address)
-    const items = await Promise.all(data.map(async (i: any) => {
-      let item = {
-        name: i.name,
-        identifier: i.identifier,
-        typeOfIdentifier: i.typeOfIdentifier,
-        connectedWalletAddress: i.connectedWalletAddress,
-        isPrimaryWallet: i.isPrimaryWallet,
-      }
-      if (item.isPrimaryWallet == true) {
-        setIsPrimary(true)
-      }
-      return item
-    }))
-
-    setLoadingState(false)
-  }
-
   async function link() {
     setLoadingState(true)
     const web3Modal = new Web3Modal({
@@ -206,13 +169,13 @@ const Home = () => {
       PhoneLink.abi,
       signer
     )
-    console.log('checked', checked)
+    //console.log('checked', checked)
     const tx = await phoneLinkContract.enterDetails(
       formInput.name,
       formInput.identifier,
-      formInput.type,
-      checked
+      formInput.type
     )
+
     tx.wait(1)
     toast.success(`Wallet succesfully linked to your ${formInput.type}`)
     setLoadingState(false)
@@ -266,25 +229,6 @@ const Home = () => {
                       excludeIdTypes={[IdType.wallet]}
                     />
 
-                    {
-                      (isPrimary == false ? (
-                        <div>
-                          <input
-                            className={`mt-2 ml-4 mr-4 h-7 w-7 rounded-lg p-1`}
-                            type="checkbox"
-                            defaultChecked={checked}
-                            onChange={() => {
-                              console.log('checked', checked)
-                              setChecked(!checked)
-                              console.log('checked', checked)
-                            }}
-                          />
-
-                          <b className={style.description}>
-                            Set this wallet as your primary wallet
-                          </b>
-                        </div>
-                      ) : null)}
                     <button type="submit" className={style.nftButton}>
                       Submit
                     </button>

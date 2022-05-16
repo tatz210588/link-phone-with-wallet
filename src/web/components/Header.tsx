@@ -5,7 +5,10 @@ import logo from '../assets/logo.png'
 // import PhoneInput from 'react-phone-number-input'
 import Link from 'next/link'
 import { AiOutlineSearch } from 'react-icons/ai'
+import { FcSettings } from 'react-icons/fc'
 import { CgProfile } from 'react-icons/cg'
+import { AiOutlineQrcode } from 'react-icons/ai'
+import { FcCallback } from 'react-icons/fc'
 import { ConnectWallet } from '@3rdweb/react'
 import { Fragment } from 'react'
 import { Popover, Transition } from '@headlessui/react'
@@ -22,10 +25,21 @@ import toast from 'react-hot-toast'
 const solutions = [
   {
     name: 'MY Profile',
-    description: 'Anyone can scan your QR code and send money instantly.',
+    description: 'Get your QR code, connected details and linked wallets.',
     href: '/myprofile',
-    modalName: 'myqrcode',
-    icon: CgProfile,
+    icon: FcSettings,
+  },
+  {
+    name: 'Send Crypto',
+    description: 'Send your crypto to your friend on his phone/email ID directly.',
+    href: '/pay',
+    icon: FcCallback,
+  },
+  {
+    name: 'Scan',
+    description: 'Scan and send crypto to your friend directly on his/her QR code.',
+    href: '/qrPay',
+    icon: AiOutlineQrcode,
   },
 ]
 
@@ -86,8 +100,8 @@ const Header = () => {
       signer
     )
     const data = await phoneLinkContract.getMarketOwner()
-    //setAdmin(data) //comment this line to withdraw admin restrictions
-    setAdmin(address) //comment this line to restrict admin access
+    setAdmin(data) //comment this line to withdraw admin restrictions
+    //setAdmin(address) //comment this line to restrict admin access
   }
 
   return (

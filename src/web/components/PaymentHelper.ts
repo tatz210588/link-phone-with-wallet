@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js'
 import { rounded } from './utils'
 import toast from 'react-hot-toast'
 import { getConfigByChain } from '../config'
+import { ellipseAddress } from './utils'
 
 export type PaymentData = {
   defaultChainId?: number
@@ -114,8 +115,10 @@ const PaymentHelper = () => {
       directAddress: boolean = false
     ) => {
       let success = false
+      console.log("testing")
       if (_data.defaultAccount && _data.selectedToken && amount && target) {
         if (_data.balanceToken && Number(_data.balanceToken) > amount) {
+
           await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
           const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
           const signer = provider.getSigner() // get signer
@@ -142,11 +145,13 @@ const PaymentHelper = () => {
             //gets the addresses linked to the identifier = target
             const to = await phoneLinkContract.fetchPrimaryWalletAddress(target)
 
-            if (to.length === 0) {
+            console.log(ellipseAddress(to))
+
+            if (to.length === 0 || ellipseAddress(to) === '0x000...00000') {
               //means your friend has not yet linked his/her wallet
               toast.error(
                 'The given phone number is not linked to any wallet.' +
-                ' Ask your friend to link his Phone'
+                ' Ask your friend to register his Phone/email'
               )
               return false
             } else {

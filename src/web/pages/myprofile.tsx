@@ -9,7 +9,7 @@ import PhoneLink from '../../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import 'react-phone-number-input/style.css'
 import { FirebaseApp } from 'firebase/app'
 import { ellipseAddress } from '../components/utils'
-import WalletCard from '../components/WalletCard'
+import WalletCard, { WalletCardDetail } from '../components/WalletCard'
 import {
   getAuth,
   RecaptchaVerifier,
@@ -57,11 +57,11 @@ const MyProfile = () => {
   const [signInData, setSignInData] = useState('')
   const [otp, setOtp] = useState(false)
   const [formInput, updateFormInput] = useState({ otp: '' })
-  const [details, setDetails] = useState<any[]>([])
+  const [details, setDetails] = useState<WalletCardDetail[]>([])
   const [toggle, setToggle] = useState(true)
   const [toggleRight, setToggleRight] = useState(true)
   const [toggleWallet, setToggleWallet] = useState(false)
-  const [myAddedWallets, setMyAddedWallets] = useState<any[]>([])
+  const [myAddedWallets, setMyAddedWallets] = useState<WalletCardDetail[]>([])
 
   useEffect(() => {
     window.ethereum
@@ -169,8 +169,8 @@ const MyProfile = () => {
         identifier: i.identifier,
         typeOfIdentifier: i.typeOfIdentifier,
         connectedWalletAddress: i.connectedWalletAddress,
-        isPrimaryWallet: i.isPrimaryWallet == true ? 'Primary Wallet' : 'Secondary Wallet',
-      }
+        isPrimaryWallet: i.isPrimaryWallet == true,// ? 'Primary Wallet' : 'Secondary Wallet',
+      } as WalletCardDetail
     })
     const myWalletItems = myWallet.filter(i => i.typeOfIdentifier).map((i) => {
       return {
@@ -178,8 +178,8 @@ const MyProfile = () => {
         identifier: i.identifier,
         typeOfIdentifier: i.typeOfIdentifier,
         connectedWalletAddress: i.connectedWalletAddress,
-        isPrimaryWallet: i.isPrimaryWallet == true ? 'Primary Wallet' : 'Secondary Wallet',
-      }
+        isPrimaryWallet: i.isPrimaryWallet == true,// ? 'Primary Wallet' : 'Secondary Wallet',
+      } as WalletCardDetail
     })
     console.log("items/details", items)
     console.log("data", data)
@@ -232,16 +232,18 @@ const MyProfile = () => {
               <div className={style.info}>
                 <div className={style.infoLeft}>
                   <div className={style.wrapper}>
-                    <div className={style.titlle} onClick={() => setToggle(!toggle)}>
+                    <div className={style.titlle}
+                    /*onClick={() => setToggle(!toggle)}*/  /****Comment out to toggle  */
+                    >
                       <div className={style.titleLeft}>
                         <span className={style.titleIcon}>
                           <CgArrowsExchangeV />
                         </span>
                         My QR CODE
                       </div>
-                      <div className={style.titleRight}>
+                      {/* <div className={style.titleRight}>
                         {toggle ? <AiOutlineUp /> : <AiOutlineDown />}
-                      </div>
+                      </div> */}
                     </div>
                     {toggle && (
                       <div className="flex flex-wrap justify-center w-[24rem] h-[23rem] my-3 mx-1 rounded-2xl overflow-hidden `,">

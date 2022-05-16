@@ -74,47 +74,21 @@ contract phoneLink is Initializable, ERC20Upgradeable {
     bool isPrimaryWallet
   );
 
-  //Save data
+  //Save data                                                                                                   //true
   function enterDetails(
     string memory name,
     string memory identifier,
-    string memory typeOfIdentifier,
-    bool isPrimaryWallet
+    string memory typeOfIdentifier
   ) public {
     _itemIds.increment();
     uint256 slNo = _itemIds.current();
 
-    if (isPrimaryWallet == true) {
-      //to get all wallets linked with the identifier
-      Details[] memory detail = fetchAllWalletAddress(identifier);
-
-      //set all such previous wallets as non-primary
-      for (uint256 j = 0; j < detail.length; j++) {
-        for (uint256 i = 0; i < slNo; i++) {
-          if (
-            phoneToDetails[i + 1].connectedWalletAddress ==
-            detail[j].connectedWalletAddress
-          ) {
-            phoneToDetails[i + 1].isPrimaryWallet = false;
-          }
-        }
-      }
-
-      Details[] memory detailIdentifier = getWalletDetails(msg.sender);
-      for (uint256 i = 0; i < detailIdentifier.length; i++) {
-        Details[] memory a = fetchAllWalletAddress(
-          detailIdentifier[i].identifier
-        );
-        for (uint256 j = 0; j < a.length; j++) {
-          for (uint256 k = 0; k < slNo; k++) {
-            if (
-              phoneToDetails[k + 1].connectedWalletAddress ==
-              a[j].connectedWalletAddress
-            ) {
-              phoneToDetails[k + 1].isPrimaryWallet = false;
-            }
-          }
-        }
+    for (uint256 i = 0; i < slNo; i++) {
+      if (
+        keccak256(abi.encodePacked((phoneToDetails[i + 1].identifier))) ==
+        keccak256(abi.encodePacked((identifier)))
+      ) {
+        phoneToDetails[i + 1].isPrimaryWallet = false;
       }
     }
 
@@ -123,53 +97,34 @@ contract phoneLink is Initializable, ERC20Upgradeable {
       identifier,
       typeOfIdentifier,
       msg.sender,
-      isPrimaryWallet
-    ); //true/false
-
-    for (uint256 i = 0; i < slNo; i++) {
-      if (phoneToDetails[i + 1].connectedWalletAddress == msg.sender) {
-        phoneToDetails[i + 1].isPrimaryWallet = isPrimaryWallet;
-      }
-    }
-
-    emit DetailsCreated(
-      name,
-      identifier,
-      typeOfIdentifier,
-      msg.sender,
-      isPrimaryWallet
+      true
     );
+
+    emit DetailsCreated(name, identifier, typeOfIdentifier, msg.sender, true);
   }
 
-  function makePrimary(address wallet) public {
-    //MAKE THE SENT WALLET AS PRIMARY
+  //make wallet primary
+  function makePrimary(address wallet, string memory identifier) public {
     uint256 slNo = _itemIds.current();
+
+    //SET ALL WALLETS of "TYPE" AS SECONDARY
     for (uint256 i = 0; i < slNo; i++) {
-      if (phoneToDetails[i + 1].connectedWalletAddress == wallet) {
-        phoneToDetails[i + 1].isPrimaryWallet = true;
+      if (
+        keccak256(abi.encodePacked((phoneToDetails[i + 1].identifier))) ==
+        keccak256(abi.encodePacked((identifier)))
+      ) {
+        phoneToDetails[i + 1].isPrimaryWallet = false;
       }
     }
 
-    //SET REMAINING OTHER WALLETS AS SECONDARY
-    Details[] memory MyWallets = myWallets();
-    for (uint256 i = 0; i < MyWallets.length; i++) {
-      if (MyWallets[i].connectedWalletAddress != wallet) {
-        for (uint256 j = 0; j < slNo; j++) {
-          if (
-            keccak256(abi.encodePacked((phoneToDetails[j + 1].name))) ==
-            keccak256(abi.encodePacked((MyWallets[i].name))) &&
-            keccak256(
-              abi.encodePacked((phoneToDetails[j + 1].typeOfIdentifier))
-            ) ==
-            keccak256(abi.encodePacked((MyWallets[i].typeOfIdentifier))) &&
-            keccak256(abi.encodePacked((phoneToDetails[j + 1].identifier))) ==
-            keccak256(abi.encodePacked((MyWallets[i].identifier))) &&
-            phoneToDetails[j + 1].connectedWalletAddress ==
-            MyWallets[i].connectedWalletAddress
-          ) {
-            phoneToDetails[j + 1].isPrimaryWallet = false;
-          }
-        }
+    //Set The required identifier of "Type" as Primary
+    for (uint256 i = 0; i < slNo; i++) {
+      if (
+        phoneToDetails[i + 1].connectedWalletAddress == wallet &&
+        keccak256(abi.encodePacked((phoneToDetails[i + 1].identifier))) ==
+        keccak256(abi.encodePacked((identifier)))
+      ) {
+        phoneToDetails[i + 1].isPrimaryWallet = true;
       }
     }
   }
@@ -198,18 +153,6 @@ contract phoneLink is Initializable, ERC20Upgradeable {
     return items;
   }
 
-  //Gets the identifier linked to my connected wallet
-  // function fetchPhoneNumber() public view returns (string memory) {
-  //   uint256 totalItemCount = _itemIds.current();
-  //   string memory phone = '';
-  //   for (uint256 i = 0; i < totalItemCount; i++) {
-  //     if (phoneToDetails[i + 1].connectedWalletAddress == msg.sender) {
-  //       phone = phoneToDetails[i + 1].identifier;
-  //       break;
-  //     }
-  //   }
-  //   return phone;
-  // }
   //edit all details
   function editProfile(
     string memory name,
