@@ -7,10 +7,11 @@
     "refresh-all": "yarn run clean-all && yarn install",
     "clean": "rm -rf node_modules build .next",
     "clean-all": "rm -rf yarn.lock node_modules build .next",
+    "pre-build": "rm -rf .next",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "deploy": "next build && vercel"
+    "deploy": "yarn run pre-build && next build && vercel"
   },
   "dependencies": {
     "@3rdweb/react": "^1.9.3",
