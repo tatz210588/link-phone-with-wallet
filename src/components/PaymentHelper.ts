@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { getTokenByChain, TokenInfo } from '../assets/tokenConfig'
-import PhoneLink from '../../artifacts/contracts/phoneLink.sol/phoneLink.json'
+import PhoneLink from '../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import BigNumber from 'bignumber.js'
 import { rounded } from './utils'
 import toast from 'react-hot-toast'

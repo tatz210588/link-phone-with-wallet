@@ -8,11 +8,11 @@ import { AiOutlineSearch } from 'react-icons/ai'
 import { FcSettings } from 'react-icons/fc'
 import { CgProfile } from 'react-icons/cg'
 import { AiOutlineQrcode } from 'react-icons/ai'
-import { FcCallback } from 'react-icons/fc'
+import { BsCashCoin } from 'react-icons/bs'
 import { ConnectWallet } from '@3rdweb/react'
 import { Fragment } from 'react'
 import { Popover, Transition } from '@headlessui/react'
-import PhoneLink from '../../artifacts/contracts/phoneLink.sol/phoneLink.json'
+import PhoneLink from '../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import { getConfigByChain } from '../config'
 import Web3Modal from 'web3modal'
 import { useWeb3 } from '@3rdweb/hooks'
@@ -33,7 +33,7 @@ const solutions = [
     name: 'Send Crypto',
     description: 'Send your crypto to your friend on his phone/email ID directly.',
     href: '/pay',
-    icon: FcCallback,
+    icon: BsCashCoin,
   },
   {
     name: 'Scan',
@@ -117,8 +117,8 @@ const Header = () => {
           <Link href="/">
             <div className={style.headerItem}>Home</div>
           </Link>
-          <Link href="/qrPay">
-            <div className={style.headerItem}>Scan</div>
+          <Link href="/register">
+            <div className={style.headerItem}>Link Wallet</div>
           </Link>
           {address === admin && address ? (
             <Link href="/admin">

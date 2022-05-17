@@ -13,7 +13,7 @@ import toast from 'react-hot-toast'
 import { useWeb3 } from '@3rdweb/hooks'
 import { getConfigByChain } from '../config'
 import { ethers } from 'ethers'
-import PhoneLink from '../../artifacts/contracts/phoneLink.sol/phoneLink.json'
+import PhoneLink from '../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import BusyLoader, { LoaderType } from './BusyLoader'
 import Router from 'next/router'
 import { NextPage } from 'next'
@@ -22,7 +22,7 @@ import { NextPage } from 'next'
 
 const style = {
     wrapper: `bg-[#f4f4f6]  w-[26rem] h-[5rem] my-3 mx-1 rounded-2xl overflow-hidden `,
-    wraper: `bg-[#f4f4f6]  w-[95%] h-[6rem] my-3 mx-1 rounded-2xl overflow-hidden `,
+    wraper: `bg-[#f4f4f6]  w-[95%] h-[100%] my-3 mx-1 rounded-2xl overflow-hidden `,
     details: `p-3`,
     info: `flex justify-between text-[#e4e8eb] drop-shadow-xl`,
     searchBarVerify: `flex flex-1 w-max-[520px] items-center rounded-[0.8rem]`,

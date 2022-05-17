@@ -4,6 +4,9 @@ import Home from '../assets/home.png'
 import Image from 'next/image'
 import logo from '../assets/QR.png'
 import Container from './Container'
+import { CgProfile } from 'react-icons/cg'
+import { AiOutlineQrcode } from 'react-icons/ai'
+import { BsCashCoin } from 'react-icons/bs'
 
 const style = {
   copyContainer: `w-1/2`,
@@ -37,8 +40,14 @@ const Hero = () => {
                 pathname: '/pay',
               })
             }}
-          >
-            Pay to Phone
+          ><BsCashCoin size={50} />
+
+          </button>
+
+          <button className={style.accentedButton}
+            onClick={() => {
+              Router.push({ pathname: '/qrPay' })
+            }}><AiOutlineQrcode size={50} />
           </button>
 
           <button
@@ -49,7 +58,7 @@ const Hero = () => {
           >
             Register
           </button>
-          <button className={style.button}>Send NFT</button>
+
         </div>
       </div>
       <div className={`${style.cardContainer} `}>
