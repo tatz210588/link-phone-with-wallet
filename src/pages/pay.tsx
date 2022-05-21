@@ -210,9 +210,13 @@ const Pay = () => {
             </div>
           </div>
           <div className=" mt-4 grid grid-cols-2 gap-1">
-            <IdInput className={style.searchInput} wrapperClass={`${style.searchBar} mt-2 p-1`}
+            <IdInput
+              className={style.searchInput}
+              wrapperClass={`${style.searchBar} mt-2 p-1`}
               placeholder="Enter phone / email / wallet"
-              value={value} id="myNewInput"
+              value={value}
+              id="myNewInput"
+              delay={500}
               onChange={setValue}
             />
             <div className={`${style.searchBar} mt-2 p-1`}>

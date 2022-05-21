@@ -86,19 +86,30 @@ const Home = () => {
     if (formInput.type === 'email') {
       var OTP = randomString(10, 'base64')
       setEmailOTP(OTP)
-      var templateParams = { user: formInput.name, email: formInput.identifier, message: OTP }
-      emailjs.send('service_t2xue7p', 'template_dnzci4u', templateParams, 'Z8B2Ufr9spWJFx4js')
-        .then(function (response) {
-          console.log('SUCCESS!', response.status, response.text)
-          toast.success("Check email for OTP")
-        }, function (error) {
-          console.log('FAILED...', error)
-        })
+      var templateParams = {
+        user: formInput.name,
+        email: formInput.identifier,
+        message: OTP,
+      }
+      emailjs
+        .send(
+          'service_t2xue7p',
+          'template_dnzci4u',
+          templateParams,
+          'Z8B2Ufr9spWJFx4js'
+        )
+        .then(
+          function (response) {
+            console.log('SUCCESS!', response.status, response.text)
+            toast.success('Check email for OTP')
+          },
+          function (error) {
+            console.log('FAILED...', error)
+          }
+        )
       setOtp(true)
-
-    }
-    else if (formInput.type === 'phone') {
-      console.log("phone otp")
+    } else if (formInput.type === 'phone') {
+      console.log('phone otp')
       const signInPhoneNumber = signInData
       console.info({ signInPhoneNumber })
 
@@ -107,15 +118,18 @@ const Home = () => {
       try {
         // SMS sent. Prompt user to type the code from the message, then sign the
         // user in with confirmationResult.confirm(code).
-        window.confirmationResult = await signInWithPhoneNumber(auth, signInPhoneNumber, appVerifier)
+        window.confirmationResult = await signInWithPhoneNumber(
+          auth,
+          signInPhoneNumber,
+          appVerifier
+        )
         toast.success('OTP sent. Please enter the OTP')
         setOtp(true)
       } catch (error) {
         console.error(error)
       }
-    }
-    else {
-      toast.error("Please enter phone/email to proceed.")
+    } else {
+      toast.error('Please enter phone/email to proceed.')
     }
   }
 
@@ -127,11 +141,11 @@ const Home = () => {
     }
     if (formInput.type === 'email') {
       if (emailOTP.toString() == formInput.otp) {
-        toast.success("Email Authenticated")
+        toast.success('Email Authenticated')
         await link()
         setOtp(false)
       } else {
-        toast.error("Wrong OTP entered.")
+        toast.error('Wrong OTP entered.')
       }
     } else {
       const code = formInput.otp
@@ -183,7 +197,11 @@ const Home = () => {
   }
 
   function setIdValue(value: string, inputType: IdType) {
-    updateFormInput({ ...formInput, identifier: value, type: inputType.toString(), })
+    updateFormInput({
+      ...formInput,
+      identifier: value,
+      type: inputType.toString(),
+    })
     setSignInData(value)
   }
 
@@ -225,6 +243,7 @@ const Home = () => {
                       id="myInput"
                       wrapperClass={`${style.searchBar} mt-2 p-1`}
                       placeholder={idPlaceholder}
+                      delay={500}
                       onChange={setIdValue}
                       excludeIdTypes={[IdType.wallet]}
                     />

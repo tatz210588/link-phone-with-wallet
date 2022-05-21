@@ -2,6 +2,7 @@ import { NextPage } from 'next'
 import { useEffect, useRef, useState } from 'react'
 import { FaBackspace, FaEdit, FaEnvelope, FaWallet } from 'react-icons/fa'
 import PhoneInput from 'react-phone-number-input'
+import useDebounce from '../hooks/useDebounce'
 import { emailRegex, emptyString, isHexString, phoneRegex } from './utils'
 
 type IdInputProps = {
@@ -11,6 +12,7 @@ type IdInputProps = {
   value?: string
   placeholder?: string
   excludeIdTypes?: IdType[]
+  delay?: number
   onChange?: (value: string, inputType: IdType) => void
 }
 
@@ -50,12 +52,15 @@ const IdInput: NextPage<IdInputProps> = ({
   wrapperClass,
   placeholder,
   excludeIdTypes = [],
+  delay = 0,
   onChange,
   ...rest
 }) => {
   const inputRef = useRef()
   const [idValue, setIdValue] = useState(value ?? '')
   const [idType, setIdType] = useState(getCorrectIdType(idValue))
+  const delayedOnChange =
+    delay && onChange ? useDebounce(onChange, delay) : null
 
   useEffect(() => {
     inputRef.current && (inputRef.current as HTMLElement).focus()
@@ -70,7 +75,11 @@ const IdInput: NextPage<IdInputProps> = ({
   //     onValidate()
   // }, [validate])
 
-  useEffect(() => onChange && onChange(idValue, idType), [idValue])
+  useEffect(() => {
+    onTypeCheck(idValue)
+    if (delayedOnChange) delayedOnChange(idValue, idType)
+    else onChange && onChange(idValue, idType)
+  }, [idValue])
 
   const notExcluded = (check: IdType) => !excludeIdTypes.includes(check)
   const setIdTypeSafe = (check: IdType) =>
@@ -80,8 +89,7 @@ const IdInput: NextPage<IdInputProps> = ({
   const setCorrectIdType = (value: string) =>
     setIdTypeSafe(getCorrectIdType(value))
 
-  const onTextChange = (e?: string) => {
-    const value = e?.toString() ?? ''
+  const onTypeCheck = (value: string) => {
     let isValid = true
     switch (idType) {
       case IdType.phone:
@@ -95,6 +103,10 @@ const IdInput: NextPage<IdInputProps> = ({
         break
     }
     if (!isValid) setCorrectIdType(value)
+  }
+
+  const onTextChange = (e?: string) => {
+    const value = e?.toString() ?? ''
     setIdValue(value)
   }
 
