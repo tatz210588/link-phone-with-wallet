@@ -1,5 +1,5 @@
 import { NextPage } from 'next'
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FaBackspace, FaEdit, FaEnvelope, FaWallet } from 'react-icons/fa'
 import PhoneInput from 'react-phone-number-input'
 import { emailRegex, emptyString, isHexString, phoneRegex } from './utils'
@@ -98,10 +98,6 @@ const IdInput: NextPage<IdInputProps> = ({
     setIdValue(value)
   }
 
-  const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    onTextChange(e.target.value)
-  }
-
   const onValidate = () => {
     let valid = true
     switch (idType) {
@@ -150,7 +146,7 @@ const IdInput: NextPage<IdInputProps> = ({
               id={id}
               className={className}
               value={idValue}
-              onChange={onInputChange}
+              onChange={(e) => onTextChange(e.target.value)}
               placeholder={placeholder}
             />
           </>
