@@ -43,9 +43,13 @@ export class NRegex extends RegExp {
   }
 }
 export const phoneRegex = new NRegex(/^[\+]?\d+$/g)
+export const emailRegex = new NRegex(
+  /^[^<>(){}\[\]\\/\|.\+\?!,;:\s@"'`=]+(\.[^<>(){}\[\]\\/\|.\+\?!,;:\s@"'`=]+)*@([\w\-]+\.([\w\-]{2,}\.)*[a-zA-Z]{2,9})$/g
+)
+export const hexRegex = new NRegex(/^(0[xX])?[a-fA-F0-9]*$/g)
 export const isNumeric = (str?: string) => !isNaN(Number(str))
 export const isHexString = (str?: string) =>
-  !emptyString(str) && str?.startsWith('0x') && isNumeric(str)
+  !emptyString(str) && hexRegex.nonStickyTest(str)
 
 export const emptyString = (str?: string) => !str?.trim()
 

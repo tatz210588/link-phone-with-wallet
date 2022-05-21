@@ -92,7 +92,14 @@
     @apply text-white;
   }
 
-  .PhoneInput .PhoneInputInput {
-    background: transparent;
+  .PhoneInput {
+    @apply !contents;
+    & .PhoneInputInput {
+      background: transparent;
+    }
+  }
+
+  .input-icon {
+    @apply mx-2 h-6 w-6 text-amber-200;
   }
 }

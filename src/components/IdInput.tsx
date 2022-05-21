@@ -1,23 +1,17 @@
 import { NextPage } from 'next'
-import { ChangeEvent, useEffect, useState } from 'react'
-import { FaBackspace } from 'react-icons/fa'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import { FaBackspace, FaEdit, FaEnvelope, FaWallet } from 'react-icons/fa'
 import PhoneInput from 'react-phone-number-input'
-import {
-  emptyString,
-  isHexString,
-  isNumeric,
-  phoneRegex,
-  randomString,
-} from './utils'
+import { emailRegex, emptyString, isHexString, phoneRegex } from './utils'
 
 type IdInputProps = {
   wrapperClass?: string
   className?: string
   id?: string
   value?: string
-  onChange?: (value: string, inputType: IdType) => void
   placeholder?: string
   excludeIdTypes?: IdType[]
+  onChange?: (value: string, inputType: IdType) => void
 }
 
 export enum IdType {
@@ -26,13 +20,27 @@ export enum IdType {
   wallet = 'wallet',
 }
 
+export const IdTypeName = {
+  [IdType.email]: 'Email',
+  [IdType.phone]: 'Phone number',
+  [IdType.wallet]: 'Wallet address',
+}
+
 const defaultIdType = IdType.email
+const hasStringValue = (str?: string) => str && !emptyString(str)
+const isEmail = (str?: string) =>
+  hasStringValue(str) && emailRegex.nonStickyTest(str)
 const isPhone = (str?: string) =>
-  str &&
-  !emptyString(str) &&
+  hasStringValue(str) &&
   0 !== Number(str) &&
   ('+' === str || phoneRegex.nonStickyTest(str))
-const isWallet = (str?: string) => isHexString(str)
+const isWallet = (str?: string) => hasStringValue(str) && isHexString(str)
+const getCorrectIdType = (value: string) => {
+  if (isEmail(value)) return IdType.email
+  else if (isPhone(value)) return IdType.phone
+  else if (isWallet(value)) return IdType.wallet
+  else return defaultIdType
+}
 
 const IdInput: NextPage<IdInputProps> = ({
   children,
@@ -40,52 +48,53 @@ const IdInput: NextPage<IdInputProps> = ({
   id,
   value,
   wrapperClass,
-  onChange,
   placeholder,
   excludeIdTypes = [],
+  onChange,
   ...rest
 }) => {
-  const [elId, setElId] = useState(id)
+  const inputRef = useRef()
   const [idValue, setIdValue] = useState(value ?? '')
-  const [idType, setIdType] = useState(
-    isPhone(idValue) ? IdType.phone : defaultIdType
-  )
-  const [excludeTypes, setExcludeTypes] = useState(excludeIdTypes)
+  const [idType, setIdType] = useState(getCorrectIdType(idValue))
 
   useEffect(() => {
-    if (emptyString(elId)) {
-      let _id = ''
-      do {
-        _id = randomString()
-      } while (document.getElementById(_id))
-      setElId(_id)
-    }
-  }, [elId])
-
-  useEffect(() => {
-    elId && document.getElementById(elId)?.focus()
+    inputRef.current && (inputRef.current as HTMLElement).focus()
   }, [idType])
+
+  // useEffect(() => {
+  //   validate &&
+  //     (() => {
+  //       validate = !validate
+  //       return true
+  //     })() &&
+  //     onValidate()
+  // }, [validate])
 
   useEffect(() => onChange && onChange(idValue, idType), [idValue])
 
-  const notExcluded = (check: IdType) => !excludeTypes.includes(check)
-  const isIdType = (check: IdType) => idType === check && notExcluded(check)
+  const notExcluded = (check: IdType) => !excludeIdTypes.includes(check)
   const setIdTypeSafe = (check: IdType) =>
-    notExcluded(check) && setIdType(check)
+    notExcluded(check)
+      ? idType !== check && setIdType(check)
+      : idType !== defaultIdType && setIdType(defaultIdType)
+  const setCorrectIdType = (value: string) =>
+    setIdTypeSafe(getCorrectIdType(value))
 
   const onTextChange = (e?: string) => {
     const value = e?.toString() ?? ''
+    let isValid = true
     switch (idType) {
       case IdType.phone:
+        isValid = isPhone(value)
+        break
       case IdType.wallet:
-        if (emptyString(value) || !isNumeric(value)) setIdType(defaultIdType)
+        isValid = isWallet(value)
         break
       case IdType.email:
-      default:
-        if (isWallet(value)) setIdTypeSafe(IdType.wallet)
-        else if (isPhone(value)) setIdTypeSafe(IdType.phone)
+        isValid = isEmail(value)
         break
     }
+    if (!isValid) setCorrectIdType(value)
     setIdValue(value)
   }
 
@@ -93,42 +102,79 @@ const IdInput: NextPage<IdInputProps> = ({
     onTextChange(e.target.value)
   }
 
-  return (
-    <>
-      <div className={wrapperClass}>
-        {isIdType(IdType.email) && (
-          <input
-            id={elId}
-            className={className}
-            value={idValue}
-            onChange={onInputChange}
-            placeholder={placeholder}
-          />
-        )}
-        {isIdType(IdType.phone) && (
+  const onValidate = () => {
+    let valid = true
+    switch (idType) {
+      case IdType.email:
+        valid = isEmail(idValue)
+        break
+      case IdType.phone:
+        valid = isPhone(idValue)
+        break
+      case IdType.wallet:
+        valid = isWallet(idValue)
+        break
+    }
+    let result = valid
+      ? `Valid ${IdTypeName[idType]}`
+      : `It is not a valid ${IdTypeName[idType]}`
+    return { valid, result, idValue, idType }
+  }
+
+  const renderInputIcon = (curIdType: IdType) => {
+    switch (curIdType) {
+      case IdType.email:
+        return (
+          <>
+            {isEmail(idValue) ? (
+              <FaEnvelope className="input-icon" />
+            ) : (
+              <FaEdit className="input-icon" />
+            )}
+          </>
+        )
+      case IdType.wallet:
+        return <FaWallet className="input-icon" />
+    }
+  }
+  const renderInput = () => {
+    let curIdType = notExcluded(idType) ? idType : defaultIdType
+    switch (curIdType) {
+      case IdType.email:
+      case IdType.wallet:
+        return (
+          <>
+            {renderInputIcon(curIdType)}
+            <input
+              ref={inputRef}
+              id={id}
+              className={className}
+              value={idValue}
+              onChange={onInputChange}
+              placeholder={placeholder}
+            />
+          </>
+        )
+      case IdType.phone:
+        return (
           <PhoneInput
-            id={elId}
+            ref={inputRef}
+            id={id}
             className={className}
             value={idValue}
             onChange={onTextChange}
             placeholder={placeholder}
           />
-        )}
-        {isIdType(IdType.wallet) && (
-          <input
-            id={elId}
-            className={`${className} text-center`}
-            value={idValue}
-            onChange={onInputChange}
-            placeholder={placeholder}
-          />
-        )}
-        <button
-          type="button"
-          className="mx-2 text-amber-200"
-          onClick={(_) => onTextChange('')}
-        >
-          <FaBackspace className="h-6 w-6" />
+        )
+    }
+  }
+
+  return (
+    <>
+      <div className={wrapperClass}>
+        {renderInput()}
+        <button type="button" onClick={(_) => onTextChange('')}>
+          <FaBackspace className="input-icon" />
         </button>
         {children}
       </div>
