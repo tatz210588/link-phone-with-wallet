@@ -13,6 +13,7 @@ import Container from '../components/Container'
 import BusyLoader, { LoaderType } from '../components/BusyLoader'
 import PaymentHelper from '../components/PaymentHelper'
 import IdInput, { IdType } from '../components/IdInput'
+import { FaMoneyBillWave } from 'react-icons/fa'
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
@@ -229,6 +230,9 @@ const Pay = () => {
               }
             />
             <div className={`${style.searchBar} mt-2 p-1`}>
+              <span>
+                <FaMoneyBillWave className="input-icon" />
+              </span>
               <input
                 type="number"
                 className={style.searchInput}
