@@ -53,13 +53,14 @@ export const isNumeric = (str?: string) => !isNaN(Number(str))
 export const isEmailString = (str?: string, strict = false) =>
   !emptyString(str) && emailRegex.nonStickyTest(str)
 export const isPhoneString = (str?: string, strict = false) =>
-  !emptyString(str) && 0 !== Number(str) && strict
+  !emptyString(str) &&
+  0 !== Number(str) &&
+  (strict
     ? str.startsWith('+') && phoneRegex.nonStickyTest(str)
-    : '+' === str || phoneRegexLoose.nonStickyTest(str)
+    : '+' === str || phoneRegexLoose.nonStickyTest(str))
 export const isHexString = (str?: string, strict = false) =>
-  !emptyString(str) && strict
-    ? hexRegex.nonStickyTest(str)
-    : hexRegexLoose.nonStickyTest(str)
+  !emptyString(str) &&
+  (strict ? hexRegex.nonStickyTest(str) : hexRegexLoose.nonStickyTest(str))
 
 export const emptyString = (str?: string) => !str?.trim()
 
