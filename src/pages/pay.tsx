@@ -13,7 +13,7 @@ import Container from '../components/Container'
 import BusyLoader, { LoaderType } from '../components/BusyLoader'
 import PaymentHelper from '../components/PaymentHelper'
 import IdInput, { IdType } from '../components/IdInput'
-import { FaMoneyBillWave } from 'react-icons/fa'
+import { FaBackspace, FaMoneyBillWave } from 'react-icons/fa'
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
@@ -40,7 +40,7 @@ const Pay = () => {
   const [formInput, updateFormInput] = useState({
     targetId: '',
     targetIdType: IdType.phone,
-    amount: 0,
+    amount: 0.0,
   })
   // const [selectedToken, setSelectedToken] = useState<TokenInfo | undefined>()
   const [loadingState, setLoadingState] = useState(false)
@@ -237,6 +237,7 @@ const Pay = () => {
                 type="number"
                 className={style.searchInput}
                 placeholder="Amount to transfer"
+                value={formInput.amount}
                 onChange={(e) =>
                   updateFormInput((formInput) => ({
                     ...formInput,
@@ -244,6 +245,17 @@ const Pay = () => {
                   }))
                 }
               />
+              <button
+                type="button"
+                onClick={(_) =>
+                  updateFormInput((formInput) => ({
+                    ...formInput,
+                    amount: 0.0,
+                  }))
+                }
+              >
+                <FaBackspace className="input-icon" />
+              </button>
             </div>
           </div>
 
