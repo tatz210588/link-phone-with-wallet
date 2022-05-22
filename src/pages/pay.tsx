@@ -12,7 +12,7 @@ import toast from 'react-hot-toast'
 import Container from '../components/Container'
 import BusyLoader, { LoaderType } from '../components/BusyLoader'
 import PaymentHelper from '../components/PaymentHelper'
-import IdInput from '../components/IdInput'
+import IdInput, { IdType } from '../components/IdInput'
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
@@ -35,9 +35,12 @@ const Pay = () => {
   //const chainName = getNetworkMetadata(chainId).chainName;
   //const chainId = '80001'
   const [paymentHelper, setPaymentHelper] = useState(PaymentHelper())
-  const [value, setValue] = useState('')
   const [balanceToken, setBalanceToken] = useState(defaults.balanceToken)
-  const [formInput, updateFormInput] = useState({ amount: 0 })
+  const [formInput, updateFormInput] = useState({
+    targetId: '',
+    targetIdType: IdType.phone,
+    amount: 0,
+  })
   // const [selectedToken, setSelectedToken] = useState<TokenInfo | undefined>()
   const [loadingState, setLoadingState] = useState(false)
   const [defaultAccount, setDefaultAccount] = useState<any>(null)
@@ -107,10 +110,10 @@ const Pay = () => {
   // }
 
   async function transfer() {
-    // if (selectedToken && formInput.amount && value) {
+    // if (selectedToken && formInput.amount && formInput.targetId) {
     //   if (balanceToken && Number(balanceToken) > formInput.amount) {
     setLoadingState(true)
-    await paymentHelper.transfer(formInput.amount, value)
+    await paymentHelper.transfer(formInput.amount, formInput.targetId)
     // await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
     // const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
     // const signer = provider.getSigner() // get signer
@@ -131,7 +134,7 @@ const Pay = () => {
     //   PhoneLink.abi,
     //   signer
     // )
-    // const to = await phoneLinkContract.fetchWalletAddress(value) //gets the addresses linked to the phone number
+    // const to = await phoneLinkContract.fetchWalletAddress(formInput.targetId) //gets the addresses linked to the phone number
 
     // if (to.length == 0) {
     //   //means your friend has not yet linked his/her wallet
@@ -214,21 +217,28 @@ const Pay = () => {
               className={style.searchInput}
               wrapperClass={`${style.searchBar} mt-2 p-1`}
               placeholder="Enter phone / email / wallet"
-              value={value}
+              value={formInput.targetId}
               id="myNewInput"
               delay={500}
-              onChange={setValue}
+              onChange={(val, idType) =>
+                updateFormInput((formInput) => ({
+                  ...formInput,
+                  targetId: val,
+                  targetIdType: idType,
+                }))
+              }
             />
             <div className={`${style.searchBar} mt-2 p-1`}>
               <input
+                type="number"
                 className={style.searchInput}
                 placeholder="Amount to transfer"
-                onChange={(e) => {
-                  updateFormInput({
+                onChange={(e) =>
+                  updateFormInput((formInput) => ({
                     ...formInput,
                     amount: Number(e.target.value),
-                  })
-                }}
+                  }))
+                }
               />
             </div>
           </div>

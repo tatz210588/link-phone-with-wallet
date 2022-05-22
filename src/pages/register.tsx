@@ -44,7 +44,7 @@ const Home = () => {
     name: '',
     otp: '',
     identifier: '',
-    type: '',
+    type: IdType.phone,
   })
   const [loadingState, setLoadingState] = useState(false)
   const { address } = useWeb3()
@@ -83,7 +83,7 @@ const Home = () => {
     }
     console.info({ signInData })
     configureCaptcha()
-    if (formInput.type === 'email') {
+    if (formInput.type === IdType.email) {
       var OTP = randomString(10, 'base64')
       setEmailOTP(OTP)
       var templateParams = {
@@ -108,7 +108,7 @@ const Home = () => {
           }
         )
       setOtp(true)
-    } else if (formInput.type === 'phone') {
+    } else if (formInput.type === IdType.phone) {
       console.log('phone otp')
       const signInPhoneNumber = signInData
       console.info({ signInPhoneNumber })
@@ -139,7 +139,7 @@ const Home = () => {
     } catch (error) {
       console.error(error)
     }
-    if (formInput.type === 'email') {
+    if (formInput.type === IdType.email) {
       if (emailOTP.toString() == formInput.otp) {
         toast.success('Email Authenticated')
         await link()
@@ -187,21 +187,21 @@ const Home = () => {
     const tx = await phoneLinkContract.enterDetails(
       formInput.name,
       formInput.identifier,
-      formInput.type
+      formInput.type.toString()
     )
 
     tx.wait(1)
-    toast.success(`Wallet succesfully linked to your ${formInput.type}`)
+    toast.success(`Wallet successfully linked to your ${formInput.type}`)
     setLoadingState(false)
     Router.push({ pathname: '/' })
   }
 
   function setIdValue(value: string, inputType: IdType) {
-    updateFormInput({
+    updateFormInput((formInput) => ({
       ...formInput,
       identifier: value,
-      type: inputType.toString(),
-    })
+      type: inputType,
+    }))
     setSignInData(value)
   }
 
@@ -231,10 +231,10 @@ const Home = () => {
                         className={style.searchInput}
                         placeholder="Enter your name"
                         onChange={(e) =>
-                          updateFormInput({
+                          updateFormInput((formInput) => ({
                             ...formInput,
                             name: e.target.value,
-                          })
+                          }))
                         }
                       />
                     </div>
@@ -262,7 +262,10 @@ const Home = () => {
                     <input
                       placeholder="OTP"
                       onChange={(e) =>
-                        updateFormInput({ ...formInput, otp: e.target.value })
+                        updateFormInput((formInput) => ({
+                          ...formInput,
+                          otp: e.target.value,
+                        }))
                       }
                     />
                     <button type="submit" className={`${style.button} p-2`}>
