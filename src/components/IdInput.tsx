@@ -30,18 +30,39 @@ export const IdTypeName = {
 
 const defaultIdType = IdType.email
 const hasStringValue = (str?: string) => str && !emptyString(str)
-const isEmail = (str?: string) =>
+export const isEmail = (str?: string) =>
   hasStringValue(str) && emailRegex.nonStickyTest(str)
-const isPhone = (str?: string) =>
+export const isPhone = (str?: string) =>
   hasStringValue(str) &&
   0 !== Number(str) &&
   ('+' === str || phoneRegex.nonStickyTest(str))
-const isWallet = (str?: string) => hasStringValue(str) && isHexString(str)
+export const isWallet = (str?: string) =>
+  hasStringValue(str) && isHexString(str)
+
 const getCorrectIdType = (value: string) => {
   if (isEmail(value)) return IdType.email
   else if (isPhone(value)) return IdType.phone
   else if (isWallet(value)) return IdType.wallet
   else return defaultIdType
+}
+
+export const IdInputValidate = (value: string, inputType: IdType) => {
+  let valid = true
+  switch (inputType) {
+    case IdType.email:
+      valid = isEmail(value)
+      break
+    case IdType.phone:
+      valid = isPhone(value)
+      break
+    case IdType.wallet:
+      valid = isWallet(value)
+      break
+  }
+  let result = valid
+    ? `Valid ${IdTypeName[inputType]}`
+    : `It is not a valid ${IdTypeName[inputType]}`
+  return { valid, result, value, inputType }
 }
 
 const IdInput: NextPage<IdInputProps> = ({
@@ -72,7 +93,7 @@ const IdInput: NextPage<IdInputProps> = ({
   //       validate = !validate
   //       return true
   //     })() &&
-  //     onValidate()
+  //     IdInputValidate()
   // }, [validate])
 
   useEffect(() => {
@@ -89,44 +110,12 @@ const IdInput: NextPage<IdInputProps> = ({
   const setCorrectIdType = (value: string) =>
     setIdTypeSafe(getCorrectIdType(value))
 
-  const onTypeCheck = (value: string) => {
-    let isValid = true
-    switch (idType) {
-      case IdType.phone:
-        isValid = isPhone(value)
-        break
-      case IdType.wallet:
-        isValid = isWallet(value)
-        break
-      case IdType.email:
-        isValid = isEmail(value)
-        break
-    }
-    if (!isValid) setCorrectIdType(value)
-  }
+  const onTypeCheck = (value: string) =>
+    !IdInputValidate(value, idType).valid && setCorrectIdType(value)
 
   const onTextChange = (e?: string) => {
     const value = e?.toString() ?? ''
     setIdValue(value)
-  }
-
-  const onValidate = () => {
-    let valid = true
-    switch (idType) {
-      case IdType.email:
-        valid = isEmail(idValue)
-        break
-      case IdType.phone:
-        valid = isPhone(idValue)
-        break
-      case IdType.wallet:
-        valid = isWallet(idValue)
-        break
-    }
-    let result = valid
-      ? `Valid ${IdTypeName[idType]}`
-      : `It is not a valid ${IdTypeName[idType]}`
-    return { valid, result, idValue, idType }
   }
 
   const renderInputIcon = (curIdType: IdType) => {
