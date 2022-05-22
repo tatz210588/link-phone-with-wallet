@@ -42,14 +42,24 @@ export class NRegex extends RegExp {
     return result
   }
 }
-export const phoneRegex = new NRegex(/^[\+]?\d+$/g)
+export const phoneRegex = new NRegex(/^[\+]?\d{7,}$/g)
+export const phoneRegexLoose = new NRegex(/^[\+]?\d+$/g)
 export const emailRegex = new NRegex(
   /^[^<>(){}\[\]\\/\|.\+\?!,;:\s@"'`=]+(\.[^<>(){}\[\]\\/\|.\+\?!,;:\s@"'`=]+)*@([\w\-]+\.([\w\-]{2,}\.)*[a-zA-Z]{2,9})$/g
 )
-export const hexRegex = new NRegex(/^(0[xX])?[a-fA-F0-9]*$/g)
+export const hexRegex = new NRegex(/^(0[xX])?[a-fA-F0-9]{16,}$/g)
+export const hexRegexLoose = new NRegex(/^(0[xX])?[a-fA-F0-9]*$/g)
 export const isNumeric = (str?: string) => !isNaN(Number(str))
-export const isHexString = (str?: string) =>
-  !emptyString(str) && hexRegex.nonStickyTest(str)
+export const isEmailString = (str?: string, strict = false) =>
+  !emptyString(str) && emailRegex.nonStickyTest(str)
+export const isPhoneString = (str?: string, strict = false) =>
+  !emptyString(str) && 0 !== Number(str) && strict
+    ? str.startsWith('+') && phoneRegex.nonStickyTest(str)
+    : '+' === str || phoneRegexLoose.nonStickyTest(str)
+export const isHexString = (str?: string, strict = false) =>
+  !emptyString(str) && strict
+    ? hexRegex.nonStickyTest(str)
+    : hexRegexLoose.nonStickyTest(str)
 
 export const emptyString = (str?: string) => !str?.trim()
 

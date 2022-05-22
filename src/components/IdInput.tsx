@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { FaBackspace, FaEdit, FaEnvelope, FaWallet } from 'react-icons/fa'
 import PhoneInput from 'react-phone-number-input'
 import useDebounce from '../hooks/useDebounce'
-import { emailRegex, emptyString, isHexString, phoneRegex } from './utils'
+import { isEmailString, isHexString, isPhoneString } from './utils'
 
 type IdInputProps = {
   wrapperClass?: string
@@ -29,15 +29,12 @@ export const IdTypeName = {
 }
 
 const defaultIdType = IdType.email
-const hasStringValue = (str?: string) => str && !emptyString(str)
-export const isEmail = (str?: string) =>
-  hasStringValue(str) && emailRegex.nonStickyTest(str)
-export const isPhone = (str?: string) =>
-  hasStringValue(str) &&
-  0 !== Number(str) &&
-  ('+' === str || phoneRegex.nonStickyTest(str))
-export const isWallet = (str?: string) =>
-  hasStringValue(str) && isHexString(str)
+export const isEmail = (str?: string, strict = false) =>
+  isEmailString(str, strict)
+export const isPhone = (str?: string, strict = false) =>
+  isPhoneString(str, strict)
+export const isWallet = (str?: string, strict = false) =>
+  isHexString(str, strict)
 
 const getCorrectIdType = (value: string) => {
   if (isEmail(value)) return IdType.email
@@ -46,22 +43,26 @@ const getCorrectIdType = (value: string) => {
   else return defaultIdType
 }
 
-export const IdInputValidate = (value: string, inputType: IdType) => {
+export const IdInputValidate = (
+  value: string,
+  inputType: IdType,
+  strict = false
+) => {
   let valid = true
   switch (inputType) {
     case IdType.email:
-      valid = isEmail(value)
+      valid = isEmail(value, strict)
       break
     case IdType.phone:
-      valid = isPhone(value)
+      valid = isPhone(value, strict)
       break
     case IdType.wallet:
-      valid = isWallet(value)
+      valid = isWallet(value, strict)
       break
   }
   let result = valid
-    ? `Valid ${IdTypeName[inputType]}`
-    : `It is not a valid ${IdTypeName[inputType]}`
+    ? `It ${strict ? 'is' : '(maybe)'} a Valid ${IdTypeName[inputType]}`
+    : `It ${strict ? 'is' : '(maybe)'} an Invalid ${IdTypeName[inputType]}`
   return { valid, result, value, inputType }
 }
 
