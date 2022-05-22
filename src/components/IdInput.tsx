@@ -36,10 +36,10 @@ export const isPhone = (str?: string, strict = false) =>
 export const isWallet = (str?: string, strict = false) =>
   isHexString(str, strict)
 
-const getCorrectIdType = (value: string) => {
-  if (isEmail(value)) return IdType.email
-  else if (isPhone(value)) return IdType.phone
-  else if (isWallet(value)) return IdType.wallet
+const getCorrectIdType = (value: string, strict = false) => {
+  if (isEmail(value, strict)) return IdType.email
+  else if (isPhone(value, strict)) return IdType.phone
+  else if (isWallet(value, strict)) return IdType.wallet
   else return defaultIdType
 }
 
@@ -63,7 +63,7 @@ export const IdInputValidate = (
   let result = valid
     ? `It ${strict ? 'is' : '(maybe)'} a Valid ${IdTypeName[inputType]}`
     : `It ${strict ? 'is' : '(maybe)'} an Invalid ${IdTypeName[inputType]}`
-  return { valid, result, value, inputType }
+  return { valid, result, value, inputType, strict }
 }
 
 const IdInput: NextPage<IdInputProps> = ({
@@ -98,7 +98,7 @@ const IdInput: NextPage<IdInputProps> = ({
   // }, [validate])
 
   useEffect(() => {
-    onTypeCheck(idValue)
+    onTypeCheck()
     if (delayedOnChange) delayedOnChange(idValue, idType)
     else onChange && onChange(idValue, idType)
   }, [idValue])
@@ -108,11 +108,10 @@ const IdInput: NextPage<IdInputProps> = ({
     notExcluded(check)
       ? idType !== check && setIdType(check)
       : idType !== defaultIdType && setIdType(defaultIdType)
-  const setCorrectIdType = (value: string) =>
-    setIdTypeSafe(getCorrectIdType(value))
+  const setCorrectIdType = () => setIdTypeSafe(getCorrectIdType(idValue))
 
-  const onTypeCheck = (value: string) =>
-    !IdInputValidate(value, idType).valid && setCorrectIdType(value)
+  const onTypeCheck = () =>
+    !IdInputValidate(idValue, idType).valid && setCorrectIdType()
 
   const onTextChange = (e?: string) => {
     const value = e?.toString() ?? ''
