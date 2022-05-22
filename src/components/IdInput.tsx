@@ -1,6 +1,12 @@
 import { NextPage } from 'next'
 import { useEffect, useRef, useState } from 'react'
-import { FaBackspace, FaEdit, FaEnvelope, FaWallet } from 'react-icons/fa'
+import {
+  FaBackspace,
+  FaCheckCircle,
+  FaEdit,
+  FaEnvelope,
+  FaWallet,
+} from 'react-icons/fa'
 import PhoneInput from 'react-phone-number-input'
 import useDebounce from '../hooks/useDebounce'
 import { isEmailString, isHexString, isPhoneString } from './utils'
@@ -141,7 +147,7 @@ const IdInput: NextPage<IdInputProps> = ({
       case IdType.wallet:
         return (
           <>
-            {renderInputIcon(curIdType)}
+            <span>{renderInputIcon(curIdType)}</span>
             <input
               ref={inputRef}
               id={id}
