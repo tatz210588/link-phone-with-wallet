@@ -97,6 +97,9 @@
     & .PhoneInputInput {
       background: transparent;
     }
+    & .PhoneInputCountrySelect {
+      @apply bg-[#363840];
+    }
   }
 
   .input-icon {
@@ -106,7 +109,7 @@
     }
   }
   .input-icon-check {
-    @apply absolute ml-4 mt-2 text-green-500;
+    @apply absolute z-20 ml-4 mt-2 text-green-500;
     & svg {
       @apply h-4 w-4;
     }
