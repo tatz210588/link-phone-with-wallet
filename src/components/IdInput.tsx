@@ -107,8 +107,7 @@ const IdInput: NextPage<IdInputProps> = ({
 
   useEffect(() => {
     onTypeCheck()
-    console.log("check", onTypeCheck())
-    changeValid(onTypeCheck())
+    changeValid(IdInputValidate(idValue, idType, true).valid)
     if (delayedOnChange) delayedOnChange(idValue, idType)
     else onChange && onChange(idValue, idType)
   }, [idValue])

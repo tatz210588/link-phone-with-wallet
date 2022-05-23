@@ -1,14 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { TokenInfo } from '../assets/tokenConfig'
-// import { getConfigByChain } from '../config'
 import { useWeb3 } from '@3rdweb/hooks'
-// import { rounded } from '../components/utils'
-// import { ethers } from 'ethers'
-// import BigNumber from 'bignumber.js'
-// import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import toast from 'react-hot-toast'
-// import PhoneLink from '../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import Container from '../components/Container'
 import BusyLoader, { LoaderType } from '../components/BusyLoader'
 import PaymentHelper from '../components/PaymentHelper'
@@ -34,8 +28,6 @@ const defaults = {
 
 const Pay = () => {
   const { chainId } = useWeb3()
-  //const chainName = getNetworkMetadata(chainId).chainName;
-  //const chainId = '80001'
   const [paymentHelper, setPaymentHelper] = useState(PaymentHelper())
   const [balanceToken, setBalanceToken] = useState(defaults.balanceToken)
   const [formInput, updateFormInput] = useState({
@@ -43,10 +35,8 @@ const Pay = () => {
     targetIdType: IdType.phone,
     amount: 0.0,
   })
-  // const [selectedToken, setSelectedToken] = useState<TokenInfo | undefined>()
   const [loadingState, setLoadingState] = useState(false)
   const [defaultAccount, setDefaultAccount] = useState<any>(null)
-  // const [loadingBalanceState, setLoadingBalanceState] = useState(false)
   const [availableTokens, setAvailableTokens] = useState<TokenInfo[]>([])
   const [validId, setValidId] = useState<Boolean>(false)
 
@@ -55,11 +45,6 @@ const Pay = () => {
   }, [validId])
 
   useEffect(() => {
-    // window.ethereum
-    //   .request({ method: 'eth_requestAccounts' })
-    //   .then((result: any[]) => {
-    //     paymentHelper.connectAccount(result[0]) //get existing wallet address
-    //   })
     setLoadingState(true)
     paymentHelper.initialize().then((_) => setLoadingState(false))
   }, [defaultAccount])
@@ -75,115 +60,21 @@ const Pay = () => {
       setBalanceToken(
         (await paymentHelper.loadBalance(selectToken)) ?? defaults.balanceToken
       )
-      // setSelectedToken(selectToken)
-      // await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
-      // const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
-
-      // if (selectToken) {
-      //   if ('null' !== selectToken.address) {
-      //     //if selected token address is non-native token
-      //     const tokenContract = new ethers.Contract(
-      //       selectToken.address,
-      //       PhoneLink.abi,
-      //       provider
-      //     )
-      //     const data = await tokenContract.balanceOf(defaultAccount)
-      //     const pow = new BigNumber('10').pow(new BigNumber(selectToken.decimal))
-      //     setBalanceToken(web3BNToFloatString(data, pow, 0, BigNumber.ROUND_DOWN))
-      //   } else {
-      //     //if selected token is native token
-      //     const balance = await provider.getBalance(defaultAccount)
-      //     const balanceInEth = ethers.utils.formatEther(balance)
-      //     setBalanceToken(rounded(balanceInEth))
-      //   }
       setLoadingState(false)
-      // } else {
-      //   toast.error('Enter Valid details please!!')
-      // }
     } else {
       setBalanceToken(defaults.balanceToken)
     }
   }
 
-  // function web3BNToFloatString(
-  //   bn: any,
-  //   divideBy: BigNumber,
-  //   decimals: number,
-  //   roundingMode = BigNumber.ROUND_DOWN
-  // ) {
-  //   const converted = new BigNumber(bn.toString())
-  //   const divided = converted.div(divideBy)
-  //   return divided.toFixed(decimals, roundingMode)
-  // }
-
   async function transfer() {
-    // if (selectedToken && formInput.amount && formInput.targetId) {
-    //   if (balanceToken && Number(balanceToken) > formInput.amount) {
-    setLoadingState(true)
-    await paymentHelper.transfer(formInput.amount, formInput.targetId)
-    // await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
-    // const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
-    // const signer = provider.getSigner() // get signer
-    // ethers.utils.getAddress(defaultAccount) //checks if an address is valid one
-    // const network = await provider.getNetwork()
-
-    // const tokenContract = new ethers.Contract(
-    //   selectedToken.address,
-    //   PhoneLink.abi,
-    //   signer
-    // )
-    // const amount = ethers.utils.parseUnits(
-    //   formInput.amount.toString(),
-    //   'ether'
-    // )
-    // const phoneLinkContract = new ethers.Contract(
-    //   getConfigByChain(network.chainId)[0].phoneLinkAddress,
-    //   PhoneLink.abi,
-    //   signer
-    // )
-    // const to = await phoneLinkContract.fetchWalletAddress(formInput.targetId) //gets the addresses linked to the phone number
-
-    // if (to.length == 0) {
-    //   //means your friend has not yet linked his/her wallet
-    //   toast.error(
-    //     'The given phone number is not linked any wallet. Ask your friend to link his Phone'
-    //   )
-    // } else {
-    //   const items = await Promise.all(
-    //     to.map(async (i: any) => {
-    //       let item = {
-    //         phoneNumber: i.phoneNumber,
-    //         connectedWalletAddress: i.connectedWalletAddress,
-    //       }
-    //       return item
-    //     })
-    //   )
-
-    //   if (selectedToken.address != 'null') {
-    //     //for non-native coin
-    //     const tx = await tokenContract.transfer(
-    //       items[0].connectedWalletAddress,
-    //       amount
-    //     ) //transfers tokens from msg.sender to destination wallet
-    //     tx.wait(1)
-    //   } else {
-    //     //for native coin
-    //     const tx = await signer.sendTransaction({
-    //       to: items[0].connectedWalletAddress, //destination wallet address
-    //       value: amount, // amount of native token to be sent
-    //     })
-    //     tx.wait(1)
-    //   }
-    //   toast.success('Transfer Successful.')
-    // }
-    setLoadingState(false)
-    //   } else {
-    //     toast.error('You need more balance to execute this transaction.')
-    //   }
-    // } else {
-    //   toast.error('Please fill all the details correctly')
-    // }
-    await loadBalance(paymentHelper.data().selectedToken)
+    if (validId) {
+      setLoadingState(true)
+      await paymentHelper.transfer(formInput.amount, formInput.targetId)
+      setLoadingState(false)
+      await loadBalance(paymentHelper.data().selectedToken)
+    } else {
+      toast.error(`Entered ${formInput.targetIdType} is invalid.`)
+    }
   }
 
   return (
