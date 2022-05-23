@@ -132,17 +132,9 @@ const IdInput: NextPage<IdInputProps> = ({
   const renderInputIcon = (curIdType: IdType) => {
     switch (curIdType) {
       case IdType.email:
-        return (
-          <>
-            {isEmail(idValue) ? (
-              <FaEnvelope className="input-icon" />
-            ) : (
-              <FaEdit className="input-icon" />
-            )}
-          </>
-        )
+        return <>{isEmail(idValue) ? <FaEnvelope /> : <FaEdit />}</>
       case IdType.wallet:
-        return <FaWallet className="input-icon" />
+        return <FaWallet />
     }
   }
   const renderInput = () => {
@@ -152,7 +144,7 @@ const IdInput: NextPage<IdInputProps> = ({
       case IdType.wallet:
         return (
           <>
-            <span>{renderInputIcon(curIdType)}</span>
+            <span className="input-icon">{renderInputIcon(curIdType)}</span>
             <input
               ref={inputRef}
               id={id}
@@ -181,8 +173,12 @@ const IdInput: NextPage<IdInputProps> = ({
     <>
       <div className={wrapperClass}>
         {renderInput()}
-        <button type="button" onClick={(_) => onTextChange('')}>
-          <FaBackspace className="input-icon" />
+        <button
+          type="button"
+          className="input-icon"
+          onClick={(_) => onTextChange('')}
+        >
+          <FaBackspace />
         </button>
         {children}
       </div>

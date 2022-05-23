@@ -100,6 +100,12 @@
   }
 
   .input-icon {
-    @apply mx-2 h-6 w-6 text-amber-200;
+    @apply text-amber-200;
+    & svg {
+      @apply mx-1 h-6 w-6;
+    }
+  }
+  .input-icon-check {
+    @apply relative -left-5 -bottom-2 h-6 w-6 text-green-500;
   }
 }

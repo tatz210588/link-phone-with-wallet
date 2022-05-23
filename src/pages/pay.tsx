@@ -141,8 +141,8 @@ const Pay = () => {
               }
             />
             <div className={`${style.searchBar} mt-2 p-1`}>
-              <span>
-                <FaMoneyBillWave className="input-icon" />
+              <span className="input-icon">
+                <FaMoneyBillWave />
               </span>
               <input
                 type="number"
@@ -158,6 +158,7 @@ const Pay = () => {
               />
               <button
                 type="button"
+                className="input-icon"
                 onClick={(_) =>
                   updateFormInput((formInput) => ({
                     ...formInput,
@@ -165,7 +166,7 @@ const Pay = () => {
                   }))
                 }
               >
-                <FaBackspace className="input-icon" />
+                <FaBackspace />
               </button>
             </div>
           </div>

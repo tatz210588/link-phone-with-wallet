@@ -47,7 +47,7 @@ export const phoneRegexLoose = new NRegex(/^[\+]?\d+$/g)
 export const emailRegex = new NRegex(
   /^[^<>(){}\[\]\\/\|.\+\?!,;:\s@"'`=]+(\.[^<>(){}\[\]\\/\|.\+\?!,;:\s@"'`=]+)*@([\w\-]+\.([\w\-]{2,}\.)*[a-zA-Z]{2,9})$/g
 )
-export const hexRegex = new NRegex(/^(0[xX])?[a-fA-F0-9]{16,}$/g)
+export const hexRegex = new NRegex(/^(0[xX])[a-fA-F0-9]{16,}$/g)
 export const hexRegexLoose = new NRegex(/^(0[xX])?[a-fA-F0-9]*$/g)
 export const isNumeric = (str?: string) => !isNaN(Number(str))
 export const isEmailString = (str?: string, strict = false) =>
