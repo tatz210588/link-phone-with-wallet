@@ -15,6 +15,7 @@ import PaymentHelper from '../components/PaymentHelper'
 import IdInput, { IdType } from '../components/IdInput'
 import { FaBackspace, FaMoneyBillWave } from 'react-icons/fa'
 
+
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
   searchBar: `flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#363840] rounded-[0.8rem] hover:bg-[#757199]`,
@@ -47,6 +48,11 @@ const Pay = () => {
   const [defaultAccount, setDefaultAccount] = useState<any>(null)
   // const [loadingBalanceState, setLoadingBalanceState] = useState(false)
   const [availableTokens, setAvailableTokens] = useState<TokenInfo[]>([])
+  const [validId, setValidId] = useState<Boolean>(false)
+
+  useEffect(() => {
+    console.log("validId", validId)
+  }, [validId])
 
   useEffect(() => {
     // window.ethereum
@@ -226,8 +232,8 @@ const Pay = () => {
                   ...formInput,
                   targetId: val,
                   targetIdType: idType,
-                }))
-              }
+                }))}
+              changeValid={validId => setValidId(validId)}
             />
             <div className={`${style.searchBar} mt-2 p-1`}>
               <span>

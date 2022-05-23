@@ -20,6 +20,7 @@ type IdInputProps = {
   excludeIdTypes?: IdType[]
   delay?: number
   onChange?: (value: string, inputType: IdType) => void
+  changeValid?: any
 }
 
 export enum IdType {
@@ -82,6 +83,7 @@ const IdInput: NextPage<IdInputProps> = ({
   excludeIdTypes = [],
   delay = 0,
   onChange,
+  changeValid,
   ...rest
 }) => {
   const inputRef = useRef()
@@ -105,6 +107,8 @@ const IdInput: NextPage<IdInputProps> = ({
 
   useEffect(() => {
     onTypeCheck()
+    console.log("check", onTypeCheck())
+    changeValid(onTypeCheck())
     if (delayedOnChange) delayedOnChange(idValue, idType)
     else onChange && onChange(idValue, idType)
   }, [idValue])
