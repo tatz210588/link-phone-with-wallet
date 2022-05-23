@@ -7,7 +7,7 @@ import {
   FaEnvelope,
   FaWallet,
 } from 'react-icons/fa'
-import PhoneInput from 'react-phone-number-input'
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input'
 import useDebounce from '../hooks/useDebounce'
 import { isEmailString, isHexString, isPhoneString } from './utils'
 
@@ -20,7 +20,6 @@ type IdInputProps = {
   excludeIdTypes?: IdType[]
   delay?: number
   onChange?: (value: string, inputType: IdType) => void
-  changeValid?: any
 }
 
 export enum IdType {
@@ -39,7 +38,7 @@ const defaultIdType = IdType.email
 export const isEmail = (str?: string, strict = false) =>
   isEmailString(str, strict)
 export const isPhone = (str?: string, strict = false) =>
-  isPhoneString(str, strict)
+  isPhoneString(str, strict) && (!strict || isValidPhoneNumber(str))
 export const isWallet = (str?: string, strict = false) =>
   isHexString(str, strict)
 
@@ -83,7 +82,6 @@ const IdInput: NextPage<IdInputProps> = ({
   excludeIdTypes = [],
   delay = 0,
   onChange,
-  changeValid,
   ...rest
 }) => {
   const inputRef = useRef()
@@ -92,8 +90,14 @@ const IdInput: NextPage<IdInputProps> = ({
   const delayedOnChange =
     delay && onChange ? useDebounce(onChange, delay) : null
 
+  const triggerChange = () => {
+    if (delayedOnChange) delayedOnChange(idValue, idType)
+    else onChange && onChange(idValue, idType)
+  }
+
   useEffect(() => {
     inputRef.current && (inputRef.current as HTMLElement).focus()
+    triggerChange()
   }, [idType])
 
   // useEffect(() => {
@@ -107,9 +111,7 @@ const IdInput: NextPage<IdInputProps> = ({
 
   useEffect(() => {
     onTypeCheck()
-    changeValid(IdInputValidate(idValue, idType, true).valid)
-    if (delayedOnChange) delayedOnChange(idValue, idType)
-    else onChange && onChange(idValue, idType)
+    triggerChange()
   }, [idValue])
 
   const notExcluded = (check: IdType) => !excludeIdTypes.includes(check)

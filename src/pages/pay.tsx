@@ -6,9 +6,12 @@ import toast from 'react-hot-toast'
 import Container from '../components/Container'
 import BusyLoader, { LoaderType } from '../components/BusyLoader'
 import PaymentHelper from '../components/PaymentHelper'
-import IdInput, { IdType } from '../components/IdInput'
+import IdInput, {
+  IdInputValidate,
+  IdType,
+  IdTypeName,
+} from '../components/IdInput'
 import { FaBackspace, FaMoneyBillWave } from 'react-icons/fa'
-
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
@@ -38,11 +41,6 @@ const Pay = () => {
   const [loadingState, setLoadingState] = useState(false)
   const [defaultAccount, setDefaultAccount] = useState<any>(null)
   const [availableTokens, setAvailableTokens] = useState<TokenInfo[]>([])
-  const [validId, setValidId] = useState<Boolean>(false)
-
-  useEffect(() => {
-    console.log("validId", validId)
-  }, [validId])
 
   useEffect(() => {
     setLoadingState(true)
@@ -66,14 +64,30 @@ const Pay = () => {
     }
   }
 
+  const validate = () => {
+    const validationResult = IdInputValidate(
+      formInput.targetId,
+      formInput.targetIdType,
+      true
+    )
+    if (validationResult.valid && formInput.amount) {
+      return true
+    } else if (validationResult.valid) {
+      toast.error(`Amount entered is invalid.`)
+    } else {
+      toast.error(
+        `Entered ${IdTypeName[validationResult.inputType]} is invalid.`
+      )
+    }
+    return false
+  }
+
   async function transfer() {
-    if (validId) {
+    if (validate()) {
       setLoadingState(true)
       await paymentHelper.transfer(formInput.amount, formInput.targetId)
-      setLoadingState(false)
       await loadBalance(paymentHelper.data().selectedToken)
-    } else {
-      toast.error(`Entered ${formInput.targetIdType} is invalid.`)
+      setLoadingState(false)
     }
   }
 
@@ -123,8 +137,8 @@ const Pay = () => {
                   ...formInput,
                   targetId: val,
                   targetIdType: idType,
-                }))}
-              changeValid={validId => setValidId(validId)}
+                }))
+              }
             />
             <div className={`${style.searchBar} mt-2 p-1`}>
               <span>
