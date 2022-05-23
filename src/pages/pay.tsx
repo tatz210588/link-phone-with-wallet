@@ -76,9 +76,7 @@ const Pay = () => {
     } else if (validationResult.valid) {
       toast.error(`Amount entered is invalid.`)
     } else {
-      toast.error(
-        `Entered ${IdTypeName[validationResult.inputType]} is invalid.`
-      )
+      toast.error(`${IdTypeName[validationResult.inputType]} is invalid.`)
     }
     return false
   }
