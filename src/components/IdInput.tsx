@@ -130,16 +130,17 @@ const IdInput: NextPage<IdInputProps> = ({
     setIdValue(value)
   }
 
-  const renderInputIcon = (curIdType: IdType) => {
+  const renderInputIcon = (curIdType: IdType, valid = false) => {
     switch (curIdType) {
       case IdType.email:
-        return isEmail(idValue) ? FaEnvelope : FaEdit
+        return valid ? FaEnvelope : FaEdit
       case IdType.wallet:
         return FaWallet
     }
   }
   const renderInput = () => {
     let curIdType = notExcluded(idType) ? idType : defaultIdType
+    let valid = IdInputValidate(idValue, curIdType, true).valid
     switch (curIdType) {
       case IdType.email:
       case IdType.wallet:
@@ -147,8 +148,11 @@ const IdInput: NextPage<IdInputProps> = ({
           <>
             <InputIcon
               className="input-icon"
-              Icon={renderInputIcon(curIdType)}
+              Icon={renderInputIcon(curIdType, valid)}
             />
+            {valid && (
+              <InputIcon className="input-icon-check" Icon={FaCheckCircle} />
+            )}
             <input
               ref={inputRef}
               id={id}
@@ -161,14 +165,19 @@ const IdInput: NextPage<IdInputProps> = ({
         )
       case IdType.phone:
         return (
-          <PhoneInput
-            ref={inputRef}
-            id={id}
-            className={className}
-            value={idValue}
-            onChange={onTextChange}
-            placeholder={placeholder}
-          />
+          <>
+            {valid && (
+              <InputIcon className="input-icon-check" Icon={FaCheckCircle} />
+            )}
+            <PhoneInput
+              ref={inputRef}
+              id={id}
+              className={className}
+              value={idValue}
+              onChange={onTextChange}
+              placeholder={placeholder}
+            />
+          </>
         )
     }
   }
