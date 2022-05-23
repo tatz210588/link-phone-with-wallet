@@ -9,6 +9,7 @@ import {
 } from 'react-icons/fa'
 import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input'
 import useDebounce from '../hooks/useDebounce'
+import InputIcon from './InputIcon'
 import { isEmailString, isHexString, isPhoneString } from './utils'
 
 type IdInputProps = {
@@ -132,9 +133,9 @@ const IdInput: NextPage<IdInputProps> = ({
   const renderInputIcon = (curIdType: IdType) => {
     switch (curIdType) {
       case IdType.email:
-        return <>{isEmail(idValue) ? <FaEnvelope /> : <FaEdit />}</>
+        return isEmail(idValue) ? FaEnvelope : FaEdit
       case IdType.wallet:
-        return <FaWallet />
+        return FaWallet
     }
   }
   const renderInput = () => {
@@ -144,7 +145,10 @@ const IdInput: NextPage<IdInputProps> = ({
       case IdType.wallet:
         return (
           <>
-            <span className="input-icon">{renderInputIcon(curIdType)}</span>
+            <InputIcon
+              className="input-icon"
+              Icon={renderInputIcon(curIdType)}
+            />
             <input
               ref={inputRef}
               id={id}
@@ -173,12 +177,8 @@ const IdInput: NextPage<IdInputProps> = ({
     <>
       <div className={wrapperClass}>
         {renderInput()}
-        <button
-          type="button"
-          className="input-icon"
-          onClick={(_) => onTextChange('')}
-        >
-          <FaBackspace />
+        <button type="button" onClick={(_) => onTextChange('')}>
+          <InputIcon className="input-icon" Icon={FaBackspace} />
         </button>
         {children}
       </div>

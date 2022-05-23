@@ -12,6 +12,7 @@ import IdInput, {
   IdTypeName,
 } from '../components/IdInput'
 import { FaBackspace, FaMoneyBillWave } from 'react-icons/fa'
+import InputIcon from '../components/InputIcon'
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
@@ -141,9 +142,7 @@ const Pay = () => {
               }
             />
             <div className={`${style.searchBar} mt-2 p-1`}>
-              <span className="input-icon">
-                <FaMoneyBillWave />
-              </span>
+              <InputIcon className="input-icon" Icon={FaMoneyBillWave} />
               <input
                 type="number"
                 className={style.searchInput}
@@ -158,7 +157,6 @@ const Pay = () => {
               />
               <button
                 type="button"
-                className="input-icon"
                 onClick={(_) =>
                   updateFormInput((formInput) => ({
                     ...formInput,
@@ -166,7 +164,7 @@ const Pay = () => {
                   }))
                 }
               >
-                <FaBackspace />
+                <InputIcon className="input-icon" Icon={FaBackspace} />
               </button>
             </div>
           </div>
