@@ -60,7 +60,7 @@ const MyProfile = () => {
   const [details, setDetails] = useState<WalletCardDetail[]>([])
   const [toggle, setToggle] = useState(true)
   const [toggleRight, setToggleRight] = useState(true)
-  const [toggleWallet, setToggleWallet] = useState(false)
+  const [toggleWallet, setToggleWallet] = useState(true)
   const [myAddedWallets, setMyAddedWallets] = useState<WalletCardDetail[]>([])
 
   useEffect(() => {
@@ -246,13 +246,13 @@ const MyProfile = () => {
                       </div> */}
                     </div>
                     {toggle && (
-                      <div className="flex flex-wrap justify-center w-[24rem] h-[23rem] my-3 mx-1 rounded-2xl overflow-hidden `,">
+                      <div className="flex flex-wrap justify-center w-[20rem] h-[20rem] my-3 mx-1 rounded-2xl overflow-hidden `,">
                         <a href={src} download><img src={src} height={400} width={400} /></a>
                       </div>
                     )}
                   </div>
                 </div>
-                <div className={`ml-5 justify-center`}>
+                <div className={`ml-5 justify-center w-[60%]`}>
                   <div className={style.wrapper}>
                     <div className={style.titlle} onClick={() => setToggleRight(!toggleRight)}>
                       <div className={style.titleLeft}>

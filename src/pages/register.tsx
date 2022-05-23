@@ -18,7 +18,11 @@ import getFirebaseApp from '../components/firebase'
 import Router from 'next/router'
 import Container from '../components/Container'
 import BusyLoader, { LoaderType } from '../components/BusyLoader'
-import IdInput, { IdType } from '../components/IdInput'
+import IdInput, {
+  IdInputValidate,
+  IdType,
+  IdTypeName,
+} from '../components/IdInput'
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
@@ -59,6 +63,8 @@ const Home = () => {
     getFirebaseApp().then((app) => setFirebaseApp(app))
   }, [firebaseApp])
 
+
+
   async function configureCaptcha() {
     const auth = getAuth(firebaseApp)
     window.recaptchaVerifier = new RecaptchaVerifier(
@@ -81,56 +87,67 @@ const Home = () => {
     } catch (error) {
       console.error(error)
     }
-    console.info({ signInData })
-    configureCaptcha()
-    if (formInput.type === IdType.email) {
-      var OTP = randomString(10, 'base64')
-      setEmailOTP(OTP)
-      var templateParams = {
-        user: formInput.name,
-        email: formInput.identifier,
-        message: OTP,
-      }
-      emailjs
-        .send(
-          'service_t2xue7p',
-          'template_dnzci4u',
-          templateParams,
-          'Z8B2Ufr9spWJFx4js'
-        )
-        .then(
-          function (response) {
-            console.log('SUCCESS!', response.status, response.text)
-            toast.success('Check email for OTP')
-          },
-          function (error) {
-            console.log('FAILED...', error)
-          }
-        )
-      setOtp(true)
-    } else if (formInput.type === IdType.phone) {
-      console.log('phone otp')
-      const signInPhoneNumber = signInData
-      console.info({ signInPhoneNumber })
-
-      const appVerifier = window.recaptchaVerifier
-      const auth = getAuth(firebaseApp)
-      try {
-        // SMS sent. Prompt user to type the code from the message, then sign the
-        // user in with confirmationResult.confirm(code).
-        window.confirmationResult = await signInWithPhoneNumber(
-          auth,
-          signInPhoneNumber,
-          appVerifier
-        )
-        toast.success('OTP sent. Please enter the OTP')
+    if (validate()) {
+      configureCaptcha()
+      if (formInput.type === IdType.email) {
+        var OTP = randomString(10, 'base64')
+        setEmailOTP(OTP)
+        var templateParams = {
+          user: formInput.name,
+          email: formInput.identifier,
+          message: OTP,
+        }
+        emailjs.send('service_t2xue7p', 'template_dnzci4u', templateParams, 'Z8B2Ufr9spWJFx4js')
+          .then(
+            function (response) {
+              console.log('SUCCESS!', response.status, response.text)
+              toast.success('Check email for OTP')
+            },
+            function (error) {
+              console.log('FAILED...', error)
+            }
+          )
         setOtp(true)
-      } catch (error) {
-        console.error(error)
+      } else if (formInput.type === IdType.phone) {
+        console.log('phone otp')
+        const signInPhoneNumber = signInData
+        console.info({ signInPhoneNumber })
+
+        const appVerifier = window.recaptchaVerifier
+        const auth = getAuth(firebaseApp)
+        try {
+          // SMS sent. Prompt user to type the code from the message, then sign the
+          // user in with confirmationResult.confirm(code).
+          window.confirmationResult = await signInWithPhoneNumber(
+            auth,
+            signInPhoneNumber,
+            appVerifier
+          )
+          toast.success('OTP sent. Please enter the OTP')
+          setOtp(true)
+        } catch (error) {
+          console.error(error)
+        }
+      } else {
+        toast.error('Please enter phone/email to proceed.')
       }
-    } else {
-      toast.error('Please enter phone/email to proceed.')
     }
+  }
+
+  const validate = () => {
+    const validationResult = IdInputValidate(
+      formInput.identifier,
+      formInput.type,
+      true
+    )
+    if (validationResult.valid) {
+      return true
+    } else {
+      toast.error(
+        `Entered ${IdTypeName[validationResult.inputType]} is invalid.`
+      )
+    }
+    return false
   }
 
   async function onSubmitOTP(e: any) {
@@ -244,7 +261,13 @@ const Home = () => {
                       wrapperClass={`${style.searchBar} mt-2 p-1`}
                       placeholder={idPlaceholder}
                       delay={500}
-                      onChange={setIdValue}
+                      onChange={(val, idType) =>
+                        updateFormInput((formInput) => ({
+                          ...formInput,
+                          targetId: val,
+                          targetIdType: idType,
+                        }))
+                      }
                       excludeIdTypes={[IdType.wallet]}
                     />
 

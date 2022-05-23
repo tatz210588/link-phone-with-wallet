@@ -6,6 +6,8 @@ import { rounded } from './utils'
 import toast from 'react-hot-toast'
 import { getConfigByChain } from '../config'
 import { ellipseAddress } from './utils'
+import emailjs from '@emailjs/browser'
+
 
 export type PaymentData = {
   defaultChainId?: number
@@ -148,11 +150,25 @@ const PaymentHelper = () => {
             console.log(ellipseAddress(to))
 
             if (to.length === 0 || ellipseAddress(to) === '0x000...00000') {
-              //means your friend has not yet linked his/her wallet
-              toast.error(
-                'The given phone number is not linked to any wallet.' +
-                ' Ask your friend to register his Phone/email'
-              )
+              if (target.includes("@")) {
+                var templateParams = {
+                  email: target
+                }
+                emailjs.send('service_t2xue7p', 'template_4f35w5l', templateParams, 'Z8B2Ufr9spWJFx4js')
+                  .then(
+                    function (response) {
+                      console.log('SUCCESS!', response.status, response.text)
+                      toast.success("Your friend is not yet registered with GrowPay. We have sent an invite email to join.")
+                    },
+                    function (error) {
+                      console.log('FAILED...', error)
+                    }
+                  )
+              } else {
+                //it is an valid phone of my friend. But he is not registered to receive. Send sms to this phone
+                toast.success('Your friend is not yet registered. Please ask your friend to register to start receiving crypto.')
+              }
+
               return false
             } else {
               targetAddress = to

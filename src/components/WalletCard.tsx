@@ -17,11 +17,11 @@ import PhoneLink from '../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import BusyLoader, { LoaderType } from './BusyLoader'
 import Router from 'next/router'
 import { NextPage } from 'next'
-
+import { isEmailString, isHexString, isPhoneString } from './utils'
 
 
 const style = {
-    wrapper: `bg-[#f4f4f6]  w-[26rem] h-[5rem] my-3 mx-1 rounded-2xl overflow-hidden `,
+    wrapper: `bg-[#f4f4f6]  w-[95%] h-[6rem] my-3 mx-1 rounded-2xl overflow-hidden `,
     wraper: `bg-[#f4f4f6]  w-[95%] h-[100%] my-3 mx-1 rounded-2xl overflow-hidden `,
     details: `p-3`,
     info: `flex justify-between text-[#e4e8eb] drop-shadow-xl`,
@@ -84,38 +84,46 @@ const WalletCard: NextPage<WalletCardProps> = ({ detail, type }) => {
         }
 
         if (detail.typeOfIdentifier === 'email') {
-            var OTP = randomString(10, 'base64')
-            setEmailOTP(OTP)
-            var templateParams = { user: formInput.name, email: formInput.identifier, message: OTP }
-            emailjs.send('service_t2xue7p', 'template_dnzci4u', templateParams, 'Z8B2Ufr9spWJFx4js')
-                .then(function (response) {
-                    console.log('SUCCESS!', response.status, response.text)
-                    toast.success("Check email for OTP")
-                }, function (error) {
-                    console.log('FAILED...', error)
-                })
-            setOtp(true)
+            if (isEmailString(formInput.identifier, true)) {
+                var OTP = randomString(10, 'base64')
+                setEmailOTP(OTP)
+                var templateParams = { user: formInput.name, email: formInput.identifier, message: OTP }
+                emailjs.send('service_t2xue7p', 'template_dnzci4u', templateParams, 'Z8B2Ufr9spWJFx4js')
+                    .then(function (response) {
+                        console.log('SUCCESS!', response.status, response.text)
+                        toast.success("Check email for OTP")
+                    }, function (error) {
+                        console.log('FAILED...', error)
+                    })
+                setOtp(true)
+            } else {
+                toast.error('Entered Email is invalid')
+            }
 
         } else if (detail.typeOfIdentifier === 'phone') {
-            configureCaptcha()
-            const phoneNumber = value
-            if (phoneNumber) {
-                const appVerifier = window.recaptchaVerifier
-                const auth = getAuth()
-                signInWithPhoneNumber(auth, phoneNumber, appVerifier)
-                    .then((confirmationResult) => {
-                        // SMS sent. Prompt user to type the code from the message, then sign the
-                        // user in with confirmationResult.confirm(code).
-                        window.confirmationResult = confirmationResult
-                        toast.success("OTP sent. Please enter the OTP")
-                        setOtp(true)
-                        // ...
-                    }).catch((error) => {
-                        // Error; SMS not sent
-                        // ...
-                        //toast.error("OTP not sent due to technical issue. Please try later.");
-                        console.log("error", error)
-                    })
+            if (isPhoneString(formInput.identifier, true)) {
+                configureCaptcha()
+                const phoneNumber = value
+                if (phoneNumber) {
+                    const appVerifier = window.recaptchaVerifier
+                    const auth = getAuth()
+                    signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+                        .then((confirmationResult) => {
+                            // SMS sent. Prompt user to type the code from the message, then sign the
+                            // user in with confirmationResult.confirm(code).
+                            window.confirmationResult = confirmationResult
+                            toast.success("OTP sent. Please enter the OTP")
+                            setOtp(true)
+                            // ...
+                        }).catch((error) => {
+                            // Error; SMS not sent
+                            // ...
+                            //toast.error("OTP not sent due to technical issue. Please try later.");
+                            console.log("error", error)
+                        })
+                }
+            } else {
+                toast.error("Invalid Phone Number.")
             }
         }
         else {
@@ -217,6 +225,7 @@ const WalletCard: NextPage<WalletCardProps> = ({ detail, type }) => {
                                                             <PhoneInput
                                                                 value={value}
                                                                 onChange={setValue}
+                                                                width={600}
                                                                 placeholder={detail.identifier}
                                                             />
                                                         ) : (

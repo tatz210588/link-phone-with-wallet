@@ -101,15 +101,6 @@ const IdInput: NextPage<IdInputProps> = ({
     triggerChange()
   }, [idType])
 
-  // useEffect(() => {
-  //   validate &&
-  //     (() => {
-  //       validate = !validate
-  //       return true
-  //     })() &&
-  //     IdInputValidate()
-  // }, [validate])
-
   useEffect(() => {
     onTypeCheck()
     triggerChange()
