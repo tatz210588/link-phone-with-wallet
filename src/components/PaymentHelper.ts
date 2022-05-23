@@ -151,6 +151,7 @@ const PaymentHelper = () => {
 
             if (to.length === 0 || ellipseAddress(to) === '0x000...00000') {
               if (target.includes("@")) {
+                //it is an valid email of my friend. But he is not registered to receive. Send  invite to his email
                 var templateParams = {
                   email: target
                 }
@@ -165,7 +166,7 @@ const PaymentHelper = () => {
                     }
                   )
               } else {
-                //it is an valid phone of my friend. But he is not registered to receive. Send sms to this phone
+                //it is an valid phone of my friend. But he is not registered to receive. Send sms invite to his phone
                 toast.success('Your friend is not yet registered. Please ask your friend to register to start receiving crypto.')
               }
 

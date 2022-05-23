@@ -30,13 +30,20 @@ const successLoader = {
 const linkPhoneWithWallet = ({ Component, pageProps }: AppProps) => {
   const [loading, setLoading] = useState(false)
   const [completed, setCompleted] = useState(false)
-  const supportedChainIds = [1, 4, 137, 80001, 43114, 242]
+  const supportedChainIds = [
+    //1,
+    //4,
+    //137,
+    //80001,
+    //43114,
+    242
+  ]
   const [loaderSize, setLoaderSize] = useState(320)
   const connectors = {
     injected: {},
     magic: {
       apiKey: 'pk_...', // Your magic api key
-      chainId: 1, // The chain ID you want to allow on magic
+      chainId: 242, // The chain ID you want to allow on magic
     },
     walletconnect: {},
     walletlink: {
