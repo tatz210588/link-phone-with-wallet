@@ -127,9 +127,7 @@ const Pay = () => {
             <IdInput
               className={style.searchInput}
               wrapperClass={`${style.searchBar} mt-2 p-1`}
-              placeholder="Enter phone / email / wallet"
-              value={formInput.targetId}
-              id="myNewInput"
+              placeholder="Enter phone / email"
               delay={500}
               onChange={(val, idType) =>
                 updateFormInput((formInput) => ({
