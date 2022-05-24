@@ -16,7 +16,7 @@ import InputIcon from '../components/InputIcon'
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
-  searchBar: `flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#363840] rounded-[0.8rem] hover:bg-[#757199]`,
+  searchBar: `flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#363840] rounded-[0.8rem] hover:bg-[#757199] mt-2 p-1 pay-search`,
   searchInput: `h-[2.6rem] w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#e6e8eb] placeholder:text-[#8a939b]`,
   copyContainer: `w-1/2`,
   title: `relative text-white text-[46px] font-semibold`,
@@ -126,7 +126,7 @@ const Pay = () => {
           <div className=" mt-4 grid grid-cols-2 gap-1">
             <IdInput
               className={style.searchInput}
-              wrapperClass={`${style.searchBar} mt-2 p-1`}
+              wrapperClass={style.searchBar}
               placeholder="Enter phone / email"
               delay={500}
               onChange={(val, idType) =>
@@ -137,7 +137,7 @@ const Pay = () => {
                 }))
               }
             />
-            <div className={`${style.searchBar} mt-2 p-1`}>
+            <div className={style.searchBar}>
               <InputIcon className="input-icon" Icon={FaMoneyBillWave} />
               <input
                 type="number"

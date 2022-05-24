@@ -92,8 +92,11 @@
     @apply text-white;
   }
 
-  .PhoneInput {
+  .pay-search .PhoneInput {
     @apply !contents;
+  }
+
+  .PhoneInput {
     & .PhoneInputInput {
       background: transparent;
     }

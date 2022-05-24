@@ -72,6 +72,8 @@ export const IdInputValidate = (
     : `It ${strict ? 'is' : '(maybe)'} an Invalid ${IdTypeName[inputType]}`
   return { valid, result, value, inputType, strict }
 }
+const iconClass = 'input-icon'
+const validIconClass = 'input-icon-check'
 
 const IdInput: NextPage<IdInputProps> = ({
   children,
@@ -124,48 +126,54 @@ const IdInput: NextPage<IdInputProps> = ({
   const renderInputIcon = (curIdType: IdType, valid = false) => {
     switch (curIdType) {
       case IdType.email:
+        // default needs extra check
         return valid ? FaEnvelope : FaEdit
       case IdType.wallet:
         return FaWallet
     }
   }
   const renderInput = () => {
-    let curIdType = notExcluded(idType) ? idType : defaultIdType
-    let valid = IdInputValidate(idValue, curIdType, true).valid
+    const curIdType = notExcluded(idType) ? idType : defaultIdType
+    const valid = IdInputValidate(idValue, curIdType, true).valid
+    const validCheck = (
+      <>
+        {valid && <InputIcon className={validIconClass} Icon={FaCheckCircle} />}
+      </>
+    )
+
     switch (curIdType) {
-      case IdType.email:
-      case IdType.wallet:
-        return (
-          <>
-            <InputIcon
-              className="input-icon"
-              Icon={renderInputIcon(curIdType, valid)}
-            />
-            {valid && (
-              <InputIcon className="input-icon-check" Icon={FaCheckCircle} />
-            )}
-            <input
-              ref={inputRef}
-              id={id}
-              className={className}
-              value={idValue}
-              onChange={(e) => onTextChange(e.target.value)}
-              placeholder={placeholder}
-            />
-          </>
-        )
+      // Phone handle its own icon
       case IdType.phone:
         return (
           <>
-            {valid && (
-              <InputIcon className="input-icon-check" Icon={FaCheckCircle} />
-            )}
+            {validCheck}
             <PhoneInput
               ref={inputRef}
               id={id}
               className={className}
               value={idValue}
               onChange={onTextChange}
+              placeholder={placeholder}
+            />
+          </>
+        )
+      // Others are basically a custom Input type
+      case IdType.email:
+      case IdType.wallet:
+      default:
+        return (
+          <>
+            <InputIcon
+              className={iconClass}
+              Icon={renderInputIcon(curIdType, valid)}
+            />
+            {validCheck}
+            <input
+              ref={inputRef}
+              id={id}
+              className={className}
+              value={idValue}
+              onChange={(e) => onTextChange(e.target.value)}
               placeholder={placeholder}
             />
           </>
@@ -178,7 +186,7 @@ const IdInput: NextPage<IdInputProps> = ({
       <div className={wrapperClass}>
         {renderInput()}
         <button type="button" onClick={(_) => onTextChange('')}>
-          <InputIcon className="input-icon" Icon={FaBackspace} />
+          <InputIcon className={iconClass} Icon={FaBackspace} />
         </button>
         {children}
       </div>

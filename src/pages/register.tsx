@@ -26,8 +26,8 @@ import IdInput, {
 
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
-  searchBar: `flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#ffffff] rounded-[0.8rem] `,
-  searchInput: `h-[2.6rem] w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#000000] placeholder:text-[#fffffff]`,
+  searchBar: `flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#363840] rounded-[0.8rem] mt-2 p-1`,
+  searchInput: `h-[2.6rem] w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#e6e8eb] placeholder:text-[#fffffff]`,
   searchBarVerify: `flex flex-1 w-max-[520px] items-center rounded-[0.8rem]`,
   copyContainer: `w-1/2`,
   modalListWrapper: `bg-[#303339]  w-1/3 h-1/3 mr-auto ml-auto my-28 rounded-2xl p-2 overflow-hidden  relative overflow-auto`,
@@ -63,8 +63,6 @@ const Home = () => {
     getFirebaseApp().then((app) => setFirebaseApp(app))
   }, [firebaseApp])
 
-
-
   async function configureCaptcha() {
     const auth = getAuth(firebaseApp)
     window.recaptchaVerifier = new RecaptchaVerifier(
@@ -97,7 +95,13 @@ const Home = () => {
           email: formInput.identifier,
           message: OTP,
         }
-        emailjs.send('service_t2xue7p', 'template_dnzci4u', templateParams, 'Z8B2Ufr9spWJFx4js')
+        emailjs
+          .send(
+            'service_t2xue7p',
+            'template_dnzci4u',
+            templateParams,
+            'Z8B2Ufr9spWJFx4js'
+          )
           .then(
             function (response) {
               console.log('SUCCESS!', response.status, response.text)
@@ -242,7 +246,7 @@ const Home = () => {
             ) : (
               <div>
                 <div className={`${style.title} mt-1 p-1`}>
-                  Enter your Phone Number
+                  Link wallet with Phone / Email
                 </div>
                 {Boolean(otp) == false ? (
                   <div>
@@ -263,7 +267,7 @@ const Home = () => {
                       <IdInput
                         className={style.searchInput}
                         id="myInput"
-                        wrapperClass={`${style.searchBar} mt-2 p-1`}
+                        wrapperClass={style.searchBar}
                         placeholder={idPlaceholder}
                         delay={500}
                         onChange={(val, idType) =>

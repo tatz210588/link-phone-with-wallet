@@ -34,9 +34,9 @@ const linkPhoneWithWallet = ({ Component, pageProps }: AppProps) => {
     //1,
     //4,
     //137,
-    //80001,
+    // 80001,
     //43114,
-    242
+    242,
   ]
   const [loaderSize, setLoaderSize] = useState(320)
   const connectors = {
