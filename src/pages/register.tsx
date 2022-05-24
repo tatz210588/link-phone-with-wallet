@@ -51,7 +51,7 @@ const Home = () => {
     type: IdType.phone,
   })
   const [loadingState, setLoadingState] = useState(false)
-  const { address } = useWeb3()
+  const { address, chainId } = useWeb3()
   const [otp, setOtp] = useState(false)
   const [emailOTP, setEmailOTP] = useState('')
 
@@ -225,81 +225,87 @@ const Home = () => {
   return (
     <>
       <Container>
-        <div className={style.copyContainer}>
-          {loadingState == true ? (
-            <BusyLoader
-              loaderType={LoaderType.Ring}
-              color={'#ffffff'}
-              size={50}
-            >
-              <b>Fetching data from blockchain...</b>
-            </BusyLoader>
-          ) : (
-            <div>
-              <div className={`${style.title} mt-1 p-1`}>
-                Enter your Phone Number
-              </div>
-              {Boolean(otp) == false ? (
-                <div>
-                  <form onSubmit={onSignInSubmit}>
-                    <div id="sign-in-button"></div>
-                    <div className={style.searchBar}>
-                      <input
+        {!chainId ? (
+          <BusyLoader loaderType={LoaderType.Ring} color={'#ffffff'} size={50}>
+            <b>Click on the Connect Wallet button !!</b>
+          </BusyLoader>
+        ) : (
+          <div className={style.copyContainer}>
+            {loadingState == true ? (
+              <BusyLoader
+                loaderType={LoaderType.Ring}
+                color={'#ffffff'}
+                size={50}
+              >
+                <b>Fetching data from blockchain...</b>
+              </BusyLoader>
+            ) : (
+              <div>
+                <div className={`${style.title} mt-1 p-1`}>
+                  Enter your Phone Number
+                </div>
+                {Boolean(otp) == false ? (
+                  <div>
+                    <form onSubmit={onSignInSubmit}>
+                      <div id="sign-in-button"></div>
+                      <div className={style.searchBar}>
+                        <input
+                          className={style.searchInput}
+                          placeholder="Enter your name"
+                          onChange={(e) =>
+                            updateFormInput((formInput) => ({
+                              ...formInput,
+                              name: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                      <IdInput
                         className={style.searchInput}
-                        placeholder="Enter your name"
+                        id="myInput"
+                        wrapperClass={`${style.searchBar} mt-2 p-1`}
+                        placeholder={idPlaceholder}
+                        delay={500}
+                        onChange={(val, idType) =>
+                          updateFormInput((formInput) => ({
+                            ...formInput,
+                            targetId: val,
+                            targetIdType: idType,
+                          }))
+                        }
+                        excludeIdTypes={[IdType.wallet]}
+                      />
+
+                      <button type="submit" className={style.nftButton}>
+                        Submit
+                      </button>
+                    </form>
+                  </div>
+                ) : (
+                  <div className={`${style.searchBarVerify} mt-2`}>
+                    <form
+                      onSubmit={onSubmitOTP}
+                      className=" mt-4 grid grid-cols-2 gap-6"
+                    >
+                      <input
+                        placeholder="OTP"
                         onChange={(e) =>
                           updateFormInput((formInput) => ({
                             ...formInput,
-                            name: e.target.value,
+                            otp: e.target.value,
                           }))
                         }
                       />
-                    </div>
-                    <IdInput
-                      className={style.searchInput}
-                      id="myInput"
-                      wrapperClass={`${style.searchBar} mt-2 p-1`}
-                      placeholder={idPlaceholder}
-                      delay={500}
-                      onChange={(val, idType) =>
-                        updateFormInput((formInput) => ({
-                          ...formInput,
-                          targetId: val,
-                          targetIdType: idType,
-                        }))
-                      }
-                      excludeIdTypes={[IdType.wallet]}
-                    />
-
-                    <button type="submit" className={style.nftButton}>
-                      Submit
-                    </button>
-                  </form>
-                </div>
-              ) : (
-                <div className={`${style.searchBarVerify} mt-2`}>
-                  <form
-                    onSubmit={onSubmitOTP}
-                    className=" mt-4 grid grid-cols-2 gap-6"
-                  >
-                    <input
-                      placeholder="OTP"
-                      onChange={(e) =>
-                        updateFormInput((formInput) => ({
-                          ...formInput,
-                          otp: e.target.value,
-                        }))
-                      }
-                    />
-                    <button type="submit" className={`${style.button} p-2`}>
-                      Verify OTP
-                    </button>
-                  </form>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+                      <button type="submit" className={`${style.button} p-2`}>
+                        Verify OTP
+                      </button>
+                    </form>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </Container>
     </>
   )
