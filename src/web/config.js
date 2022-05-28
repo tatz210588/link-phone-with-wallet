@@ -21,7 +21,7 @@ export const networkConfig = {
 
     "242": [
         {
-            phoneLinkAddress: "0xFF1F17F3429aCee72F2bA1420F63BF6deE25DcdB", //proxy address
+            phoneLinkAddress: "0x588e0570DD24a8CFFDF1fC43840f77Ca7C7c9499", //proxy address
             token_icon: "https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=022",
             alt: "KAI",
             networkName: "kardiachain_test"

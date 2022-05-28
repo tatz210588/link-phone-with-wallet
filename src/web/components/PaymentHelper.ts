@@ -125,6 +125,7 @@ const PaymentHelper = () => {
           const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
           const signer = provider.getSigner() // get signer
           ethers.utils.getAddress(_data.defaultAccount) //checks if an address is valid one
+          const networkId = await window.ethereum.request({ method: 'net_version' })
           const network = await provider.getNetwork()
 
           const tokenContract = new ethers.Contract(
@@ -146,6 +147,7 @@ const PaymentHelper = () => {
           if (!directAddress) {
             //gets the addresses linked to the identifier = target
             const to = await phoneLinkContract.fetchPrimaryWalletAddress(target)
+
 
             console.log(ellipseAddress(to))
 

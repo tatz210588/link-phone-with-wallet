@@ -6,14 +6,20 @@ import './Counters.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import 'hardhat/console.sol';
+import '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
 
-contract phoneLink is Initializable, ERC20Upgradeable {
+contract phoneLink is
+  Initializable,
+  ERC20Upgradeable,
+  ReentrancyGuardUpgradeable
+{
   address payable public marketowner;
   using Counters for Counters.Counter;
   Counters.Counter public _itemIds;
 
   function initialize() public initializer {
     __ERC20_init('', '');
+    __ReentrancyGuard_init();
     marketowner = payable(msg.sender);
   }
 
@@ -74,12 +80,12 @@ contract phoneLink is Initializable, ERC20Upgradeable {
     bool isPrimaryWallet
   );
 
-  //Save data                                                                                                   //true
+  //Save data
   function enterDetails(
     string memory name,
     string memory identifier,
     string memory typeOfIdentifier
-  ) public {
+  ) public nonReentrant {
     _itemIds.increment();
     uint256 slNo = _itemIds.current();
 
@@ -103,8 +109,19 @@ contract phoneLink is Initializable, ERC20Upgradeable {
     emit DetailsCreated(name, identifier, typeOfIdentifier, msg.sender, true);
   }
 
+  function deleteAll() public {
+    uint256 totalItemCount = _itemIds.current();
+    for (uint256 i = 0; i < totalItemCount; i++) {
+      delete phoneToDetails[i + 1];
+    }
+    _itemIds.reset();
+  }
+
   //make wallet primary
-  function makePrimary(address wallet, string memory identifier) public {
+  function makePrimary(address wallet, string memory identifier)
+    public
+    nonReentrant
+  {
     uint256 slNo = _itemIds.current();
 
     //SET ALL WALLETS of "TYPE" AS SECONDARY
@@ -159,7 +176,7 @@ contract phoneLink is Initializable, ERC20Upgradeable {
     string memory identifier,
     string memory typeOfIdentifier,
     string memory oldIdentifier
-  ) public {
+  ) public nonReentrant {
     uint256 totalItemCount = _itemIds.current();
 
     for (uint256 i = 0; i < totalItemCount; i++) {
@@ -182,7 +199,11 @@ contract phoneLink is Initializable, ERC20Upgradeable {
     }
   }
 
-  function sendToken(address destination, uint256 amount) public payable {
+  function sendToken(address destination, uint256 amount)
+    public
+    payable
+    nonReentrant
+  {
     payable(destination).transfer(amount);
   }
 
@@ -218,6 +239,24 @@ contract phoneLink is Initializable, ERC20Upgradeable {
       }
     }
     return detail;
+  }
+
+  //restrict duplicate entries
+  function uniqueEntry(string memory identifier) public view returns (bool) {
+    bool unique = true;
+    uint256 slNo = _itemIds.current();
+
+    for (uint256 i = 0; i < slNo; i++) {
+      if (
+        phoneToDetails[i + 1].connectedWalletAddress == msg.sender &&
+        keccak256(abi.encodePacked((phoneToDetails[i + 1].identifier))) ==
+        keccak256(abi.encodePacked((identifier)))
+      ) {
+        unique = false;
+        break;
+      }
+    }
+    return unique;
   }
 
   function fetchPrimaryWalletAddress(string memory userIdentifier)

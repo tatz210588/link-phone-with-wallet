@@ -8,7 +8,7 @@ export const ellipseAddress = (address: string, width = 5) =>
 
 export const maskPhone = (address: string, width = 5) =>
   address && address.length > width + 2
-    ? `${address.slice(0, width)}xxx${address.slice(-2)}`
+    ? `${address.slice(0, width)}xxx${address.slice(-3)}`
     : address
 
 export const ellipseName = (address: string, width = 15) =>

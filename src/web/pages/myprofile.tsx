@@ -23,6 +23,9 @@ import BusyLoader, { LoaderType } from '../components/BusyLoader'
 import IdInput, { IdType } from '../components/IdInput'
 
 const style = {
+  pageWrapper: `relative`,
+  container: `before:content-[''] before:bg-red-500 before:absolute before:top-0 before:left-0 before:right-0 before:bottom-0 before:bg-[url('../assets/4.jpg')] before:bg-cover before:bg-center before:bg-fixed before:opacity-100 before:blur`,
+  contentWrapper: `flex relative flex-wrap items-center justify-center`,
   wrapper: `w-full mt-4 border border-[#151b22] rounded-xl bg-[#ffffff]] overflow-hidden justify-center `,
   titleLeft: `flex-1 flex items-center text-xl font-bold justify-center text-black cursor-pointer`,
   titlle: `bg-[#ffffff] px-6 py-4 flex iems-center`,
@@ -68,6 +71,7 @@ const MyProfile = () => {
       .request({ method: 'eth_requestAccounts' }) // get the connected wallet address
       .then((result: string[]) => {
         QRCode.toDataURL(result[0]).then((data) => {
+          console.log("data", QRCode.toDataURL(result[0]))
           setSrc(data) //Generate QR code for the connected wallet address
         })
       })
@@ -219,91 +223,94 @@ const MyProfile = () => {
   }
 
   return (
-    <>
-      <Container>
-        {loadingState == true ? (
-          <BusyLoader loaderType={LoaderType.Ring} color={'#ffffff'} size={50}>
-            <b>Fetching data from blockchain...</b>
-          </BusyLoader>
-        ) : (
-          <>
 
-            <div className={style.details}>
-              <div className={style.info}>
-                <div className={style.infoLeft}>
-                  <div className={style.wrapper}>
-                    <div className={style.titlle}
-                    /*onClick={() => setToggle(!toggle)}*/  /****Comment out to toggle  */
-                    >
-                      <div className={style.titleLeft}>
-                        <span className={style.titleIcon}>
-                          <CgArrowsExchangeV />
-                        </span>
-                        My QR CODE
-                      </div>
-                      {/* <div className={style.titleRight}>
+    <div className={style.pageWrapper}>
+      <div className={style.container}>
+        <div className={style.contentWrapper}>
+          {loadingState == true ? (
+            <BusyLoader loaderType={LoaderType.Ring} color={'#ffffff'} size={50}>
+              <b>Fetching data from blockchain...</b>
+            </BusyLoader>
+          ) : (
+            <>
+
+              <div className={style.details}>
+                <div className={style.info}>
+                  <div className={style.infoLeft}>
+                    <div className={style.wrapper}>
+                      <div className={style.titlle}
+                      /*onClick={() => setToggle(!toggle)}*/  /****Comment out to toggle  */
+                      >
+                        <div className={style.titleLeft}>
+                          <span className={style.titleIcon}>
+                            <CgArrowsExchangeV />
+                          </span>
+                          My QR CODE
+                        </div>
+                        {/* <div className={style.titleRight}>
                         {toggle ? <AiOutlineUp /> : <AiOutlineDown />}
                       </div> */}
-                    </div>
-                    {toggle && (
-                      <div className="flex flex-wrap justify-center w-[20rem] h-[20rem] my-3 mx-1 rounded-2xl overflow-hidden `,">
-                        <a href={src} download><img src={src} height={400} width={400} /></a>
                       </div>
-                    )}
+                      {toggle && (
+                        <div className="flex flex-wrap justify-center w-[20rem] h-[20rem] my-3 mx-1 rounded-2xl overflow-hidden `,">
+                          <a href={src} download><img src={src} height={400} width={400} /></a>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-                <div className={`ml-5 justify-center w-[60%]`}>
-                  <div className={style.wrapper}>
-                    <div className={style.titlle} onClick={() => setToggleRight(!toggleRight)}>
-                      <div className={style.titleLeft}>
-                        <span className={style.titleIcon}>
-                          <CgArrowsExchangeV />
-                        </span>
-                        My Linked Details
+                  <div className={`ml-5 justify-center w-[60%]`}>
+                    <div className={style.wrapper}>
+                      <div className={style.titlle} onClick={() => setToggleRight(!toggleRight)}>
+                        <div className={style.titleLeft}>
+                          <span className={style.titleIcon}>
+                            <CgArrowsExchangeV />
+                          </span>
+                          My Linked Details
+                        </div>
+                        <div className={style.titleRight}>
+                          {toggleRight ? <AiOutlineUp /> : <AiOutlineDown />}
+                        </div>
                       </div>
-                      <div className={style.titleRight}>
-                        {toggleRight ? <AiOutlineUp /> : <AiOutlineDown />}
-                      </div>
+                      {toggleRight && (
+                        <div className={`flex flex-wrap justify-center`}>
+                          {details.map((detail, id) => (
+                            <WalletCard key={id} detail={detail} type="details" />
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    {toggleRight && (
-                      <div className={`flex flex-wrap justify-center`}>
-                        {details.map((detail, id) => (
-                          <WalletCard key={id} detail={detail} type="details" />
-                        ))}
-                      </div>
-                    )}
                   </div>
-                </div>
-                <div className={`ml-5 justify-center`}>
-                  <div className={style.wrapper}>
-                    <div className={style.titlle} onClick={() => setToggleWallet(!toggleWallet)}>
-                      <div className={style.titleLeft}>
-                        <span className={style.titleIcon}>
-                          <CgArrowsExchangeV />
-                        </span>
-                        My Wallets
+                  <div className={`ml-5 justify-center`}>
+                    <div className={style.wrapper}>
+                      <div className={style.titlle} onClick={() => setToggleWallet(!toggleWallet)}>
+                        <div className={style.titleLeft}>
+                          <span className={style.titleIcon}>
+                            <CgArrowsExchangeV />
+                          </span>
+                          My Wallets
+                        </div>
+                        <div className={style.titleRight}>
+                          {toggleWallet ? <AiOutlineUp /> : <AiOutlineDown />}
+                        </div>
                       </div>
-                      <div className={style.titleRight}>
-                        {toggleWallet ? <AiOutlineUp /> : <AiOutlineDown />}
-                      </div>
+                      {toggleWallet && (
+                        <div className={`flex flex-wrap justify-center`}>
+                          {myAddedWallets.map((detail, id) => (
+                            <WalletCard key={id} detail={detail} type="wallets" />
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    {toggleWallet && (
-                      <div className={`flex flex-wrap justify-center`}>
-                        {myAddedWallets.map((detail, id) => (
-                          <WalletCard key={id} detail={detail} type="wallets" />
-                        ))}
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
-            </div>
 
-          </>
+            </>
 
-        )}
-      </Container>
-    </>
+          )}
+        </div>
+      </div></div>
+
   )
 }
 

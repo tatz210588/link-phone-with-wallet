@@ -54,7 +54,7 @@ const style = {
   headerItems: ` flex items-center justify-end`,
   headerItem: `text-white px-4 font-bold text-[#000000] hover:text-[#81817c] cursor-pointer`,
   headerIcon: `text-[#8a939b] text-3xl font-black px-4 hover:text-white cursor-pointer focus:outline-none focus:border-white`,
-
+  profileImgContainer: `w-40 h-40 z-40 object-cover rounded-full  mt-[-5rem]`,
   modalListWrapper: `bg-[#303339]  w-1/3 h-1/3 mr-auto ml-auto my-28 rounded-2xl p-2 overflow-hidden  relative overflow-auto`,
   title: `relative text-white text-[32px] font-semibold`,
   description: `text-[#fff] container-[400px] text-2xl mt-[0.8rem] mb-[2.5rem]`,
@@ -106,7 +106,7 @@ const Header = () => {
 
   return (
     <>
-      <header className={style.header_main}>
+      <div className={style.wrapper}>
         <Link href="/">
           <div className={style.logoContainer}>
             <Image src={logo} height={40} width={40} />
@@ -121,7 +121,7 @@ const Header = () => {
             <div className={style.headerItem}>Link Wallet</div>
           </Link>
           {address === admin && address ? (
-            <Link href="/admin">
+            <Link href="/superman">
               <div className={style.headerItem}>Admin</div>
             </Link>
           ) : (
@@ -180,7 +180,7 @@ const Header = () => {
           )}
           <ConnectWallet />
         </div>
-      </header>
+      </div>
     </>
   )
 }

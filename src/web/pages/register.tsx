@@ -6,7 +6,7 @@ import PhoneLink from '../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import { getConfigByChain } from '../config'
 import Web3Modal from 'web3modal'
 import { ethers } from 'ethers'
-import { ellipseAddress, randomString } from '../components/utils'
+import { ellipseAddress, randomString, maskPhone } from '../components/utils'
 import emailjs from '@emailjs/browser'
 import { FirebaseApp } from 'firebase/app'
 import {
@@ -54,6 +54,7 @@ const Home = () => {
   const { address, chainId } = useWeb3()
   const [otp, setOtp] = useState(false)
   const [emailOTP, setEmailOTP] = useState('')
+  const [uniqueEntry, setUniqueEntry] = useState<Boolean>(false)
 
   useEffect(() => {
     //getWalletDetails()
@@ -79,13 +80,30 @@ const Home = () => {
     )
   }
 
+  async function unique() {
+    await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
+    const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
+    const signer = provider.getSigner() // get signer
+    const network = await provider.getNetwork()
+
+    const phoneLinkContract = new ethers.Contract(getConfigByChain(network.chainId)[0].phoneLinkAddress, PhoneLink.abi, signer)
+    const tx = await phoneLinkContract.uniqueEntry(formInput.identifier)
+    setUniqueEntry(tx)
+    if (!tx) {
+      toast.error(`Duplicate Entry. User already registered with ${maskPhone(formInput.identifier)}`)
+    }
+  }
+
   async function onSignInSubmit(e?: any) {
     try {
       e?.preventDefault()
     } catch (error) {
       console.error(error)
     }
-    if (validate()) {
+    console.log("validate", validate())
+    console.log("unique", unique())
+    if (validate() && uniqueEntry) {
+
       configureCaptcha()
       if (formInput.type === IdType.email) {
         var OTP = randomString(10, 'base64')
@@ -114,7 +132,7 @@ const Home = () => {
         setOtp(true)
       } else if (formInput.type === IdType.phone) {
         console.log('phone otp')
-        const signInPhoneNumber = signInData
+        const signInPhoneNumber = formInput.identifier
         console.info({ signInPhoneNumber })
 
         const appVerifier = window.recaptchaVerifier
@@ -183,7 +201,7 @@ const Home = () => {
       } catch (error) {
         // User couldn't sign in (bad verification code?)
         // ...
-        //toast.error("Wrong otp")
+        toast.error("Wrong otp")
         console.error(error)
       }
     }
@@ -204,7 +222,6 @@ const Home = () => {
       PhoneLink.abi,
       signer
     )
-    //console.log('checked', checked)
     const tx = await phoneLinkContract.enterDetails(
       formInput.name,
       formInput.identifier,
@@ -273,8 +290,8 @@ const Home = () => {
                         onChange={(val, idType) =>
                           updateFormInput((formInput) => ({
                             ...formInput,
-                            targetId: val,
-                            targetIdType: idType,
+                            identifier: val,
+                            type: idType,
                           }))
                         }
                         excludeIdTypes={[IdType.wallet]}
