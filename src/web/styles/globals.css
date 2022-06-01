@@ -73,7 +73,7 @@
   }
 
   .content-wrapper {
-    @apply relative flex h-screen flex-wrap items-center justify-center;
+    @apply relative flex min-h-screen flex-wrap items-center justify-center;
   }
 
   .loading-container {
