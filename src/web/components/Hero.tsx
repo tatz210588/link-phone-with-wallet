@@ -69,6 +69,7 @@ const Hero = () => {
         <div className={style.ctaContainer}>
           <button
             className={style.accentedButton}
+            title="Send Crypto"
             onClick={() => {
               Router.push({
                 pathname: '/pay',
@@ -80,6 +81,7 @@ const Hero = () => {
 
           <button
             className={style.accentedButton}
+            title="Scan and Send Crypto"
             onClick={() => {
               Router.push({ pathname: '/qrPay' })
             }}
@@ -89,6 +91,7 @@ const Hero = () => {
 
           <button
             className={style.button}
+            title="Link your Wallet"
             onClick={() => {
               Router.push({ pathname: '/register' })
             }}
