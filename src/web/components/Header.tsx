@@ -31,13 +31,15 @@ const solutions = [
   },
   {
     name: 'Send Crypto',
-    description: 'Send your crypto to your friend on his phone/email ID directly.',
+    description:
+      'Send your crypto to your friend on his phone/email ID directly.',
     href: '/pay',
     icon: BsCashCoin,
   },
   {
     name: 'Scan',
-    description: 'Scan and send crypto to your friend directly on his/her QR code.',
+    description:
+      'Scan and send crypto to your friend directly on his/her QR code.',
     href: '/qrPay',
     icon: AiOutlineQrcode,
   },
@@ -46,13 +48,14 @@ const solutions = [
 const style = {
   header_main: `header-main`,
   wrapper: `bg-[#E6CF7C] w-screen px-[1.2rem] py-[0.8rem] flex justify-center`,
-  logoContainer: `flex items-center cursor-pointer`,
+  logoContainer: `flex items-center cursor-pointer mx-2`,
   logoText: ` ml-[0.8rem] text-black font-semibold text-2xl`,
   searchBar: `flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#363840] rounded-[0.8rem] hover:bg-[#757199]`,
   searchIcon: `text-[#8a939b] mx-3 font-bold text-lg`,
   searchInput: `h-[2.6rem] w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#e6e8eb] placeholder:text-[#8a939b]`,
-  headerItems: ` flex items-center justify-end`,
-  headerItem: `text-white px-4 font-bold text-[#000000] hover:text-[#81817c] cursor-pointer`,
+  headerItems: `flex items-center justify-end ml-3`,
+  headerItem: `mx-4 font-bold text-[#000000] hover:text-[#81817c] cursor-pointer`,
+  headerButton: `mx-4 cursor-pointer`,
   headerIcon: `text-[#8a939b] text-3xl font-black px-4 hover:text-white cursor-pointer focus:outline-none focus:border-white`,
   profileImgContainer: `w-40 h-40 z-40 object-cover rounded-full  mt-[-5rem]`,
   modalListWrapper: `bg-[#303339]  w-1/3 h-1/3 mr-auto ml-auto my-28 rounded-2xl p-2 overflow-hidden  relative overflow-auto`,
@@ -120,14 +123,11 @@ const Header = () => {
           <Link href="/register">
             <div className={style.headerItem}>Link Wallet</div>
           </Link>
-          {address === admin && address ? (
+          {address === admin && address && (
             <Link href="/superman">
               <div className={style.headerItem}>Admin</div>
             </Link>
-          ) : (
-            <div className={style.headerItems}></div>
           )}
-
           {address && (
             <Popover.Group as="nav" className={style.headerIcon}>
               <Popover className="relative">
@@ -178,7 +178,7 @@ const Header = () => {
               </Popover>
             </Popover.Group>
           )}
-          <ConnectWallet />
+          <ConnectWallet className={style.headerButton} />
         </div>
       </div>
     </>
