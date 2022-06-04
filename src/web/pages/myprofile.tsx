@@ -71,7 +71,7 @@ const MyProfile = () => {
       .request({ method: 'eth_requestAccounts' }) // get the connected wallet address
       .then((result: string[]) => {
         QRCode.toDataURL(result[0]).then((data) => {
-          console.log("data", QRCode.toDataURL(result[0]))
+          console.info({ data: QRCode.toDataURL(result[0]) })
           setSrc(data) //Generate QR code for the connected wallet address
         })
       })
@@ -90,8 +90,8 @@ const MyProfile = () => {
         size: 'invisible',
         callback: (response: any) => {
           // reCAPTCHA solved, allow signInWithPhoneNumber.
-          console.info('recaptcha verifying')
-          onSignInSubmit(null).then((_) => console.info('recaptha verified'))
+          console.info('recaptcha verifying...')
+          onSignInSubmit(null).then((_) => console.info('recaptha verified...'))
         },
       },
       auth
@@ -102,9 +102,8 @@ const MyProfile = () => {
     try {
       e?.preventDefault()
     } catch (error) {
-      console.error(error)
+      console.error({ error })
     }
-    console.info('step1')
     await configureCaptcha()
     const signInPhoneNumber = signInData
     console.info({ signInPhoneNumber })
@@ -126,7 +125,7 @@ const MyProfile = () => {
       // Error; SMS not sent
       // ...
       //toast.error("OTP not sent due to technical issue. Please try later.");
-      console.error(error)
+      console.error({ error })
     }
   }
 
@@ -134,7 +133,7 @@ const MyProfile = () => {
     try {
       e?.preventDefault()
     } catch (error) {
-      console.error(error)
+      console.error({ error })
     }
     const code = formInput.otp
     console.info({ code })
@@ -167,26 +166,30 @@ const MyProfile = () => {
     )
     const data: any[] = await phoneLinkContract.getWalletDetails(address)
     const myWallet: any[] = await phoneLinkContract.myWallets()
-    const items = data.filter(i => i.typeOfIdentifier).map((i) => {
-      return {
-        name: i.name,
-        identifier: i.identifier,
-        typeOfIdentifier: i.typeOfIdentifier,
-        connectedWalletAddress: i.connectedWalletAddress,
-        isPrimaryWallet: i.isPrimaryWallet == true,// ? 'Primary Wallet' : 'Secondary Wallet',
-      } as WalletCardDetail
-    })
-    const myWalletItems = myWallet.filter(i => i.typeOfIdentifier).map((i) => {
-      return {
-        name: i.name,
-        identifier: i.identifier,
-        typeOfIdentifier: i.typeOfIdentifier,
-        connectedWalletAddress: i.connectedWalletAddress,
-        isPrimaryWallet: i.isPrimaryWallet == true,// ? 'Primary Wallet' : 'Secondary Wallet',
-      } as WalletCardDetail
-    })
-    console.log("items/details", items)
-    console.log("data", data)
+    const items = data
+      .filter((i) => i.typeOfIdentifier)
+      .map((i) => {
+        return {
+          name: i.name,
+          identifier: i.identifier,
+          typeOfIdentifier: i.typeOfIdentifier,
+          connectedWalletAddress: i.connectedWalletAddress,
+          isPrimaryWallet: i.isPrimaryWallet == true, // ? 'Primary Wallet' : 'Secondary Wallet',
+        } as WalletCardDetail
+      })
+    const myWalletItems = myWallet
+      .filter((i) => i.typeOfIdentifier)
+      .map((i) => {
+        return {
+          name: i.name,
+          identifier: i.identifier,
+          typeOfIdentifier: i.typeOfIdentifier,
+          connectedWalletAddress: i.connectedWalletAddress,
+          isPrimaryWallet: i.isPrimaryWallet == true, // ? 'Primary Wallet' : 'Secondary Wallet',
+        } as WalletCardDetail
+      })
+    console.info({ items })
+    console.info({ data })
     if (!data?.length) {
       Router.push({ pathname: '/register' })
     } else {
@@ -223,23 +226,26 @@ const MyProfile = () => {
   }
 
   return (
-
     <div className={style.pageWrapper}>
       <div className={style.container}>
         <div className={style.contentWrapper}>
           {loadingState == true ? (
-            <BusyLoader loaderType={LoaderType.Ring} color={'#ffffff'} size={50}>
+            <BusyLoader
+              loaderType={LoaderType.Ring}
+              color={'#ffffff'}
+              size={50}
+            >
               <b>Fetching data from blockchain...</b>
             </BusyLoader>
           ) : (
             <>
-
               <div className={style.details}>
                 <div className={style.info}>
                   <div className={style.infoLeft}>
                     <div className={style.wrapper}>
-                      <div className={style.titlle}
-                      /*onClick={() => setToggle(!toggle)}*/  /****Comment out to toggle  */
+                      <div
+                        className={style.titlle} /****Comment out to toggle  */
+                        /*onClick={() => setToggle(!toggle)}*/
                       >
                         <div className={style.titleLeft}>
                           <span className={style.titleIcon}>
@@ -252,15 +258,20 @@ const MyProfile = () => {
                       </div> */}
                       </div>
                       {toggle && (
-                        <div className="flex flex-wrap justify-center w-[20rem] h-[20rem] my-3 mx-1 rounded-2xl overflow-hidden `,">
-                          <a href={src} download><img src={src} height={400} width={400} /></a>
+                        <div className="my-3 mx-1 flex h-[20rem] w-[20rem] flex-wrap justify-center overflow-hidden rounded-2xl">
+                          <a href={src} download>
+                            <img src={src} height={400} width={400} />
+                          </a>
                         </div>
                       )}
                     </div>
                   </div>
-                  <div className={`ml-5 justify-center w-[60%]`}>
+                  <div className="ml-5 w-[60%] justify-center">
                     <div className={style.wrapper}>
-                      <div className={style.titlle} onClick={() => setToggleRight(!toggleRight)}>
+                      <div
+                        className={style.titlle}
+                        onClick={() => setToggleRight(!toggleRight)}
+                      >
                         <div className={style.titleLeft}>
                           <span className={style.titleIcon}>
                             <CgArrowsExchangeV />
@@ -272,17 +283,24 @@ const MyProfile = () => {
                         </div>
                       </div>
                       {toggleRight && (
-                        <div className={`flex flex-wrap justify-center`}>
+                        <div className="flex flex-wrap justify-center">
                           {details.map((detail, id) => (
-                            <WalletCard key={id} detail={detail} type="details" />
+                            <WalletCard
+                              key={id}
+                              detail={detail}
+                              type="details"
+                            />
                           ))}
                         </div>
                       )}
                     </div>
                   </div>
-                  <div className={`ml-5 justify-center`}>
+                  <div className="ml-5 justify-center">
                     <div className={style.wrapper}>
-                      <div className={style.titlle} onClick={() => setToggleWallet(!toggleWallet)}>
+                      <div
+                        className={style.titlle}
+                        onClick={() => setToggleWallet(!toggleWallet)}
+                      >
                         <div className={style.titleLeft}>
                           <span className={style.titleIcon}>
                             <CgArrowsExchangeV />
@@ -294,9 +312,13 @@ const MyProfile = () => {
                         </div>
                       </div>
                       {toggleWallet && (
-                        <div className={`flex flex-wrap justify-center`}>
+                        <div className="flex flex-wrap justify-center">
                           {myAddedWallets.map((detail, id) => (
-                            <WalletCard key={id} detail={detail} type="wallets" />
+                            <WalletCard
+                              key={id}
+                              detail={detail}
+                              type="wallets"
+                            />
                           ))}
                         </div>
                       )}
@@ -304,13 +326,11 @@ const MyProfile = () => {
                   </div>
                 </div>
               </div>
-
             </>
-
           )}
         </div>
-      </div></div>
-
+      </div>
+    </div>
   )
 }
 

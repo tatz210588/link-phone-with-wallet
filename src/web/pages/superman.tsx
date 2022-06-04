@@ -24,7 +24,7 @@ const style = {
   midRow: `text-white`,
   description: `text-[#fff] container-[400px] text-2xl mt-[0.8rem] mb-[2.5rem]`,
   ctaContainer: `flex`,
-  spinner: `w-full h-screen flex justify-center text-[#000000] mt-20 p-100 object-center`,
+  spinner: `w-full h-screen flex justify-center text-[#000000] mt-20 p-100 object-center mb-4 text-5xl font-bold`,
   accentedButton: ` relative text-lg font-semibold px-12 py-4 bg-[#2181e2] rounded-lg mr-5 text-white hover:bg-[#42a0ff] cursor-pointer`,
   button: ` relative text-lg font-semibold px-12 py-4 bg-[#363840] rounded-lg mr-5 text-[#e4e8ea] hover:bg-[#4c505c] cursor-pointer`,
   nftButton: `font-bold w-full mt-4 bg-pink-500 text-white text-lg rounded p-4 shadow-lg hover:bg-[#19a857] cursor-pointer`,
@@ -52,7 +52,7 @@ const Home = () => {
     console.info({ signer })
     const network = await provider.getNetwork()
     console.info({ network })
-    console.log("chain", network.chainId)
+    console.info({ chain: network.chainId })
     const phoneLinkContract = new ethers.Contract(
       getConfigByChain(network.chainId)[0].phoneLinkAddress,
       PhoneLink.abi,
@@ -60,16 +60,18 @@ const Home = () => {
     )
     const data = await phoneLinkContract.getPhoneToDetails()
     const items = await Promise.all(
-      data.filter(i => i.typeOfIdentifier).map(async (i: any) => {
-        let item = {
-          name: i.name,
-          identifier: i.identifier,
-          connectedWalletAddress: i.connectedWalletAddress,
-          typeOfIdentifier: i.typeOfIdentifier,
-          isPrimaryWallet: i.isPrimaryWallet
-        }
-        return item
-      })
+      data
+        .filter((i) => i.typeOfIdentifier)
+        .map(async (i: any) => {
+          let item = {
+            name: i.name,
+            identifier: i.identifier,
+            connectedWalletAddress: i.connectedWalletAddress,
+            typeOfIdentifier: i.typeOfIdentifier,
+            isPrimaryWallet: i.isPrimaryWallet,
+          }
+          return item
+        })
     )
     setDetails(items)
     toast.success('Data fetched successfully !!')
@@ -82,9 +84,13 @@ const Home = () => {
     const signer = provider.getSigner() // get signer
     const network = await provider.getNetwork()
 
-    const phoneLinkContract = new ethers.Contract(getConfigByChain(network.chainId)[0].phoneLinkAddress, PhoneLink.abi, signer)
+    const phoneLinkContract = new ethers.Contract(
+      getConfigByChain(network.chainId)[0].phoneLinkAddress,
+      PhoneLink.abi,
+      signer
+    )
     const tx = await phoneLinkContract.deleteAll()
-    toast.success("Database Cleared")
+    toast.success('Database Cleared')
   }
 
   async function search(e: KeyboardEvent<HTMLInputElement>) {
@@ -104,7 +110,10 @@ const Home = () => {
         const signer = provider.getSigner()
         const network = await provider.getNetwork()
         const phoneLinkContract = new ethers.Contract(
-          getConfigByChain(network.chainId)[0].phoneLinkAddress, PhoneLink.abi, signer)
+          getConfigByChain(network.chainId)[0].phoneLinkAddress,
+          PhoneLink.abi,
+          signer
+        )
         const data = await phoneLinkContract.fetchAllWalletAddress(
           formInput.identifier
         )
@@ -115,7 +124,7 @@ const Home = () => {
               identifier: i.identifier,
               connectedWalletAddress: i.connectedWalletAddress,
               typeOfIdentifier: i.typeOfIdentifier,
-              isPrimaryWallet: i.isPrimaryWallet
+              isPrimaryWallet: i.isPrimaryWallet,
             }
             return item
           })
@@ -136,17 +145,21 @@ const Home = () => {
       <div className={style.container}>
         <div className={style.contentWrapper}>
           {loadingState ? (
-            <BusyLoader loaderType={LoaderType.Circle} color={'#277cc2'} size={150}>
+            <BusyLoader
+              loaderType={LoaderType.Circle}
+              color={'#277cc2'}
+              size={150}
+            >
               Fetching Data From BlockChain... Please Wait...✋🏻
             </BusyLoader>
           ) : !details.length ? (
-            <div className={`${style.spinner} mb-4 text-5xl font-bold`}>
-              DATABASE IS EMPTY !!
-            </div>
+            <div className={style.spinner}>DATABASE IS EMPTY !!</div>
           ) : (
-            <div className={`overflow-hidden mt-8`}>
+            <div className="mt-8 overflow-hidden">
               <div className={style.midRow}>
-                <div className={style.title} onClick={() => deleteAll()}>Database</div>
+                <div className={style.title} onClick={() => deleteAll()}>
+                  Database
+                </div>
                 <div className={style.searchBar}>
                   <div className={style.searchIcon}>
                     <AiOutlineSearch />
@@ -228,7 +241,8 @@ const Home = () => {
             </div>
           )}
         </div>
-      </div></div>
+      </div>
+    </div>
   )
 }
 

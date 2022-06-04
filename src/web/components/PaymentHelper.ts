@@ -8,7 +8,6 @@ import { getConfigByChain } from '../config'
 import { ellipseAddress } from './utils'
 import emailjs from '@emailjs/browser'
 
-
 export type PaymentData = {
   defaultChainId?: number
   defaultAccount?: any
@@ -117,15 +116,15 @@ const PaymentHelper = () => {
       directAddress: boolean = false
     ) => {
       let success = false
-      console.log("testing")
       if (_data.defaultAccount && _data.selectedToken && amount && target) {
         if (_data.balanceToken && Number(_data.balanceToken) > amount) {
-
           await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
           const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
           const signer = provider.getSigner() // get signer
           ethers.utils.getAddress(_data.defaultAccount) //checks if an address is valid one
-          const networkId = await window.ethereum.request({ method: 'net_version' })
+          const networkId = await window.ethereum.request({
+            method: 'net_version',
+          })
           const network = await provider.getNetwork()
 
           const tokenContract = new ethers.Contract(
@@ -148,28 +147,37 @@ const PaymentHelper = () => {
             //gets the addresses linked to the identifier = target
             const to = await phoneLinkContract.fetchPrimaryWalletAddress(target)
 
-
-            console.log(ellipseAddress(to))
+            console.info({ address: ellipseAddress(to) })
 
             if (to.length === 0 || ellipseAddress(to) === '0x000...00000') {
-              if (target.includes("@")) {
+              if (target.includes('@')) {
                 //it is an valid email of my friend. But he is not registered to receive. Send  invite to his email
                 var templateParams = {
-                  email: target
+                  email: target,
                 }
-                emailjs.send('service_t2xue7p', 'template_4f35w5l', templateParams, 'Z8B2Ufr9spWJFx4js')
+                emailjs
+                  .send(
+                    'service_t2xue7p',
+                    'template_4f35w5l',
+                    templateParams,
+                    'Z8B2Ufr9spWJFx4js'
+                  )
                   .then(
                     function (response) {
-                      console.log('SUCCESS!', response.status, response.text)
-                      toast.success("Your friend is not yet registered with GrowPay. We have sent an invite email to join.")
+                      console.info({ status: 'SUCCESS!', response })
+                      toast.success(
+                        'Your friend is not yet registered with GrowPay. We have sent an invite email to join.'
+                      )
                     },
                     function (error) {
-                      console.log('FAILED...', error)
+                      console.error({ error })
                     }
                   )
               } else {
                 //it is an valid phone of my friend. But he is not registered to receive. Send sms invite to his phone
-                toast.success('Your friend is not yet registered. Please ask your friend to register to start receiving crypto.')
+                toast.success(
+                  'Your friend is not yet registered. Please ask your friend to register to start receiving crypto.'
+                )
               }
 
               return false

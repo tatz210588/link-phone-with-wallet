@@ -72,8 +72,8 @@ const Home = () => {
         size: 'invisible',
         callback: (response: any) => {
           // reCAPTCHA solved, allow signInWithPhoneNumber.
-          console.info('recaptcha verifying')
-          onSignInSubmit().then((_) => console.info('recaptcha verified'))
+          console.info('recaptcha verifying...')
+          onSignInSubmit().then((_) => console.info('recaptcha verified...'))
         },
       },
       auth
@@ -86,11 +86,19 @@ const Home = () => {
     const signer = provider.getSigner() // get signer
     const network = await provider.getNetwork()
 
-    const phoneLinkContract = new ethers.Contract(getConfigByChain(network.chainId)[0].phoneLinkAddress, PhoneLink.abi, signer)
+    const phoneLinkContract = new ethers.Contract(
+      getConfigByChain(network.chainId)[0].phoneLinkAddress,
+      PhoneLink.abi,
+      signer
+    )
     const tx = await phoneLinkContract.uniqueEntry(formInput.identifier)
     setUniqueEntry(tx)
     if (!tx) {
-      toast.error(`Duplicate Entry. User already registered with ${maskPhone(formInput.identifier)}`)
+      toast.error(
+        `Duplicate Entry. User already registered with ${maskPhone(
+          formInput.identifier
+        )}`
+      )
     }
   }
 
@@ -98,12 +106,11 @@ const Home = () => {
     try {
       e?.preventDefault()
     } catch (error) {
-      console.error(error)
+      console.error({ error })
     }
-    console.log("validate", validate())
-    console.log("unique", unique())
+    console.info({ validate: validate() })
+    console.info({ unique: unique() })
     if (validate() && uniqueEntry) {
-
       configureCaptcha()
       if (formInput.type === IdType.email) {
         var OTP = randomString(10, 'base64')
@@ -122,16 +129,16 @@ const Home = () => {
           )
           .then(
             function (response) {
-              console.log('SUCCESS!', response.status, response.text)
+              console.info({ status: 'SUCCESS!', response })
               toast.success('Check email for OTP')
             },
             function (error) {
-              console.log('FAILED...', error)
+              console.error({ error })
             }
           )
         setOtp(true)
       } else if (formInput.type === IdType.phone) {
-        console.log('phone otp')
+        console.info('phone otp')
         const signInPhoneNumber = formInput.identifier
         console.info({ signInPhoneNumber })
 
@@ -148,7 +155,7 @@ const Home = () => {
           toast.success('OTP sent. Please enter the OTP')
           setOtp(true)
         } catch (error) {
-          console.error(error)
+          console.error({ error })
         }
       } else {
         toast.error('Please enter phone/email to proceed.')
@@ -176,7 +183,7 @@ const Home = () => {
     try {
       e?.preventDefault()
     } catch (error) {
-      console.error(error)
+      console.error({ error })
     }
     if (formInput.type === IdType.email) {
       if (emailOTP.toString() == formInput.otp) {
@@ -201,8 +208,8 @@ const Home = () => {
       } catch (error) {
         // User couldn't sign in (bad verification code?)
         // ...
-        toast.error("Wrong otp")
-        console.error(error)
+        toast.error('Wrong otp')
+        console.error({ error })
       }
     }
   }

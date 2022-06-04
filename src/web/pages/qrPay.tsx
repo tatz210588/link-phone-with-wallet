@@ -59,7 +59,7 @@ const qrPay = () => {
   }, [chainId])
 
   const handleErrorWebCam = (error: any) => {
-    console.error(error)
+    console.error({ error })
   }
 
   async function fetchDetails(address: string) {
