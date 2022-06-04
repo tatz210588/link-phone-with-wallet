@@ -1,24 +1,22 @@
-import {
-  useCallback,
-  // useDebugValue,
-  useEffect,
-  useState,
-} from 'react'
+import { useDebugValue, useEffect, useState } from 'react'
 
-const useDebounce = (callback, delay: number) => {
+const useDebounce = (
+  callback: (...args: any[]) => any | void,
+  delay: number,
+  debug: false
+) => {
   let [timer, setTimer] = useState(null)
-  const cb = useCallback(callback, [])
 
-  const debounce = async (...args) => {
+  const debounce = async (...args: any[]) => {
     clearTimeout(timer)
-    setTimer(setTimeout(() => cb(...args), delay))
+    setTimer(setTimeout(() => callback(...args), delay))
   }
 
   useEffect(() => {
     return () => clearTimeout(timer)
   }, [])
 
-  // useDebugValue({ cb, timer, delay })
+  debug && useDebugValue({ callback, delay, timer })
   return debounce
 }
 
