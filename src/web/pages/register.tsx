@@ -108,7 +108,6 @@ const Home = () => {
     } catch (error) {
       console.error({ error })
     }
-    console.info({ validate: validate() })
     console.info({ unique: unique() })
     if (validate() && uniqueEntry) {
       configureCaptcha()
