@@ -1,13 +1,11 @@
 import { useWeb3 } from '@3rdweb/hooks'
 import React, { useState, useEffect, KeyboardEvent } from 'react'
 import toast from 'react-hot-toast'
-import Router from 'next/router'
 import PhoneLink from '../artifacts/contracts/phoneLink.sol/phoneLink.json'
 import { getConfigByChain } from '../config'
 import Web3Modal from 'web3modal'
 import { ethers } from 'ethers'
 import { AiOutlineSearch } from 'react-icons/ai'
-import Container from '../components/Container'
 import BusyLoader, { LoaderType } from '../components/BusyLoader'
 //import getFirebaseApp from"./firebase"
 
