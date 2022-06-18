@@ -10,7 +10,6 @@ import getFirebaseApp from './firebase'
 import { ellipseAddress, randomString } from './utils'
 import emailjs from '@emailjs/browser'
 import toast from 'react-hot-toast'
-import { useWeb3 } from '@3rdweb/hooks'
 import { getConfigByChain } from '../config'
 import { ethers } from 'ethers'
 import PhoneLink from '../artifacts/contracts/phoneLink.sol/phoneLink.json'
@@ -153,7 +152,7 @@ const WalletCard: NextPage<WalletCardProps> = ({ detail, type }) => {
                 const user = result.user
                 console.log(JSON.stringify(user))
                 toast.success("user is verified")
-                //await update()
+                update()
                 setOtp(false)
                 // ...
             }).catch((error) => {
@@ -167,18 +166,23 @@ const WalletCard: NextPage<WalletCardProps> = ({ detail, type }) => {
 
     async function update() {
         setLoadingState(true)
-        await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
-        const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
+        await (window as any).ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
+        const provider = new ethers.providers.Web3Provider((window as any).ethereum) //create provider
         const signer = provider.getSigner() // get signer
         const network = await provider.getNetwork()
         const phoneLinkContract = new ethers.Contract(getConfigByChain(network.chainId)[0].phoneLinkAddress, PhoneLink.abi, signer)
         let tx
         if (detail.identifier === 'phone') {
-            tx = await phoneLinkContract.editProfile(detail.name, value, detail.typeOfIdentifier, detail.identifier)
+            tx = await phoneLinkContract.editProfile(detail.name, value, detail.typeOfIdentifier, detail.identifier).catch((error)=>{
+                toast.error("User Denied Transaction.")
+                setLoadingState(false)
+              })
         } else { //email
-            tx = await phoneLinkContract.editProfile(detail.name, formInput.identifier, detail.typeOfIdentifier, detail.identifier)
+            tx = await phoneLinkContract.editProfile(detail.name, formInput.identifier, detail.typeOfIdentifier, detail.identifier).catch((error)=>{
+                toast.error("User Denied Transaction.")
+                setLoadingState(false)
+              })
         }
-        tx.wait(1)
         setLoadingState(false)
         toast.success(`${detail.typeOfIdentifier} details updated successfully.`)
         Router.push({ pathname: './' })
@@ -186,14 +190,17 @@ const WalletCard: NextPage<WalletCardProps> = ({ detail, type }) => {
 
     async function makePrimary() {
         setLoadingState(true)
-        await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
-        const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
+        await (window as any).ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
+        const provider = new ethers.providers.Web3Provider((window as any).ethereum) //create provider
         const signer = provider.getSigner() // get signer
         const network = await provider.getNetwork()
         const phoneLinkContract = new ethers.Contract(getConfigByChain(network.chainId)[0].phoneLinkAddress, PhoneLink.abi, signer)
-        const tx = await phoneLinkContract.makePrimary(detail.connectedWalletAddress, detail.identifier)
+        const tx = await phoneLinkContract.makePrimary(detail.connectedWalletAddress, detail.identifier).catch((error)=>{
+            toast.error("User Denied Transaction.")
+            setLoadingState(false)
+          })
 
-        tx.wait(1)
+        
         setTimeout(() => {
             setLoadingState(false)
             toast.success(`Details updated successfully.`)
@@ -205,7 +212,7 @@ const WalletCard: NextPage<WalletCardProps> = ({ detail, type }) => {
     return (
         <>
             {loadingState === true ? (
-                <BusyLoader loaderType={LoaderType.Beat} color={'#ffffff'} size={10}>
+                <BusyLoader loaderType={LoaderType.Beat} color={'#ffffff'} size={5}>
                     <b>Connection established to blockchain...Do not refresh</b>
                 </BusyLoader>
             ) : (
@@ -295,7 +302,8 @@ const WalletCard: NextPage<WalletCardProps> = ({ detail, type }) => {
                                     <div className={style.infoLeft}>
                                         <div className={style.collectionName}>Name: {detail.name}</div>
                                         <div className={style.collectionName}>{detail.typeOfIdentifier}: {detail.identifier}</div>
-                                        <div className={style.collectionName}>Wallet: {detail.connectedWalletAddress}</div>
+                                        <div className='font-semibold text-sm text-[#8a939b] hidden lg:block md:block'>Wallet: {detail.connectedWalletAddress}</div>
+                                        <div className='font-semibold text-sm text-[#8a939b] lg:hidden md:hidden'>Wallet: {ellipseAddress(detail.connectedWalletAddress)}</div>
                                         <div className={style.collectionName}>{detail.isPrimaryWallet ? 'Primary Wallet' : 'Secondary Wallet'}</div>
                                     </div>
 

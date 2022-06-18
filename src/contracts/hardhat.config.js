@@ -36,9 +36,17 @@ module.exports = {
       url: 'https://dev.kardiachain.io/',
       accounts: [privateKey],
     },
+    aurora_testnet:{
+      url: `https://aurora-testnet.infura.io/v3/${infura_projectId}`,
+      accounts: [privateKey],
+    },
+    aurora_mainnet:{
+      url: `https://near-mainnet.infura.io/v3/${infura_projectId}`,
+      accounts: [privateKey],
+    }
   },
   etherscan: {
-    apiKey: '7BVQVNCAAB8GWGBW2JMJ9HYVE2AT8M296S', //polygonscan api is added here
+    apiKey: '5PB2QWEDWRA9JBUWGBDHHZFM2X5YECC5Q2',
   },
   solidity: '0.8.4',
   paths: {

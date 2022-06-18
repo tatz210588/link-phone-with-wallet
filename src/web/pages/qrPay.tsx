@@ -1,26 +1,24 @@
 import React, { useState, useEffect } from 'react'
 import QrReader from 'react-qr-scanner'
 import { TokenInfo } from '../assets/tokenConfig'
-import { useWeb3 } from '@3rdweb/hooks'
-// import { rounded } from '../components/utils'
-// import { ethers } from 'ethers'
-// import BigNumber from 'bignumber.js'
-import toast from 'react-hot-toast'
-// import PhoneLink from '../artifacts/contracts/phoneLink.sol/phoneLink.json'
-// import { getConfigByChain } from '../config'
+import {useAccount,useNetwork} from 'wagmi'
 import Container from '../components/Container'
 import BusyLoader, { LoaderType } from '../components/BusyLoader'
 import PaymentHelper from '../components/PaymentHelper'
+import toast from 'react-hot-toast'
 
 const style = {
+  wrapper: `relative`,
+  container: `flex flex-wrap before:content-[''] before:bg-red-500 before:absolute before:top-0 before:left-0 before:right-0 before:bottom-0 before:bg-[url('../assets/4.jpg')] before:bg-cover before:bg-center before:bg-fixed before:opacity-100 before:blur`,
+  contentWrapper: `w-full m-4 h-screen relative justify-center flex-wrap items-center block flex-grow lg:flex lg:items-center lg:w-auto`,
   center: ` h-screen relative justify-center flex-wrap items-center `,
-  searchBar: `flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#363840] rounded-[0.8rem] hover:bg-[#757199]`,
-  searchInput: `h-[2.6rem] w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#e6e8eb] placeholder:text-[#8a939b]`,
-  copyContainer: `w-1/2`,
-  title: `relative text-white text-[46px] font-semibold`,
-  description: `text-[#fff] container-[400px] text-md mb-[2.5rem]`,
+  searchBar: `flex flex-1 mx-[0.8rem] w-max-[520px] lg:items-center bg-[#363840] rounded-[0.8rem] hover:bg-[#757199]`,
+  searchInput: `h-[2.6rem] w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#e6e8eb] placeholder:text-[#8a939b] placeholder:text-xs`,
+  copyContainer: `w-full justify-center items-center lg:w-1/2`,
+  title: `relative text-white justify-center text-2xl lg:text-[46px] font-semibold`,
+  description: `text-[#8a939b] font-bold container-[400px] text-sm lg:text-2xl mt-[0.8rem] mb-[2.5rem] mr[0.8rem]`,
   spinner: `w-full h-screen flex justify-center text-white mt-20 p-100 object-center`,
-  nftButton: `font-bold w-full mt-4 bg-pink-500 text-white text-lg rounded p-4 shadow-lg hover:bg-[#19a857] cursor-pointer`,
+  nftButton: `font-bold w-3/4 lg:w-full mt-4 bg-pink-500 text-white text-lg rounded p-4 shadow-lg hover:bg-[#19a857] cursor-pointer`,
   dropDown: `font-bold w-full mt-4 bg-[#2181e2] text-white text-lg rounded p-4 shadow-lg cursor-pointer`,
 }
 
@@ -32,7 +30,8 @@ const defaults = {
 const qrPay = () => {
   const [scanResultWebCam, setScanResultWebCam] = useState('')
   const [formInput, updateFormInput] = useState({ amount: 0 })
-  const { chainId } = useWeb3()
+  const { data } = useAccount()
+  const {activeChain} = useNetwork()
   const [paymentHelper, setPaymentHelper] = useState(PaymentHelper())
   const [balanceToken, setBalanceToken] = useState(defaults.balanceToken)
   // const [selectedToken, setSelectedToken] = useState<TokenInfo | undefined>()
@@ -51,12 +50,12 @@ const qrPay = () => {
     // console.info({ defaultAccount })
     setLoadingState(true)
     paymentHelper.initialize().then((_) => setLoadingState(false))
-  }, [defaultAccount])
+  }, [data?.address])
 
   useEffect(() => {
-    paymentHelper.connectWallet(chainId)
+    paymentHelper.connectWallet(activeChain?.id)
     setAvailableTokens(paymentHelper.data().availableTokens)
-  }, [chainId])
+  }, [activeChain?.id])
 
   const handleErrorWebCam = (error: any) => {
     console.error(error)
@@ -141,7 +140,10 @@ const qrPay = () => {
     // if (selectedToken && formInput.amount > 0) {
     //   if (Number(balanceToken) > formInput.amount) {
     setLoadingState(true)
-    await paymentHelper.transfer(formInput.amount, scanResultWebCam, true)
+    await paymentHelper.transfer(formInput.amount, scanResultWebCam, true).catch((error)=>{
+      toast.error("User Denied Payment.")
+      setLoadingState(false)
+    })
     // await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
     // const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
     // const signer = provider.getSigner() // get signer
@@ -195,88 +197,90 @@ const qrPay = () => {
   //   return divided.toFixed(decimals, roundingMode)
   // }
   return (
-    <Container>
-      {!chainId ? (
-        <BusyLoader loaderType={LoaderType.Ring} color={'#ffffff'} size={50}>
-          <b>Click on the Connect Wallet button !!</b>
-        </BusyLoader>
-      ) : !scanResultWebCam ? (
-        <QrReader
-          delay={300}
-          style={{ width: '100%' }}
-          onError={handleErrorWebCam}
-          onScan={handleScanWebCam}
-        />
-      ) : (
-        <div className={style.copyContainer}>
-          <div className={`${style.description} mt-8 p-1`}>
-            Name: {walletName}
-          </div>
-          <div className={`${style.description} mt-2 p-1`}>
-            Wallet Address: {scanResultWebCam}
-          </div>
-          <div className=" mt-4 grid grid-cols-3 gap-2">
-            <select
-              className={style.dropDown}
-              onChange={async (e) => {
-                const selectedValue = Number(e.target.value)
-                let token: TokenInfo | undefined
-                if (selectedValue) {
-                  token = availableTokens[Number(selectedValue)]
-                }
-                await loadBalance(token)
-              }}
-            >
-              {availableTokens.map((token: TokenInfo, index: number) => (
-                <option value={index} key={token.address}>
-                  {token.name}
-                </option>
-              ))}
-            </select>
-
-            <div className={`${style.searchBar} mt-2 p-1`}>
-              <input
-                className={style.searchInput}
-                placeholder="Amount to transfer"
-                onChange={(e) => {
-                  updateFormInput({
-                    ...formInput,
-                    amount: Number(e.target.value),
-                  })
-                }}
-              />
-            </div>
-            <div className={style.description}>
-              Available Balance: {balanceToken}
-            </div>
-          </div>
-          {loadingState === true ? (
-            <BusyLoader
-              loaderType={LoaderType.Beat}
-              wrapperClass="white-busy-container"
-              className="white-busy-container"
-              color={'#ffffff'}
-              size={15}
-            >
-              Connecting to blockchain. Please wait
+    <div className={style.wrapper}>
+      <div className={style.container}>
+        <div className={style.contentWrapper}>
+          {!activeChain?.id ? (
+            <BusyLoader loaderType={LoaderType.Ring} color={'#ffffff'} size={50}>
+              <b>Click on the Connect Wallet button !!</b>
             </BusyLoader>
+          ) : !scanResultWebCam ? (
+            <QrReader
+              delay={300}
+              style={{ width: '100%' }}
+              onError={handleErrorWebCam}
+              onScan={handleScanWebCam}
+            />
           ) : (
-            <div>
-              {
-                <div>
-                  <button
-                    onClick={() => transfer()}
-                    className={style.nftButton}
-                  >
-                    Transfer
-                  </button>
+            <div className={style.copyContainer}>
+              <div className={`${style.description} mt-8 p-1`}>
+                Name: {walletName}
+              </div>
+              <div className={`${style.description} mt-2 p-1`}>
+                Wallet Address: {scanResultWebCam}
+              </div>
+              <div className=" mt-4 grid grid-cols-3 gap-2">
+                <select
+                  className={style.dropDown}
+                  onChange={async (e) => {
+                    const selectedValue = Number(e.target.value)
+                    let token: TokenInfo | undefined
+                    if (selectedValue) {
+                      token = availableTokens[Number(selectedValue)]
+                    }
+                    await loadBalance(token)
+                  }}
+                >
+                  {availableTokens.map((token: TokenInfo, index: number) => (
+                    <option value={index} key={token.address}>
+                      {token.name}
+                    </option>
+                  ))}
+                </select>
+
+                <div className={`${style.searchBar} mt-2 p-1`}>
+                  <input
+                    className={style.searchInput}
+                    placeholder="Amount to transfer"
+                    onChange={(e) => {
+                      updateFormInput({
+                        ...formInput,
+                        amount: Number(e.target.value),
+                      })
+                    }}
+                  />
                 </div>
-              }
+                <div className={style.description}>
+                  Available Balance: {balanceToken}
+                </div>
+              </div>
+              {loadingState === true ? (
+                <BusyLoader
+                  loaderType={LoaderType.Beat}
+                  wrapperClass="white-busy-container"
+                  className="white-busy-container"
+                  color={'#ffffff'}
+                  size={15}
+                >
+                  Connecting to blockchain. Please wait
+                </BusyLoader>
+              ) : (
+                <div>
+                  {
+                    <div>
+                      <button
+                        onClick={() => transfer()}
+                        className={style.nftButton}
+                      >
+                        Transfer
+                      </button>
+                    </div>
+                  }
+                </div>
+              )}
             </div>
           )}
-        </div>
-      )}
-    </Container>
+        </div></div></div>
   )
 }
 

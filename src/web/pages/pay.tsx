@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { TokenInfo } from '../assets/tokenConfig'
-import { useWeb3 } from '@3rdweb/hooks'
+import {useAccount,useNetwork} from 'wagmi'
 import 'react-phone-number-input/style.css'
 import toast from 'react-hot-toast'
 import Container from '../components/Container'
@@ -15,15 +15,19 @@ import { FaBackspace, FaMoneyBillWave } from 'react-icons/fa'
 import InputIcon from '../components/InputIcon'
 
 const style = {
+  wrapper: `relative`,
+  container: `flex flex-wrap before:content-[''] before:bg-red-500 before:absolute before:top-0 before:left-0 before:right-0 before:bottom-0 before:bg-[url('../assets/4.jpg')] before:bg-cover before:bg-center before:bg-fixed before:opacity-100 before:blur`,
+  contentWrapper: `w-full m-4 h-screen relative justify-center flex-wrap items-center block flex-grow lg:flex lg:items-center lg:w-auto`,
   center: ` h-screen relative justify-center flex-wrap items-center `,
   searchBar: `flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#363840] rounded-[0.8rem] hover:bg-[#757199] mt-2 p-1 pay-search`,
   searchInput: `h-[2.6rem] w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#e6e8eb] placeholder:text-[#8a939b]`,
-  copyContainer: `w-1/2`,
-  title: `relative text-white text-[46px] font-semibold`,
-  description: `text-[#fff] container-[400px] text-md mb-[2.5rem]`,
+  copyContainer: `w-full justify-center items-center lg:w-1/2`,
+  title: `relative text-white justify-center text-2xl lg:text-[46px] font-semibold`,
+  description: `text-[#8a939b] container-[400px] text-xl lg:text-2xl mt-[0.8rem] mb-[2.5rem]`,
   spinner: `w-full h-screen flex justify-center text-white mt-20 p-100 object-center`,
   nftButton: `font-bold w-full mt-4 bg-pink-500 text-white text-lg rounded p-4 shadow-lg hover:bg-[#19a857] cursor-pointer`,
-  dropDown: `font-bold w-full mt-4 bg-[#2181e2] text-white text-lg rounded p-4 shadow-lg cursor-pointer`,
+  dropDown: `font-bold w-full mt-4 bg-[#2181e2] text-white text-sm lg:text-lg rounded p-4 shadow-sm cursor-pointer`,
+  option: `font-bold w-1/2 lg:w-full mt-4 bg-[#2181e2] text-white text-sm lg:text-lg rounded p-4 shadow-lg cursor-pointer`,
 }
 
 const defaults = {
@@ -31,7 +35,8 @@ const defaults = {
 }
 
 const Pay = () => {
-  const { chainId } = useWeb3()
+  const { data } = useAccount()
+  const {activeChain} = useNetwork()
   const [paymentHelper, setPaymentHelper] = useState(PaymentHelper())
   const [balanceToken, setBalanceToken] = useState(defaults.balanceToken)
   const [formInput, updateFormInput] = useState({
@@ -46,12 +51,12 @@ const Pay = () => {
   useEffect(() => {
     setLoadingState(true)
     paymentHelper.initialize().then((_) => setLoadingState(false))
-  }, [defaultAccount])
+  }, [data?.address])
 
   useEffect(() => {
-    paymentHelper.connectWallet(chainId)
+    paymentHelper.connectWallet(activeChain?.id)
     setAvailableTokens(paymentHelper.data().availableTokens)
-  }, [chainId])
+  }, [activeChain?.id])
 
   async function loadBalance(selectToken?: TokenInfo) {
     if (selectToken) {
@@ -84,114 +89,120 @@ const Pay = () => {
   async function transfer() {
     if (validate()) {
       setLoadingState(true)
-      await paymentHelper.transfer(formInput.amount, formInput.targetId)
+      await paymentHelper.transfer(formInput.amount, formInput.targetId).catch((error)=>{
+        toast.error("User Denied Payment.")
+        setLoadingState(false)
+      })
       await loadBalance(paymentHelper.data().selectedToken)
       setLoadingState(false)
     }
   }
 
   return (
-    <Container>
-      {!chainId ? (
-        <BusyLoader loaderType={LoaderType.Ring} color={'#ffffff'} size={50}>
-          <b>Click on the Connect Wallet button !!</b>
-        </BusyLoader>
-      ) : (
-        <div className={style.copyContainer}>
-          <div className={`${style.title} mt-1 p-1`}>
-            Transfer Currency to Phone !!
-          </div>
-          <div className=" mt-4 grid grid-cols-2 gap-2">
-            <select
-              className={style.dropDown}
-              onChange={async (e) => {
-                const selectedValue = Number(e.target.value)
-                let token: TokenInfo | undefined
-                if (selectedValue) {
-                  token = availableTokens[Number(selectedValue)]
-                }
-                await loadBalance(token)
-              }}
-            >
-              {availableTokens.map((token: TokenInfo, index: number) => (
-                <option value={index} key={token.address}>
-                  {token.name}
-                </option>
-              ))}
-            </select>
-            <div className={style.description}>
-              Available Balance: {balanceToken}
-            </div>
-          </div>
-          <div className=" mt-4 grid grid-cols-2 gap-1">
-            <IdInput
-              className={style.searchInput}
-              wrapperClass={style.searchBar}
-              placeholder="Enter phone / email"
-              delay={500}
-              onChange={(val, idType) =>
-                updateFormInput((formInput) => ({
-                  ...formInput,
-                  targetId: val,
-                  targetIdType: idType,
-                }))
-              }
-            />
-            <div className={style.searchBar}>
-              <InputIcon className="input-icon" Icon={FaMoneyBillWave} />
-              <input
-                type="number"
-                className={style.searchInput}
-                placeholder="Amount to transfer"
-                value={formInput.amount}
-                onChange={(e) =>
-                  updateFormInput((formInput) => ({
-                    ...formInput,
-                    amount: Number(e.target.value),
-                  }))
-                }
-              />
-              <button
-                type="button"
-                onClick={(_) =>
-                  updateFormInput((formInput) => ({
-                    ...formInput,
-                    amount: 0.0,
-                  }))
-                }
-              >
-                <InputIcon className="input-icon" Icon={FaBackspace} />
-              </button>
-            </div>
-          </div>
+    <div className={style.wrapper}>
 
-          {loadingState === true ? (
-            <BusyLoader
-              loaderType={LoaderType.Beat}
-              wrapperClass="white-busy-container"
-              className="white-busy-container"
-              color={'#ffffff'}
-              size={15}
-            >
-              Connecting to blockchain. Please wait
+      <div className={style.container}>
+        <div className={style.contentWrapper}>
+          {!activeChain?.id ? (
+            <BusyLoader loaderType={LoaderType.Ring} color={'#ffffff'} size={50}>
+              <b>Click on the Connect Wallet button !!</b>
             </BusyLoader>
           ) : (
-            <div>
-              {
-                <div>
+            <div className={style.copyContainer}>
+              <div className={`${style.title} mt-1 p-1`}>
+                Transfer Currency to Phone !!
+              </div>
+              <div className=" mt-4 grid grid-cols-2 gap-2">
+                <select
+                  className={style.dropDown}
+                  onChange={async (e) => {
+                    const selectedValue = Number(e.target.value)
+                    let token: TokenInfo | undefined
+                    if (selectedValue) {
+                      token = availableTokens[Number(selectedValue)]
+                    }
+                    await loadBalance(token)
+                  }}
+                >
+                  {availableTokens.map((token: TokenInfo, index: number) => (
+                    <option className={style.option} value={index} key={token.address}>
+                      {token.name}
+                    </option>
+                  ))}
+                </select>
+                <div className={style.description}>
+                  Available Balance: {balanceToken}
+                </div>
+              </div>
+              <div className=" mt-4 grid grid-cols-2 gap-1">
+                <IdInput
+                  className={style.searchInput}
+                  wrapperClass={style.searchBar}
+                  placeholder="Enter phone / email"
+                  delay={500}
+                  onChange={(val, idType) =>
+                    updateFormInput((formInput) => ({
+                      ...formInput,
+                      targetId: val,
+                      targetIdType: idType,
+                    }))
+                  }
+                />
+                <div className={style.searchBar}>
+                  <InputIcon className="input-icon" Icon={FaMoneyBillWave} />
+                  <input
+                    type="number"
+                    className={style.searchInput}
+                    placeholder="Amount to transfer"
+                    value={formInput.amount}
+                    onChange={(e) =>
+                      updateFormInput((formInput) => ({
+                        ...formInput,
+                        amount: Number(e.target.value),
+                      }))
+                    }
+                  />
                   <button
-                    onClick={() => transfer()}
-                    className={style.nftButton}
+                    type="button"
+                    onClick={(_) =>
+                      updateFormInput((formInput) => ({
+                        ...formInput,
+                        amount: 0.0,
+                      }))
+                    }
                   >
-                    Transfer
+                    <InputIcon className="input-icon" Icon={FaBackspace} />
                   </button>
                 </div>
-              }
+              </div>
+
+              {loadingState === true ? (
+                <BusyLoader
+                  loaderType={LoaderType.Beat}
+                  wrapperClass="white-busy-container"
+                  className="white-busy-container"
+                  color={'#ffffff'}
+                  size={15}
+                >
+                  Connecting to blockchain. Please wait
+                </BusyLoader>
+              ) : (
+                <div>
+                  {
+                    <div>
+                      <button
+                        onClick={() => transfer()}
+                        className={style.nftButton}
+                      >
+                        Transfer
+                      </button>
+                    </div>
+                  }
+                </div>
+              )}
             </div>
           )}
-        </div>
-      )}
-    </Container>
+        </div></div></div>
   )
 }
 

@@ -1,4 +1,4 @@
-import { useWeb3 } from '@3rdweb/hooks'
+import {useAccount,useNetwork} from 'wagmi'
 import React, { useState, useEffect, KeyboardEvent } from 'react'
 import toast from 'react-hot-toast'
 import Router from 'next/router'
@@ -10,6 +10,8 @@ import { AiOutlineSearch } from 'react-icons/ai'
 import Container from '../components/Container'
 import BusyLoader, { LoaderType } from '../components/BusyLoader'
 //import getFirebaseApp from"./firebase"
+import Web3 from 'web3'
+import axios from 'axios'
 
 const style = {
   wrapper: `relative`,
@@ -31,15 +33,17 @@ const style = {
 }
 
 const Home = () => {
-  const { address, chainId } = useWeb3()
+  const { data } = useAccount()
+  const {activeChain} = useNetwork()
   const [loadingState, setLoadingState] = useState(true)
   const [details, setDetails] = useState<any[]>([])
   const [formInput, updateFormInput] = useState({ identifier: '' })
   const [admins, setAdmins] = useState()
+  const [ethData,setEthData] = useState<any[]>([])
 
   useEffect(() => {
     loadPhoneDetails()
-  }, [])
+  }, [data?.address])
 
   async function loadPhoneDetails() {
     const web3Modal = new Web3Modal({
@@ -47,8 +51,46 @@ const Home = () => {
       cacheProvider: true,
     })
     const connection = await web3Modal.connect()
+    
     const provider = new ethers.providers.Web3Provider(connection)
     const signer = provider.getSigner()
+    /*********transaction log***********/
+    /*****************This is the code get historical transactional data right*
+     * from etherscan or any blockexplorer for any other network right in the react page*
+     * Just uncomment ta code to see the magic. This code will show historical data*
+     * of the connected wallet
+     **************************************************************/
+    //  const web3 = new Web3(connection)
+    // // const block = await web3.eth.getBlock(92101574)
+    // // for (let txhash of block.transactions){
+      
+    // // const tx = await web3.eth.getTransaction(txhash)
+    // // if(tx.to === address || tx.from === address){
+    // //   console.log({address_from: tx.from, address_to: tx.to,value:web3.utils.fromWei(tx.value,'ether')})
+    // // }
+    // // }
+    // // console.log("block",block)
+
+    // const endpointURL = 'https://api-rinkeby.etherscan.io/api'
+    // const apiKey = "5PB2QWEDWRA9JBUWGBDHHZFM2X5YECC5Q2"
+    // console.log("apiKey",endpointURL+`?module=account&action=txlist&address=${address}&page=1&offset=100&sort=desc&apikey=${apiKey}`)
+    // const etherscan = await axios.get(endpointURL+`?module=account&action=txlist&address=${address}&page=1&offset=100&sort=desc&apikey=${apiKey}`)
+    // setEthData(etherscan.data.result)
+    //  const itemss = ethData.map((i: any) => {
+    //     return{
+    //       from: i.from,
+    //       to: i.to ==='' ? i.contractAddress : i.to,
+    //       reason: i.to === ''?'Contract Creation':'Wallet transfer',
+    //       value: web3.utils.fromWei(i.value,'ether'),
+    //       time: new Date(i.timeStamp*1000),
+        
+    //  }
+    //   })
+    // console.log("main",etherscan)
+    // console.log("mywalley",itemss)
+
+    /*********transaction log***********/
+
     console.info({ signer })
     const network = await provider.getNetwork()
     console.info({ network })
@@ -77,8 +119,8 @@ const Home = () => {
   }
 
   const deleteAll = async () => {
-    await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
-    const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
+    await (window as any).ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
+    const provider = new ethers.providers.Web3Provider((window as any).ethereum) //create provider
     const signer = provider.getSigner() // get signer
     const network = await provider.getNetwork()
 

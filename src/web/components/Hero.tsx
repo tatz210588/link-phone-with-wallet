@@ -9,14 +9,16 @@ import { AiOutlineQrcode } from 'react-icons/ai'
 import { BsCashCoin } from 'react-icons/bs'
 
 const style = {
-  copyContainer: `w-1/2`,
-  title: `relative text-[#277cc2] text-[46px] font-semibold`,
-  description: `text-[#fffbeb] container-[400px] text-xl mt-[0.8rem] mb-[2.5rem]`,
+  wrapper: `relative`,
+  container: `flex flex-wrap before:content-[''] before:bg-red-500 before:absolute before:top-0 before:left-0 before:right-0 before:bottom-0 before:bg-[url('../assets/4.jpg')] before:bg-cover before:bg-center before:bg-fixed before:opacity-100 before:blur`,
+  contentWrapper: `w-[95%] lg:w-full m-4 h-screen relative justify-center flex-wrap items-center block flex-grow lg:flex lg:items-center lg:w-auto`,
+  copyContainer: `w-full justify-center items-center lg:w-1/2`,
+  title: `relative text-white justify-center text-2xl lg:text-[46px] font-semibold`,
+  description: `text-[#8a939b] container-[400px] text-xl lg:text-2xl mt-[0.8rem] mb-[2.5rem]`,
   ctaContainer: `flex`,
-  qrButton: ` relative text-lg font-semibold bg-[#2181e2] rounded-lg mr-5 text-white cursor-pointer`,
-  accentedButton: ` relative text-lg font-semibold px-12 py-4 bg-[#2181e2] rounded-lg mr-5 text-white hover:bg-[#42a0ff] cursor-pointer`,
-  button: ` relative text-lg font-semibold px-12 py-4 bg-[#363840]  rounded-lg mr-5 text-[#e4e8ea] hover:bg-[#4c505c] cursor-pointer`,
-  cardContainer: `rounded-[7rem]`,
+  accentedButton: ` relative text-lg px-4 lg:px-12 py-4 font-semibold bg-[#2181e2] rounded-lg mr-5 text-white hover:bg-[#42a0ff] cursor-pointer`,
+  button: ` relative text-lg font-semibold px-4 lg:px-12 py-4 bg-[#363840]  rounded-lg mr-5 text-[#e4e8ea] hover:bg-[#4c505c] cursor-pointer`,
+  cardContainer: `rounded-[7rem] mt-4 mb-4`,
   infoContainer: `h-20 bg-[#313338] p-4 rounded-b-lg flex items-center text-white`,
   author: `flex flex-col justify-center ml-4`,
   name: ``,
@@ -24,64 +26,55 @@ const style = {
 }
 
 const Hero = () => {
+  
   return (
-    <Container>
-      <div className={`${style.copyContainer} `}>
-        <div className={style.title}>Send crypto to phone number</div>
-        <div className={style.description}>
-          Forget the era of wallet address and send crypto directly to phone
-          number now.
-        </div>
-        <div className={style.ctaContainer}>
-          <button
-            className={style.accentedButton}
-            onClick={() => {
-              Router.push({
-                pathname: '/pay',
-              })
-            }}
-          ><BsCashCoin size={50} />
 
-          </button>
+    <div className={style.wrapper}>
 
-          <button className={style.accentedButton}
-            onClick={() => {
-              Router.push({ pathname: '/qrPay' })
-            }}><AiOutlineQrcode size={50} />
-          </button>
+      <div className={style.container}>
+        <div className={style.contentWrapper}>
+          <div className={style.copyContainer}>
+            <div className={style.title}>Send crypto to phone number</div>
+            <div className={style.description}>
+              Forget the era of wallet address and send crypto directly to phone
+              number now.
+            </div>
+            <div className={style.ctaContainer}>
+              <button
+                className={style.accentedButton}
+                onClick={() => {
+                  Router.push({
+                    pathname: '/pay',
+                  })
+                }}
+              ><BsCashCoin size={50} />
 
-          <button
-            className={style.button}
-            onClick={() => {
-              Router.push({ pathname: '/register' })
-            }}
-          >
-            Register
-          </button>
+              </button>
 
-        </div>
-      </div>
-      <div className={`${style.cardContainer} `}>
-        <Image className="w-1/2 rounded-t-lg " src={Home} alt="" />
+              <button className={style.accentedButton}
+                onClick={() => {
+                  Router.push({ pathname: '/qrPay' })
+                }}><AiOutlineQrcode size={50} />
+              </button>
 
-        <div className={style.infoContainer}>
-          <img
-            className="h-[2.5rem] rounded-full"
-            src="https://lh3.googleusercontent.com/hKfUfZcOpvGfsNz4p6Pu9b2ckD4MRFcL-XbwPuZ2PwtOynFloE85nekShDqAZcN0JCFBAXPX_royc9Lx1k_gAJJmqJLyoPhnvjWi4g=s80"
-            alt=""
-          />
-          <div className={style.author}>
-            <div className={style.name}>Tatz</div>
-            <a
-              className="text-[#1868b7]"
-              href="https://opensea.io/assets/0x495f947276749ce646f68ac8c248420045cb7b5e/43617070992181872498657409852160512582181349889597339264956620564284712157185"
-            >
-              Tathagat
-            </a>
+              <button
+                className={style.button}
+                onClick={() => {
+                  Router.push({ pathname: '/register' })
+                }}
+              >
+                Register
+              </button>
+
+            </div>
+          </div>
+          <div className={style.cardContainer}>
+            <Image className="rounded-t-lg flex flex-wrap h-[50%] lg:h-full lg:w-full" src={Home} alt="" />
           </div>
         </div>
       </div>
-    </Container>
+    </div>
+
   )
 }
 

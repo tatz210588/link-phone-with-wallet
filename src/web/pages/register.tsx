@@ -1,4 +1,4 @@
-import { useWeb3 } from '@3rdweb/hooks'
+import {useAccount,useNetwork} from 'wagmi'
 import React, { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import 'react-phone-number-input/style.css'
@@ -27,7 +27,7 @@ import IdInput, {
 const style = {
   center: ` h-screen relative justify-center flex-wrap items-center `,
   searchBar: `flex flex-1 mx-[0.8rem] w-max-[520px] items-center bg-[#363840] rounded-[0.8rem] mt-2 p-1`,
-  searchInput: `h-[2.6rem] w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#e6e8eb] placeholder:text-[#fffffff]`,
+  searchInput: `h-[2.6rem] w-full border-0 bg-transparent outline-0 ring-0 px-2 pl-0 text-[#e6e8eb] placeholder:text-[#fffffff] placeholder:text-xs`,
   searchBarVerify: `flex flex-1 w-max-[520px] items-center rounded-[0.8rem]`,
   copyContainer: `w-1/2`,
   modalListWrapper: `bg-[#303339]  w-1/3 h-1/3 mr-auto ml-auto my-28 rounded-2xl p-2 overflow-hidden  relative overflow-auto`,
@@ -44,6 +44,8 @@ const idPlaceholder = 'Phone / Email'
 const Home = () => {
   const [firebaseApp, setFirebaseApp] = useState<FirebaseApp | undefined>()
   const [signInData, setSignInData] = useState('')
+  const { data } = useAccount()
+  const {activeChain} = useNetwork()
   const [formInput, updateFormInput] = useState({
     name: '',
     otp: '',
@@ -51,14 +53,15 @@ const Home = () => {
     type: IdType.phone,
   })
   const [loadingState, setLoadingState] = useState(false)
-  const { address, chainId } = useWeb3()
+ 
   const [otp, setOtp] = useState(false)
   const [emailOTP, setEmailOTP] = useState('')
   const [uniqueEntry, setUniqueEntry] = useState<Boolean>(false)
 
   useEffect(() => {
     //getWalletDetails()
-  }, [address])
+    
+  }, [data?.address])
 
   useEffect(() => {
     getFirebaseApp().then((app) => setFirebaseApp(app))
@@ -80,19 +83,7 @@ const Home = () => {
     )
   }
 
-  async function unique() {
-    await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
-    const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
-    const signer = provider.getSigner() // get signer
-    const network = await provider.getNetwork()
 
-    const phoneLinkContract = new ethers.Contract(getConfigByChain(network.chainId)[0].phoneLinkAddress, PhoneLink.abi, signer)
-    const tx = await phoneLinkContract.uniqueEntry(formInput.identifier)
-    setUniqueEntry(tx)
-    if (!tx) {
-      toast.error(`Duplicate Entry. User already registered with ${maskPhone(formInput.identifier)}`)
-    }
-  }
 
   async function onSignInSubmit(e?: any) {
     try {
@@ -101,10 +92,16 @@ const Home = () => {
       console.error(error)
     }
     console.log("validate", validate())
-    console.log("unique", unique())
-    if (validate() && uniqueEntry) {
+    await (window as any).ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
+    const provider = new ethers.providers.Web3Provider((window as any).ethereum) //create provider
+    const signer = provider.getSigner() // get signer
+    const network = await provider.getNetwork()
 
-      configureCaptcha()
+    const phoneLinkContract = new ethers.Contract(getConfigByChain(network.chainId)[0].phoneLinkAddress, PhoneLink.abi, signer)
+    const tx = await phoneLinkContract.uniqueEntry(formInput.identifier)
+    !tx && toast.error('Phone/Email already registered.')
+    if (validate() && tx) {
+
       if (formInput.type === IdType.email) {
         var OTP = randomString(10, 'base64')
         setEmailOTP(OTP)
@@ -132,6 +129,7 @@ const Home = () => {
         setOtp(true)
       } else if (formInput.type === IdType.phone) {
         console.log('phone otp')
+        configureCaptcha()
         const signInPhoneNumber = formInput.identifier
         console.info({ signInPhoneNumber })
 
@@ -226,9 +224,12 @@ const Home = () => {
       formInput.name,
       formInput.identifier,
       formInput.type.toString()
-    )
+    ).catch((error)=>{
+      toast.error("User Denied Transaction.")
+      setLoadingState(false)
+    })
 
-    tx.wait(1)
+    
     toast.success(`Wallet successfully linked to your ${formInput.type}`)
     setLoadingState(false)
     Router.push({ pathname: '/' })
@@ -246,7 +247,7 @@ const Home = () => {
   return (
     <>
       <Container>
-        {!chainId ? (
+        {!activeChain?.id ? (
           <BusyLoader loaderType={LoaderType.Ring} color={'#ffffff'} size={50}>
             <b>Click on the Connect Wallet button !!</b>
           </BusyLoader>

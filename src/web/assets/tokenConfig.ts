@@ -48,6 +48,20 @@ const tokenConfig: Record<number, TokenInfo[]> = {
       decimal: 18,
     },
   ],
+  '1313161555':[
+    {
+      name: '---Select Your Crypto---',
+      address: '0x000',
+      symbol: 'SELECT',
+      decimal: 18,
+    },
+    {
+      name: 'ETH',
+      address: 'null',
+      symbol: 'ETH',
+      decimal: 18,
+    },
+  ],
   '242': [
     {
       name: '---Select Your Crypto---',

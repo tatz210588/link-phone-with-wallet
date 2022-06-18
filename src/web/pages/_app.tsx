@@ -1,6 +1,5 @@
 import '../styles/globals.css'
 import Header from '../components/Header'
-import { ThirdwebProvider } from '@3rdweb/react'
 import Footer from '../components/Footer'
 import { useEffect, useState } from 'react'
 import Lottie from 'react-lottie'
@@ -8,6 +7,10 @@ import * as globeLoaderData from '../assets/globe.json'
 import * as successLoaderData from '../assets/success.json'
 import { AppProps } from 'next/app'
 import { Toaster } from 'react-hot-toast'
+import {WagmiConfig,configureChains,chain,createClient} from 'wagmi'
+import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
+import {getDefaultWallets,RainbowKitProvider,connectorsForWallets,wallet,Chain, darkTheme, lightTheme} from '@rainbow-me/rainbowkit'
+import '@rainbow-me/rainbowkit/styles.css'
 
 const globeLoader = {
   loop: true,
@@ -27,31 +30,65 @@ const successLoader = {
   },
 }
 
+const Kardiachain_testNet: Chain = {
+  id: 242,
+  name: 'KAI TestNet',
+  network: 'Kardiachain-testnet',
+  iconUrl: 'https://ipfs.infura.io/ipfs/QmV91sx1aWr2RhzF3LRq5M1qoGvYURaqTtsKjF3kiE88Xw',
+  iconBackground: '#fff',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'KAI',
+    symbol: 'KAI',
+  },
+  rpcUrls: {
+    default: 'https://dev.kardiachain.io/',
+  },
+  blockExplorers: {
+    default: { name: 'Kai-Test-Scanner', url: 'https://explorer.kardiachain.io/' }
+  },
+  testnet: false,
+};
+
+
+const {chains, provider} = configureChains(
+  [chain.polygonMumbai,chain.rinkeby,Kardiachain_testNet],
+  [jsonRpcProvider({rpc:chain=>({http:chain.rpcUrls.default})})]
+)
+
+// const {connectors} = getDefaultWallets({
+//   appName: "My App",
+//   chains
+// })
+
+const connectors = connectorsForWallets([
+  {
+    groupName: 'Recommended',
+    wallets: [
+      wallet.rainbow({ chains }),
+      wallet.walletConnect({ chains }),
+      wallet.metaMask({chains}),
+      wallet.trust({chains}),
+      wallet.argent({chains}),
+      wallet.coinbase({appName:"My App",chains}),
+      wallet.brave({chains}),
+      wallet.steak({chains})
+    ],
+  },
+]);
+
+const wagmiClient = createClient({
+  autoConnect:true,
+  connectors,
+  provider
+})
+
 const linkPhoneWithWallet = ({ Component, pageProps }: AppProps) => {
   const [loading, setLoading] = useState(false)
   const [completed, setCompleted] = useState(false)
-  const supportedChainIds = [
-    //1,
-    //4,
-    //137,
-    // 80001,
-    //43114,
-    242,
-  ]
+  
   const [loaderSize, setLoaderSize] = useState(320)
-  const connectors = {
-    injected: {},
-    magic: {
-      apiKey: 'pk_...', // Your magic api key
-      chainId: 242, // The chain ID you want to allow on magic
-    },
-    walletconnect: {},
-    walletlink: {
-      appName: 'thirdweb - demo',
-      url: 'https://thirdweb.com',
-      darkMode: false,
-    },
-  }
+  
   useEffect(() => {
     setTimeout(() => {
       setLoading(true)
@@ -80,16 +117,15 @@ const linkPhoneWithWallet = ({ Component, pageProps }: AppProps) => {
           )}
         </div>
       ) : (
-        <ThirdwebProvider
-          connectors={connectors}
-          supportedChainIds={supportedChainIds}
-        >
-          <Header />
-          <Component {...pageProps} />
-          <Footer />
-        </ThirdwebProvider>
+        <WagmiConfig client={wagmiClient}>
+          <RainbowKitProvider chains={chains} theme={lightTheme()} coolMode showRecentTransactions={true}>
+            <Header />
+            <Toaster position="top-center" reverseOrder={false} />
+            <Component {...pageProps} />
+            <Footer />
+          </RainbowKitProvider>
+        </WagmiConfig>
       )}
-      <Toaster position="top-center" reverseOrder={false} />
     </>
   )
 }

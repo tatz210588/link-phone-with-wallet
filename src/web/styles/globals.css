@@ -29,17 +29,16 @@
     'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas,
     'Liberation Mono', 'Courier New', monospace;
-  --bs-gradient: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.15),
-    rgba(255, 255, 255, 0)
-  );
+  --bs-gradient: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.15),
+      rgba(255, 255, 255, 0));
 }
 
 @layer components {
+
   html,
   body {
-    @apply !font-poppins block;
+    @apply  !font-poppins;
   }
 
   header,
@@ -79,8 +78,8 @@
   .loading-container {
     @apply m-auto flex h-screen content-center justify-center;
 
-    & > div {
-      @apply !m-auto;
+    &>div {
+      @apply  !m-auto;
     }
   }
 
@@ -93,13 +92,14 @@
   }
 
   .pay-search .PhoneInput {
-    @apply !contents;
+    @apply  !contents;
   }
 
   .PhoneInput {
     & .PhoneInputInput {
       background: transparent;
     }
+
     & .PhoneInputCountrySelect {
       @apply bg-[#363840];
     }
@@ -107,12 +107,15 @@
 
   .input-icon {
     @apply text-amber-200;
+
     & svg {
       @apply mx-1 h-6 w-6;
     }
   }
+
   .input-icon-check {
     @apply absolute z-20 ml-4 mt-2 text-green-500;
+
     & svg {
       @apply h-4 w-4;
     }

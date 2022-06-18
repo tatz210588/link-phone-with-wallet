@@ -55,22 +55,22 @@ const Footer = () => {
                 Links
               </h6>
               <p className="mb-4">
-                <a href="#!" className="text-gray-600">
+                <a href="/" className="text-gray-600">
                   Home
                 </a>
               </p>
               <p className="mb-4">
-                <a href="#!" className="text-gray-600">
+                <a href="/pay" className="text-gray-600">
                   Pay to Phone
                 </a>
               </p>
               <p className="mb-4">
-                <a href="#!" className="text-gray-600">
+                <a href="/qrPay" className="text-gray-600">
                   Scan QR code
                 </a>
               </p>
               <p>
-                <a href="#!" className="text-gray-600">
+                <a href="/myProfile" className="text-gray-600">
                   My Profile
                 </a>
               </p>
@@ -86,12 +86,11 @@ const Footer = () => {
                   alt="address"
                   className="mr-4 w-4 opacity-70"
                 /> */}
-                <FaHome title="address" className="mr-4 w-4" /> Bishnupur, WB
-                722138, IN
+                <FaHome title="address" className="mr-4 w-4" /> IN
               </p>
               <p className="mb-4 flex items-center justify-center md:justify-start">
                 <FaEnvelope title="e-mail" className="mr-4 w-4" />{' '}
-                tathagat.saha@gmail.com
+                test@something.com
               </p>
               <p className="mb-4 flex items-center justify-center md:justify-start">
                 <FaPhone title="phone" className="mr-4 w-4" /> +91 963 5021 539
@@ -105,7 +104,7 @@ const Footer = () => {
         <div className="bg-blue-300 p-6 text-center">
           <span>© 2022 Copyright: </span>
           <a className="text-gray-600 ">
-            Developed by Tathagat Saha a.k.a Tatz
+            Developed by Team Grow Global
           </a>
         </div>
       </footer>

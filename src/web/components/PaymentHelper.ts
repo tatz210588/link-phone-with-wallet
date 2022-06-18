@@ -40,7 +40,7 @@ const PaymentHelper = () => {
       console.info({ chainId, availableTokens: _data.availableTokens })
     },
     initialize: async () => {
-      const result: any[] = await window.ethereum.request({
+      const result: any[] = await (window as any).ethereum.request({
         method: 'eth_requestAccounts',
       })
       _data.defaultAccount = result[0] //get existing wallet address
@@ -48,8 +48,8 @@ const PaymentHelper = () => {
       console.info({ _data })
     },
     fetchDetails: async (address: string) => {
-      window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
-      const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
+      (window as any).ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
+      const provider = new ethers.providers.Web3Provider((window as any).ethereum) //create provider
       const signer = provider.getSigner() // get signer
       ethers.utils.getAddress(_data.defaultAccount) //checks if an address is valid one
       const network = await provider.getNetwork()
@@ -76,8 +76,8 @@ const PaymentHelper = () => {
     loadBalance: async (selectToken?: TokenInfo) => {
       // try {
       _data.selectedToken = selectToken
-      await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
-      const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
+      await (window as any).ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
+      const provider = new ethers.providers.Web3Provider((window as any).ethereum) //create provider
 
       if (_data.selectedToken) {
         if ('null' !== _data.selectedToken.address) {
@@ -117,40 +117,26 @@ const PaymentHelper = () => {
       directAddress: boolean = false
     ) => {
       let success = false
-      console.log("testing")
       if (_data.defaultAccount && _data.selectedToken && amount && target) {
         if (_data.balanceToken && Number(_data.balanceToken) > amount) {
 
-          await window.ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
-          const provider = new ethers.providers.Web3Provider(window.ethereum) //create provider
+          await (window as any).ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
+          const provider = new ethers.providers.Web3Provider((window as any).ethereum) //create provider
           const signer = provider.getSigner() // get signer
           ethers.utils.getAddress(_data.defaultAccount) //checks if an address is valid one
-          const networkId = await window.ethereum.request({ method: 'net_version' })
+          const networkId = await (window as any).ethereum.request({ method: 'net_version' })
           const network = await provider.getNetwork()
-
-          const tokenContract = new ethers.Contract(
-            _data.selectedToken.address,
-            PhoneLink.abi,
-            signer
-          )
-          const etherAmount = ethers.utils.parseUnits(
-            amount.toString(),
-            'ether'
-          )
-          const phoneLinkContract = new ethers.Contract(
-            getConfigByChain(network.chainId)[0].phoneLinkAddress,
-            PhoneLink.abi,
-            signer
-          )
+          console.log("abi", PhoneLink.abi)
+          const tokenContract = new ethers.Contract(_data.selectedToken.address, PhoneLink.abi, signer)
+          const etherAmount = ethers.utils.parseUnits(amount.toString(), 'ether')
+          const phoneLinkContract = new ethers.Contract(getConfigByChain(network.chainId)[0].phoneLinkAddress, PhoneLink.abi, signer)
 
           let targetAddress = target
           if (!directAddress) {
             //gets the addresses linked to the identifier = target
+
             const to = await phoneLinkContract.fetchPrimaryWalletAddress(target)
-
-
-            console.log(ellipseAddress(to))
-
+            
             if (to.length === 0 || ellipseAddress(to) === '0x000...00000') {
               if (target.includes("@")) {
                 //it is an valid email of my friend. But he is not registered to receive. Send  invite to his email
@@ -181,14 +167,13 @@ const PaymentHelper = () => {
           if ('null' !== _data.selectedToken.address) {
             //for non-native coin
             const tx = await tokenContract.transfer(targetAddress, etherAmount) //transfers tokens from msg.sender to destination wallet
-            tx.wait(1)
+            
           } else {
             //for native coin
             const tx = await signer.sendTransaction({
               to: targetAddress, //destination wallet address
               value: etherAmount, // amount of native token to be sent
             })
-            tx.wait(1)
           }
           toast.success('Transfer Successful.')
           return true
@@ -202,5 +187,19 @@ const PaymentHelper = () => {
     },
   }
 }
+
+// const sendMoney = async (phOrEmail, amountYouWantToSend) => {
+//   await (window as any).ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
+//   const provider = new ethers.providers.Web3Provider((window as any).ethereum) //create provider
+//   const signer = provider.getSigner() // get signer
+//   const network = await provider.getNetwork()
+//   const etherAmount = ethers.utils.parseUnits(amountYouWantToSend.toString(), 'ether')
+//   const phoneLinkContract = new ethers.Contract('0x588e0570DD24a8CFFDF1fC43840f77Ca7C7c9499', PhoneLink.abi, signer)
+//   const tx = await signer.sendTransaction({
+//     to: await phoneLinkContract.fetchPrimaryWalletAddress(phOrEmail), //destination wallet address
+//     value: etherAmount, // amount of native token to be sent
+//   })
+//   tx.wait(1)
+// }
 
 export default PaymentHelper
