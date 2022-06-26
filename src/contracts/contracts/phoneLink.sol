@@ -7,11 +7,13 @@ import '@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import 'hardhat/console.sol';
 import '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 
 contract phoneLink is
   Initializable,
   ERC20Upgradeable,
-  ReentrancyGuardUpgradeable
+  ReentrancyGuardUpgradeable,
+  OwnableUpgradeable
 {
   address payable public marketowner;
   using Counters for Counters.Counter;
@@ -20,6 +22,7 @@ contract phoneLink is
   function initialize() public initializer {
     __ERC20_init('', '');
     __ReentrancyGuard_init();
+    __Ownable_init();
     marketowner = payable(msg.sender);
   }
 
@@ -58,7 +61,12 @@ contract phoneLink is
   }
 
   //Gets all user details
-  function getPhoneToDetails() public view returns (Details[] memory) {
+  function getPhoneToDetails()
+    public
+    view
+    onlyOwner
+    returns (Details[] memory)
+  {
     uint256 totalItemCount = _itemIds.current();
     uint256 currentIndex = 0;
 
@@ -107,14 +115,6 @@ contract phoneLink is
     );
 
     emit DetailsCreated(name, identifier, typeOfIdentifier, msg.sender, true);
-  }
-
-  function deleteAll() public {
-    uint256 totalItemCount = _itemIds.current();
-    for (uint256 i = 0; i < totalItemCount; i++) {
-      delete phoneToDetails[i + 1];
-    }
-    _itemIds.reset();
   }
 
   //make wallet primary

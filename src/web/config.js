@@ -11,7 +11,7 @@ export const networkConfig = {
 
     "4": [
         {
-            phoneLinkAddress: "0xc62773E07ab521DB2366Ea441D47ccFA6F15c005", //proxy deployment
+            phoneLinkAddress: "0xF09f5824c693804Be9573f5f75f7d3f0F97e1437", //proxy deployment
             token_icon: "https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=022",
             alt: "ETH",
             networkName: "Rinkeby"
@@ -34,6 +34,14 @@ export const networkConfig = {
             networkName: "Aurora_Testnet"
         }
 
+    ],
+    "24":[
+        {
+            phoneLinkAddress: "0xdD7Fa6c4BDC6B48859C88a28ad1b9A7993991a81", //proxy address
+            token_icon: "https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=022",
+            alt: "KAI",
+            networkName: "kardiachain_main"
+        }
     ],
 
     "242": [

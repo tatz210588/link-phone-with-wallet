@@ -47,12 +47,32 @@ const Kardiachain_testNet: Chain = {
   blockExplorers: {
     default: { name: 'Kai-Test-Scanner', url: 'https://explorer.kardiachain.io/' }
   },
+  testnet: true,
+};
+
+const Kardiachain_mainnet: Chain = {
+  id: 24,
+  name: 'KARDIACHAIN MAINNET',
+  network: 'Kardiachain-mainnet',
+  iconUrl: 'https://ipfs.infura.io/ipfs/QmV91sx1aWr2RhzF3LRq5M1qoGvYURaqTtsKjF3kiE88Xw',
+  iconBackground: '#fff',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'KAI',
+    symbol: 'KAI',
+  },
+  rpcUrls: {
+    default: 'https://rpc.kardiachain.io',
+  },
+  blockExplorers: {
+    default: { name: 'Kai-Scanner', url: 'https://explorer.kardiachain.io/' }
+  },
   testnet: false,
 };
 
 
 const {chains, provider} = configureChains(
-  [chain.polygonMumbai,chain.rinkeby,Kardiachain_testNet],
+  [chain.polygonMumbai,chain.rinkeby,Kardiachain_mainnet,Kardiachain_testNet],
   [jsonRpcProvider({rpc:chain=>({http:chain.rpcUrls.default})})]
 )
 

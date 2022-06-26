@@ -191,7 +191,7 @@ const Header = () => {
                 </Popover.Group>
               )}
               <div className={style.headerItem}>
-                <ConnectButton showBalance={false}  />
+                <ConnectButton showBalance={false} chainStatus="icon"  />
               </div>
             </div>
           </div>

@@ -118,17 +118,7 @@ const Home = () => {
     setLoadingState(false)
   }
 
-  const deleteAll = async () => {
-    await (window as any).ethereum.send('eth_requestAccounts') // opens up metamask extension and connects Web2 to Web3
-    const provider = new ethers.providers.Web3Provider((window as any).ethereum) //create provider
-    const signer = provider.getSigner() // get signer
-    const network = await provider.getNetwork()
-
-    const phoneLinkContract = new ethers.Contract(getConfigByChain(network.chainId)[0].phoneLinkAddress, PhoneLink.abi, signer)
-    const tx = await phoneLinkContract.deleteAll()
-    toast.success("Database Cleared")
-  }
-
+  
   async function search(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') {
       setLoadingState(true)
@@ -188,7 +178,7 @@ const Home = () => {
           ) : (
             <div className={`overflow-hidden mt-8`}>
               <div className={style.midRow}>
-                <div className={style.title} onClick={() => deleteAll()}>Database</div>
+                <div className={style.title}>Database</div>
                 <div className={style.searchBar}>
                   <div className={style.searchIcon}>
                     <AiOutlineSearch />
